@@ -68,7 +68,7 @@ Generate embeddings for semantic search:
 
 ```bash
 # Option 1: Via script
-python generate_embeddings.py
+python scripts/generate_embeddings.py
 
 # Option 2: Via MCP tool (if server running)
 mcp__duckdb-kb__generate_embeddings({})
@@ -187,7 +187,7 @@ To update seed entries after changes:
 python import_seed.py
 
 # Option 2: Export current KB as new seed
-python ../export.py --output seed_updated.json --filter "layer:base"
+python ../backup/export.py --output seed_updated.json --filter "layer:base"
 
 # Option 3: Manually edit seed.json and re-import
 ```
@@ -198,7 +198,7 @@ To create a clean Layer 1 distribution:
 
 ```bash
 # Export only layer:base tagged entries
-python ../export.py \
+python ../backup/export.py \
     --output layer1_distribution.json \
     --filter-tags layer:base
 
@@ -227,7 +227,7 @@ To force update all:
 Seed import doesn't generate embeddings automatically (for speed). Generate after import:
 
 ```bash
-python generate_embeddings.py
+python scripts/generate_embeddings.py
 ```
 
 ### "Database not found"
@@ -265,7 +265,7 @@ cd team-kb
 # Result: ONE database with base + team knowledge
 
 # Export for team distribution
-python export.py --filter-tags layer:base,layer:team
+python backup/export.py --filter-tags layer:base,layer:team
 ```
 
 ### Layer 3: Personal Fork

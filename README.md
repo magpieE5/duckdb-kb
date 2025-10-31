@@ -63,17 +63,7 @@ This imports the 12 base seed entries into your database.
 ```bash
 # Set OpenAI API key (already done via export)
 # Generate embeddings for all entries
-python -c "
-import asyncio
-from mcp_server import tool_generate_embeddings, get_connection
-
-async def main():
-    con = get_connection()
-    result = await tool_generate_embeddings(con, {})
-    print(result[0].text)
-
-asyncio.run(main())
-"
+python scripts/generate_embeddings.py
 ```
 
 ### 5. Configure Claude Code
@@ -485,18 +475,18 @@ MCP protocol overhead: ~4-5k tokens per connection
 duckdb-kb/
 ├── schema.sql              # Database schema with VSS extension
 ├── mcp_server.py          # MCP server with 10 tools
-├── generate_embeddings.py # Batch embedding generator
-├── export.py              # Export to JSON/SQL (git-friendly)
-├── restore.py             # Restore from backups
 ├── requirements.txt       # Python dependencies
+├── backup/                # Backup and restore tools
+│   ├── export.py          # Export to JSON/SQL (git-friendly)
+│   └── restore.py         # Restore from backups
 ├── seed/                  # Seed data (12 base entries)
 │   ├── seed.json
 │   └── import_seed.py
 ├── scripts/               # Utility scripts
 │   ├── defrag.py          # Quality control & maintenance
-│   └── init_db.py         # Database initialization
+│   ├── init_db.py         # Database initialization
+│   └── generate_embeddings.py # Batch embedding generator
 ├── knowledge.duckdb       # DuckDB database (DO NOT GIT COMMIT)
-├── backups/               # Optional manual backups (DO NOT GIT COMMIT)
 ├── exports/               # JSON/SQL exports (GIT FRIENDLY)
 ├── README.md              # This file
 ├── SETUP.md               # Setup guide
@@ -513,7 +503,7 @@ duckdb-kb/
 
 ```bash
 # Export to JSON (human-readable, git-friendly)
-python export.py
+python backup/export.py
 
 # Commit to git
 git add exports/knowledge_latest.json exports/links_latest.json
@@ -530,8 +520,8 @@ git commit -m "Backup $(date +%Y-%m-%d)"
 
 ```bash
 # From JSON export
-python restore.py --from-json exports/knowledge_latest.json
-python generate_embeddings.py
+python backup/restore.py --from-json exports/knowledge_latest.json
+python scripts/generate_embeddings.py
 ```
 
 ### Quick Manual Backup
@@ -589,15 +579,7 @@ duckdb knowledge.duckdb
 > FROM knowledge;
 
 # Generate manually
-python -c "
-import asyncio
-from mcp_server import tool_generate_embeddings, get_connection
-async def main():
-    con = get_connection()
-    result = await tool_generate_embeddings(con, {})
-    print(result[0].text)
-asyncio.run(main())
-"
+python scripts/generate_embeddings.py
 ```
 
 ## Advanced Usage

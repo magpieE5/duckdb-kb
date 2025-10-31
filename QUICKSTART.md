@@ -57,7 +57,7 @@ Found 12 entries to import
 export OPENAI_API_KEY="sk-..."
 
 # Generate embeddings for semantic search
-python generate_embeddings.py
+python scripts/generate_embeddings.py
 ```
 
 **Expected:** ~10-15 seconds to generate 12 embeddings (~$0.0001 cost)
@@ -128,7 +128,7 @@ Now that it's working, try:
 - **Read the directives:** Search for "directive" entries to learn automatic knowledge capture patterns
 - **Explore tools:** See README.md "For AI Assistants" section for tool guide
 - **Customize:** Add your own entries, organize with tags, build your knowledge base
-- **Backup:** Export to JSON with `python export.py` and commit to git (see BACKUP.md)
+- **Backup:** Export to JSON with `python backup/export.py` and commit to git (see BACKUP.md)
 
 ## Troubleshooting
 
@@ -149,7 +149,7 @@ echo $OPENAI_API_KEY  # Should show sk-...
 If not set:
 ```bash
 export OPENAI_API_KEY="sk-..."
-python generate_embeddings.py
+python scripts/generate_embeddings.py
 ```
 
 ### "MCP server not connecting"
@@ -173,7 +173,7 @@ print(f'Entries: {result[0]}, With embeddings: {result[1]}')
 
 Should show: `Entries: 12, With embeddings: 12`
 
-If not, run: `python generate_embeddings.py`
+If not, run: `python scripts/generate_embeddings.py`
 
 ## Cost Information
 
@@ -189,7 +189,7 @@ If not, run: `python generate_embeddings.py`
 ```bash
 export EMBEDDING_PROVIDER="local"
 pip install sentence-transformers torch
-python generate_embeddings.py
+python scripts/generate_embeddings.py
 ```
 
 ## Further Reading

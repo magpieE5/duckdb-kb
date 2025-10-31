@@ -451,14 +451,14 @@ cd personal-kb
 **Layer 1 → Public:**
 ```bash
 # Export only base entries
-python export.py --filter-tags layer:base
+python backup/export.py --filter-tags layer:base
 # Share seed.json publicly
 ```
 
 **Layer 2 → Team:**
 ```bash
 # Export base + team entries
-python export.py --filter-tags layer:base,layer:team
+python backup/export.py --filter-tags layer:base,layer:team
 # Share with team only
 ```
 
