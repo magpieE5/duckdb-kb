@@ -1,8 +1,8 @@
 # Claude Code Directives for DuckDB Knowledge Base
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Last Updated:** 2025-10-31
-**Project:** duckdb-kb (Layer 1 - Public)
+**Project:** duckdb-kb
 
 ---
 
@@ -11,8 +11,8 @@
 This is a **DuckDB Knowledge Base MCP Server** providing hybrid SQL + semantic search capabilities for AI assistants.
 
 **Key characteristics:**
-- Layer 1 (public, platform-focused)
-- 12 seed entries demonstrating the system
+- Generic, forkable platform for knowledge management
+- Seed entries demonstrating the system
 - Self-documenting via semantic search
 - Multi-model AI compatible
 
@@ -75,7 +75,7 @@ When creating entries:
 
 - **ID format:** `kebab-case` (e.g., `pattern-error-handling`)
 - **Categories:** `table`, `command`, `issue`, `pattern`, `troubleshooting`, `reference`, `other`
-- **Tags:** Include `layer:base` for Layer 1 entries + 3-5 descriptive tags
+- **Tags:** 3-6 descriptive tags for discoverability
 - **Content:** Use markdown, include Problem/Solution/Context/Example sections
 - **Title:** Clear, descriptive (not just IDs)
 
@@ -90,25 +90,25 @@ The KB has automatic conflict detection. If you find contradictory information:
 
 ---
 
-## Layer 1 Specific Guidelines
+## Content Guidelines
 
-This is the **public layer** - maintain these standards:
+When adding entries to the knowledge base:
 
-### ✅ DO Include:
+### ✅ Prioritize Saving:
 - Platform documentation (how the KB system works)
-- Generic patterns (applicable to any knowledge base)
-- Self-bootstrapping directives
-- Tool usage guides
-- Best practices
+- Domain-specific patterns and solutions
+- Reusable troubleshooting procedures
+- Tool usage guides and commands
+- Best practices and optimization techniques
+- Architecture decisions and rationale
 
-### ❌ DO NOT Include:
-- Domain-specific knowledge (SQL, Oracle, etc.)
-- Organization-specific content
-- Personal notes or Jira tickets
-- Private/sensitive information
-- User-specific configurations (use placeholders)
+### ⚠️ Use Caution With:
+- Sensitive credentials or API keys (use placeholders or environment variables)
+- Private/confidential business information
+- Personally identifiable information (PII)
+- Time-sensitive data that will become stale quickly
 
-**Why:** Layer 1 is meant to be forked and used by the public.
+**Remember:** This KB is designed to be forked and customized for different use cases (public platform knowledge, team knowledge, personal notes, etc.)
 
 ---
 
@@ -138,10 +138,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ### Before Pushing
 
-1. Verify no personal data in commits
-2. Check `.gitignore` is working (no `.duckdb` files)
+1. Verify no sensitive data in commits (credentials, secrets, PII)
+2. Check `.gitignore` is working (no `.duckdb` database files committed)
 3. Ensure documentation is up to date
-4. Test seed data import works
+4. Test seed data import works if modified
 
 ---
 
@@ -159,8 +159,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 1. Check existing docs first (avoid duplication)
 2. Update relevant .md files
-3. Add to seed KB if it's a usage pattern
-4. Keep it platform-focused (Layer 1)
+3. Add to seed KB if it's a reusable pattern
+4. Ensure examples are clear and tested
 
 ### Fix a Bug
 
@@ -192,7 +192,7 @@ After making changes, verify:
 rm -f test.duckdb
 duckdb test.duckdb < schema.sql
 cd seed && python import_seed.py
-# Should import all 12 entries successfully
+# Should import all seed entries successfully
 ```
 
 ---
@@ -238,13 +238,19 @@ Check for:
 
 ## Version History
 
+**v1.1.0** (2025-10-31)
+- Removed layer restrictions - now fully generic and forkable
+- Updated content guidelines to support any use case
+- Clarified security and privacy considerations
+- Improved documentation for customization
+
 **v1.0.0** (2025-10-31)
-- Initial Layer 1 (public) release
-- 12 seed entries
+- Initial release
+- Seed entries demonstrating the system
 - 10 MCP tools
 - Comprehensive documentation
 - Multi-model compatibility
 
 ---
 
-**Remember:** Layer 1 is the public foundation. Keep it generic, well-documented, and distribution-ready!
+**Remember:** This is a generic, forkable platform. Customize it for your needs - whether that's public platform knowledge, team documentation, or personal notes!
