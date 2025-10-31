@@ -264,20 +264,36 @@ Links to related entries, external docs
 
 ## Directive 4: Layer Tagging
 
-### Three-Layer Architecture
+### Three-Layer Fork Architecture
+
+**IMPORTANT**: Layers are **forks**, not concurrent MCPs. You run ONE MCP at your current layer.
 
 ```
-Layer 1: Base (layer:base)     ← Generic platform knowledge
-Layer 2: Team (layer:team)     ← Organization-specific + Layer 1
-Layer 3: Personal (layer:personal) ← Individual + Layers 1+2
+duckdb-kb (Layer 1: Base)
+    ↓ FORK (copy entire repo)
+team-kb (Layer 2: Team/Org)
+    ↓ FORK (copy entire repo)
+personal-kb (Layer 3: Personal)
 ```
 
-### Choosing the Right Layer
+**Each layer contains all previous layers:**
+- **Layer 1**: 12 base entries (layer:base)
+- **Layer 2**: 12 base + 50 team entries = 62 total (layer:base + layer:team)
+- **Layer 3**: 12 base + 50 team + 20 personal = 82 total (all layers)
+
+**You run only ONE MCP server** - the one at your current layer. It contains everything you need.
+
+### Choosing the Right Layer Tag
 
 **Ask yourself:**
 1. Is this useful to anyone using this KB platform? → `layer:base`
 2. Is this specific to my team/organization? → `layer:team`
 3. Is this personal/private? → `layer:personal`
+
+**Purpose of tags:**
+- Filter during export ("export only base entries for distribution")
+- Track provenance ("this came from base layer")
+- Enable cleanup ("strip personal entries to share with team")
 
 **Examples:**
 
@@ -287,23 +303,33 @@ Layer 3: Personal (layer:personal) ← Individual + Layers 1+2
 | "Our team's coding standards" | team | Organization-specific |
 | "My notes on project X" | personal | Individual's work |
 | "DuckDB embedding patterns" | base | Platform knowledge |
-| "How we use Oracle" | team | Team's tech stack |
-| "My Jira ticket IDR-1234" | personal | Individual issue |
+| "How we use Python" | team | Team's tech stack |
+| "My ticket #1234" | personal | Individual issue |
 
-### Layer 1 Content Rules
+### Layer Tagging Rules
 
-**Include in layer:base:**
+**layer:base** - Include in base layer for public distribution:
 - ✅ Knowledge base platform documentation
 - ✅ MCP server usage guides
 - ✅ Embedding and semantic search patterns
 - ✅ Organization and maintenance practices
 - ✅ Claude directives for automation
+- ❌ Domain-specific knowledge (SQL, specific databases, etc.)
+- ❌ Organization names or projects
+- ❌ Personal notes or issue tracking
 
-**Exclude from layer:base:**
-- ❌ Domain-specific knowledge (SQL, Oracle, etc. → layer:team)
-- ❌ Organization names or projects (→ layer:team)
-- ❌ Personal notes or issue tracking (→ layer:personal)
-- ❌ Private/sensitive information (→ layer:personal)
+**layer:team** - Team/organization-specific knowledge:
+- ✅ Organization's tech stack and tools
+- ✅ Team coding standards and practices
+- ✅ Domain-specific patterns (e.g., how we use Oracle)
+- ✅ Shared troubleshooting knowledge
+- ❌ Personal notes or private information
+
+**layer:personal** - Individual knowledge (not shared):
+- ✅ Personal notes and discoveries
+- ✅ Individual issue tracking
+- ✅ Private experimentation notes
+- ✅ Anything not suitable for team distribution
 
 ## Directive 5: Defragmentation
 
@@ -390,6 +416,54 @@ topic-approach-2.md   } → topic-comprehensive.md
 - Generic IDs like "entry-1"
 - No category assigned
 
+## Fork Workflow
+
+### Creating Layer 2 (Team Fork)
+
+```bash
+# Fork base to create team layer
+cp -r duckdb-kb team-kb
+cd team-kb
+
+# Your database now has 12 base entries
+# Add team-specific entries with layer:team tag
+# Result: base + team knowledge in ONE database
+
+# Configure Claude to use team-kb MCP only
+```
+
+### Creating Layer 3 (Personal Fork)
+
+```bash
+# Fork team layer to create personal layer
+cp -r team-kb personal-kb
+cd personal-kb
+
+# Your database has: base + team entries
+# Add personal entries with layer:personal tag
+# Result: ALL layers in ONE database
+
+# Configure Claude to use personal-kb MCP only
+```
+
+### Distribution Strategy
+
+**Layer 1 → Public:**
+```bash
+# Export only base entries
+python export.py --filter-tags layer:base
+# Share seed.json publicly
+```
+
+**Layer 2 → Team:**
+```bash
+# Export base + team entries
+python export.py --filter-tags layer:base,layer:team
+# Share with team only
+```
+
+**Layer 3 → Private** (not distributed)
+
 ## Using These Directives
 
 ### For Claude (AI)
@@ -404,18 +478,10 @@ These directives are embedded in the knowledge base with tags:
 ### For Humans (Developers)
 
 This file serves as reference documentation for:
+- Understanding the fork architecture
 - Understanding how Claude uses the KB
-- Maintaining consistency
-- Onboarding new team members
-- Troubleshooting issues
-
-### Keeping in Sync
-
-**Two sources of truth:**
-1. **This file** (CLAUDE_DIRECTIVES.md) - Human-readable
-2. **Seed entries** (seed/seed.json) - Machine-discoverable
-
-**Maintenance:** When updating directives, update both places to keep them in sync.
+- Maintaining consistency across layers
+- Creating team or personal forks
 
 ## References
 
@@ -423,9 +489,7 @@ This file serves as reference documentation for:
 - `seed/README.md` - Seed data documentation
 - `scripts/defrag.py` - Defragmentation tool
 - `README.md` - Full MCP server documentation
-- `kb-maintenance-comprehensive-guide` (in KB) - Full maintenance guide
-- `directive-auto-knowledge-capture` (in KB) - When to save knowledge
-- `directive-conflict-detection` (in KB) - Conflict resolution
+- Search the knowledge base for "directive" or "maintenance" entries
 
 ## Version
 

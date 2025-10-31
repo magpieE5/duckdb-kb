@@ -472,7 +472,7 @@ TAGS: Include 4-6 relevant tags + layer tag (layer:base, layer:team, or layer:pe
                 "properties": {
                     "id": {
                         "type": "string",
-                        "description": "Unique identifier (e.g., 'mst-course-offering', 'issue-idr-3674')"
+                        "description": "Unique identifier (e.g., 'pattern-caching', 'troubleshooting-performance')"
                     },
                     "category": {
                         "type": "string",

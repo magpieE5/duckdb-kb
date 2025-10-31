@@ -3,14 +3,14 @@
 Restore DuckDB knowledge base from exports
 
 This can restore from:
-1. JSON exports (created by export.py)
+1. JSON exports (created by export.py) - RECOMMENDED
 2. SQL dumps
-3. Binary backups (just copy the .duckdb file)
 
 Usage:
     python restore.py --from-json exports/knowledge_latest.json
     python restore.py --from-sql exports/knowledge_20250130_120000.sql
-    python restore.py --from-backup backups/knowledge_20250130_120000.duckdb
+
+Note: JSON format is recommended as it's human-readable and can be reviewed/edited before restore.
 """
 
 import argparse
@@ -18,7 +18,6 @@ import json
 from pathlib import Path
 from datetime import datetime
 import duckdb
-import shutil
 import os
 
 DB_PATH = os.getenv('KNOWLEDGE_DB_PATH', 'knowledge.duckdb')
@@ -157,38 +156,11 @@ def restore_from_sql(sql_file: Path, db_path: str):
     return count
 
 
-def restore_from_backup(backup_file: Path, db_path: str):
-    """Restore from binary backup (simple file copy)"""
-
-    print(f"Restoring from backup: {backup_file}")
-
-    if Path(db_path).exists():
-        # Create safety backup of current database
-        safety_backup = Path(db_path).parent / f"{Path(db_path).stem}_before_restore_{datetime.now().strftime('%Y%m%d_%H%M%S')}.duckdb"
-        print(f"Creating safety backup: {safety_backup}")
-        shutil.copy2(db_path, safety_backup)
-
-    # Copy backup to main database
-    shutil.copy2(backup_file, db_path)
-
-    # Verify
-    con = duckdb.connect(db_path, read_only=True)
-    count = con.execute("SELECT COUNT(*) FROM knowledge").fetchone()[0]
-    embedding_count = con.execute("SELECT COUNT(*) FROM knowledge WHERE embedding IS NOT NULL").fetchone()[0]
-    con.close()
-
-    print(f"✅ Restored {count} entries")
-    print(f"   Embeddings: {embedding_count}/{count} ({100*embedding_count//count}%)")
-
-    return count
-
-
 def main():
-    parser = argparse.ArgumentParser(description='Restore DuckDB knowledge base')
+    parser = argparse.ArgumentParser(description='Restore DuckDB knowledge base from JSON/SQL exports')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--from-json', type=Path, help='Restore from JSON export')
+    group.add_argument('--from-json', type=Path, help='Restore from JSON export (recommended)')
     group.add_argument('--from-sql', type=Path, help='Restore from SQL dump')
-    group.add_argument('--from-backup', type=Path, help='Restore from binary backup')
 
     parser.add_argument('--db-path', type=str, default=DB_PATH,
                       help=f'Target database path (default: {DB_PATH})')
@@ -221,12 +193,6 @@ def main():
                 print(f"❌ SQL file not found: {args.from_sql}")
                 return 1
             restore_from_sql(args.from_sql, args.db_path)
-
-        elif args.from_backup:
-            if not args.from_backup.exists():
-                print(f"❌ Backup file not found: {args.from_backup}")
-                return 1
-            restore_from_backup(args.from_backup, args.db_path)
 
         print()
         print(f"✅ Restore complete: {args.db_path}")

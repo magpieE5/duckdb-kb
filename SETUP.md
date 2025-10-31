@@ -1,268 +1,292 @@
-# DuckDB Knowledge Base - System Guide
-
-## Current System Status
-
-- ✅ **66+ knowledge entries** with semantic search
-- ✅ **100% embedding coverage** using OpenAI
-- ✅ **DuckDB database** with full schema and indexes
-- ✅ **MCP server** with 10 tools integrated with Claude Code
-- ✅ **~5k token overhead** for efficient queries
-
-## Configure Claude Code
-
-### Step 1: Locate Claude Code MCP Config
-
-The config file is at:
-```
-~/Library/Application Support/Claude/claude_desktop_config.json
-```
-
-### Step 2: Verify DuckDB Knowledge MCP Configuration
-
-Add this to your `mcpServers` object:
-
-```json
-{
-  "mcpServers": {
-    "duckdb-kb": {
-      "command": "/absolute/path/to/duckdb-kb/venv/bin/python",
-      "args": [
-        "/absolute/path/to/duckdb-kb/mcp_server.py"
-      ],
-      "env": {
-        "OPENAI_API_KEY": "your-openai-api-key-here",
-        "KNOWLEDGE_DB_PATH": "/absolute/path/to/duckdb-kb/knowledge.duckdb",
-        "EMBEDDING_PROVIDER": "openai"
-      }
-    }
-  }
-}
-```
-
-**Important:** Replace the paths and API key with your actual values!
-
-### Getting an OpenAI API Key
-
-1. Go to https://platform.openai.com/api-keys
-2. Sign up or log in
-3. Create a new API key
-4. Copy the key (starts with `sk-proj-...`)
-5. Add it to your MCP config above
-
-**Cost:** ~$0.01-0.02/month for personal use
-
-### Alternative: Use Local Embeddings (Free)
-
-If you prefer not to use OpenAI, you can use local embeddings:
-
-```json
-{
-  "mcpServers": {
-    "duckdb-kb": {
-      "command": "/absolute/path/to/duckdb-kb/venv/bin/python",
-      "args": [
-        "/absolute/path/to/duckdb-kb/mcp_server.py"
-      ],
-      "env": {
-        "KNOWLEDGE_DB_PATH": "/absolute/path/to/duckdb-kb/knowledge.duckdb",
-        "EMBEDDING_PROVIDER": "local"
-      }
-    }
-  }
-}
-```
-
-Then install local model support:
-```bash
-pip install sentence-transformers torch
-```
-
-### Step 3: Restart Claude Code (if configuration changed)
-
-1. Quit Claude Code completely
-2. Reopen Claude Code
-3. The MCP server will start automatically
-
-## Verify System is Working
-
-Try asking Claude:
-
-```
-"Show me database statistics from the knowledge base"
-```
-
-Claude should call `get_stats()` and show you:
-- 66 total entries
-- 66 with embeddings (100%)
-- Breakdown by category
-
-Or try:
-
-```
-"Find notes similar to waitlist issues"
-```
-
-Claude should use semantic search (`find_similar`) to find related content.
-
-## Available Tools
-
-Once configured, Claude Code can use these 10 tools:
-
-### Read/Query
-1. **get_knowledge** - Get single entry by ID
-2. **list_knowledge** - Browse/filter entries
-3. **query_knowledge** - Execute custom SQL
-4. **find_similar** - Semantic search (conceptual)
-5. **smart_search** - Hybrid SQL + semantic
-
-### Write
-6. **upsert_knowledge** - Create/update entry
-7. **delete_knowledge** - Delete entry
-8. **add_link** - Create relationships
-
-### Utility
-9. **get_stats** - Database statistics
-10. **generate_embeddings** - Batch generate embeddings
-
-## Example Queries
-
-**Browse tables:**
-```
-"List all table documentation we have"
-```
-
-**Semantic search:**
-```
-"Find notes about Oracle performance optimization"
-```
-
-**Recent work:**
-```
-"What have we documented in the last 2 weeks?"
-```
-
-**Add new documentation:**
-```
-"Document a new table called STUDENT_ENROLLMENT with these details..."
-```
-
-## Maintenance
-
-### Update Embeddings
-
-When you add new entries, embeddings are generated automatically during `upsert_knowledge`.
-
-To manually regenerate:
-```bash
-export OPENAI_API_KEY="sk-..."
-venv/bin/python generate_embeddings.py
-```
-
-### Database Backup
-
-```bash
-# Backup
-cp knowledge.duckdb knowledge.duckdb.backup
-
-# Restore
-cp knowledge.duckdb.backup knowledge.duckdb
-```
-
-### View Database
-
-```bash
-duckdb knowledge.duckdb
-
-# Run queries:
-SELECT * FROM knowledge_stats;
-SELECT category, COUNT(*) FROM knowledge GROUP BY category;
-SELECT * FROM recent_knowledge;
-```
-
-## System Performance
-
-| Operation | Traditional File Reading | DuckDB MCP | Efficiency |
-|-----------|-------------------------|------------|------------|
-| MCP overhead | N/A | ~5k tokens | Minimal |
-| List Oracle tables | Read 5 files (10k) | SQL query (500) | **95% reduction** |
-| Semantic search | Full file scan | find_similar (800) | **Instant, ranked results** |
-
-## File Structure
-
-```
-duckdb-mcp/
-├── knowledge.duckdb          ← Your knowledge base (66 entries)
-├── mcp_server.py            ← MCP server (10 tools)
-├── generate_embeddings.py   ← Embedding generator
-├── migrate.py               ← Obsidian → DuckDB migration
-├── schema_simple.sql        ← Database schema
-├── requirements.txt         ← Python dependencies
-├── venv/                    ← Virtual environment
-├── README.md                ← Full documentation
-├── MCP-EXPLAINED.md         ← MCP architecture guide
-└── SETUP.md                 ← This file
-```
-
-## Troubleshooting
-
-### "Tool not found" when calling tools
-
-1. Check Claude Code restarted after config change
-2. Verify MCP config path is correct
-3. Check server logs in Claude Code settings
-
-### "OpenAI API error"
-
-1. Verify API key in config is correct
-2. Check OpenAI account has credits
-3. Test with: `echo $OPENAI_API_KEY`
-
-### "Database not found"
-
-1. Check `KNOWLEDGE_DB_PATH` in config
-2. Verify file exists: `ls -lh knowledge.duckdb`
-3. Should be ~2-5 MB with 66 entries
-
-### Regenerate embeddings
-
-**With OpenAI:**
-```bash
-export OPENAI_API_KEY="your-openai-api-key"
-venv/bin/python generate_embeddings.py
-```
-
-**With local embeddings (free):**
-```bash
-export EMBEDDING_PROVIDER="local"
-pip install sentence-transformers torch
-venv/bin/python generate_embeddings.py
-```
-
-## Next Steps
-
-1. ✅ Configure Claude Code with new MCP
-2. ✅ Remove old Obsidian MCP
-3. ✅ Test with simple query
-4. ✅ Start using hybrid search capabilities!
-
-## Cost Tracking
-
-**Current usage:**
-- Initial embeddings: 66 entries ≈ $0.002
-- Monthly additions: ~50 entries ≈ $0.001/month
-- **Total: ~$0.01-0.02/month**
-
-Set usage limit in OpenAI dashboard: https://platform.openai.com/usage
+# DuckDB Knowledge Base - Complete Setup Guide
+
+**Version:** 2.0
+**Updated:** 2025-10-31
+**For:** New users setting up from scratch
 
 ---
 
-**You're all set! 🎉**
+## Quick Start (Recommended)
 
-Your knowledge base is now:
-- ✅ Token-efficient (~35% less overhead)
-- ✅ Semantically searchable
-- ✅ SQL-queryable
-- ✅ Fast (DuckDB + indexes)
-- ✅ Hybrid search capable
+The MCP server now **auto-initializes** the database on first run! Just configure the environment variable and start using it.
 
-Try asking Claude about your PDS documentation!
+### 1. Install Dependencies
+
+```bash
+cd ~/duckdb-kb
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2. Configure MCP Server
+
+Add to your Claude Code configuration (`~/.claude.json`):
+
+```json
+{
+  "projects": {
+    "/your/project/path": {
+      "mcpServers": {
+        "duckdb-kb": {
+          "type": "stdio",
+          "command": "/absolute/path/to/duckdb-kb/venv/bin/python",
+          "args": ["/absolute/path/to/duckdb-kb/mcp_server.py"],
+          "env": {
+            "KNOWLEDGE_DB_PATH": "/absolute/path/to/duckdb-kb/knowledge.duckdb"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**CRITICAL:**
+- Use **absolute paths** for all paths
+- The `KNOWLEDGE_DB_PATH` environment variable is **required**
+- Replace `/your/project/path` and `/absolute/path/to/duckdb-kb` with your actual paths
+
+### 3. Start Using
+
+That's it! The database will auto-initialize on first use. Restart Claude Code and start adding knowledge entries.
+
+---
+
+## Manual Initialization (Optional)
+
+If you prefer to initialize the database manually or want to validate it:
+
+### Initialize a New Database
+
+```bash
+cd ~/duckdb-kb
+source venv/bin/activate
+python scripts/init_db.py
+```
+
+This will:
+- Create the `knowledge.duckdb` file
+- Set up tables (`knowledge`, `knowledge_links`)
+- Create indexes and views
+- Add helper functions for search
+- Install VSS extension (if available)
+
+### Validate Existing Database
+
+```bash
+python scripts/init_db.py --validate
+```
+
+This checks:
+- Tables exist
+- Functions are present
+- Database statistics
+- VSS extension status
+
+### Initialize Custom Database
+
+```bash
+python scripts/init_db.py --db /path/to/custom.duckdb
+```
+
+---
+
+## What Gets Created
+
+### Tables
+
+1. **knowledge** - Main table for entries
+   - `id` (PRIMARY KEY)
+   - `category`, `title`, `tags`, `content`
+   - `metadata` (JSON)
+   - `embedding` (FLOAT[1536]) for semantic search
+   - `created`, `updated` timestamps
+
+2. **knowledge_links** - Relationship graph
+   - `from_id`, `to_id`, `link_type`
+   - Supports: 'related', 'parent', 'child', 'references'
+
+### Functions/Macros
+
+- `get_with_related()` - Get entry with linked entries
+- `semantic_search()` - Vector similarity search
+- `hybrid_search()` - Combined SQL + semantic search
+- `database_summary()` - Database statistics
+
+### Views
+
+- `recent_knowledge` - Entries from last 30 days
+- `knowledge_stats` - Statistics by category
+- `tag_usage` - Tag frequency analysis
+
+---
+
+## Environment Variables
+
+### Required
+
+- **KNOWLEDGE_DB_PATH** - Path to your database file
+  - Example: `/Users/you/duckdb-kb/knowledge.duckdb`
+  - Must be absolute path
+  - Used by MCP server to locate database
+
+### Optional
+
+- **OPENAI_API_KEY** - For OpenAI embeddings (recommended)
+  - Get from: https://platform.openai.com/api-keys
+  - Sign up, create API key, copy key (starts with `sk-proj-...`)
+  - Cost: ~$0.005-0.01/month for typical usage
+  - Falls back to local model if not set
+
+- **EMBEDDING_PROVIDER** - Choose embedding provider
+  - Options: `openai` (default) or `local`
+  - Local uses `sentence-transformers` (free but slower, ~500MB model download on first run)
+
+---
+
+## Troubleshooting
+
+### Error: "Table with name knowledge does not exist"
+
+**Cause:** `KNOWLEDGE_DB_PATH` not set or pointing to wrong file
+
+**Fix:**
+1. Check your `~/.claude.json` has the `env.KNOWLEDGE_DB_PATH` set
+2. Verify the path is absolute and points to existing database
+3. Restart Claude Code after changing config
+
+### Error: "Table Function with name database_summary does not exist"
+
+**Cause:** Database schema initialized but functions not added
+
+**Fix:**
+```bash
+cd ~/duckdb-kb
+source venv/bin/activate
+python scripts/init_db.py --validate  # Check status
+python scripts/init_db.py --force     # Reinitialize if needed
+```
+
+### Auto-initialization Not Working
+
+**Cause:** Schema files (`schema.sql`, `add_functions.sql`) not in same directory as `mcp_server.py`
+
+**Fix:**
+Ensure your directory structure looks like:
+```
+duckdb-kb/
+├── mcp_server.py
+├── schema.sql
+├── add_functions.sql
+├── scripts/
+│   └── init_db.py
+└── venv/
+```
+
+### VSS Extension Not Available
+
+**Cause:** DuckDB VSS extension not installed
+
+**Impact:** Semantic search (`find_similar`, `smart_search`) won't work
+
+**Fix:**
+```bash
+# Install VSS extension
+python -c "import duckdb; con = duckdb.connect(); con.execute('INSTALL vss')"
+```
+
+**Note:** VSS is optional - SQL filtering and CRUD operations work without it
+
+---
+
+## Configuration Examples
+
+### Standard Configuration
+
+```json
+{
+  "projects": {
+    "/Users/you/myproject": {
+      "mcpServers": {
+        "duckdb-kb": {
+          "type": "stdio",
+          "command": "/Users/you/duckdb-kb/venv/bin/python",
+          "args": ["/Users/you/duckdb-kb/mcp_server.py"],
+          "env": {
+            "KNOWLEDGE_DB_PATH": "/Users/you/duckdb-kb/knowledge.duckdb",
+            "OPENAI_API_KEY": "sk-your-key-here"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Using Local Embeddings (No OpenAI)
+
+```json
+{
+  "projects": {
+    "/Users/you/myproject": {
+      "mcpServers": {
+        "duckdb-kb": {
+          "type": "stdio",
+          "command": "/Users/you/duckdb-kb/venv/bin/python",
+          "args": ["/Users/you/duckdb-kb/mcp_server.py"],
+          "env": {
+            "KNOWLEDGE_DB_PATH": "/Users/you/duckdb-kb/knowledge.duckdb",
+            "EMBEDDING_PROVIDER": "local"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Note:** Run only ONE knowledge base MCP at a time. If you fork this repo to create team or personal layers, configure only the layer you're currently using.
+
+---
+
+## Verification Checklist
+
+After setup, verify everything works:
+
+- [ ] Database file exists at specified path
+- [ ] `python scripts/init_db.py --validate` passes
+- [ ] Claude Code shows MCP server as "Connected"
+- [ ] Can call `mcp__duckdb-kb__get_stats()` tool successfully
+- [ ] Database summary shows expected entry count
+- [ ] No "table not found" errors when using MCP tools
+
+---
+
+## Next Steps
+
+1. **Add your first entry** using `upsert_knowledge` tool
+2. **Generate embeddings** for semantic search with `generate_embeddings`
+3. **Link related entries** using `add_link`
+4. **Search your knowledge** with `find_similar` or `smart_search`
+
+---
+
+## Need Help?
+
+- Run validation: `python scripts/init_db.py --validate`
+- Check MCP logs: Look for connection errors in Claude Code debug logs
+- Read documentation: See `README.md`, `QUICKSTART.md`, `BACKUP.md`
+- File issues: Create GitHub issue with validation output
+
+---
+
+## Summary: What Makes This Easy for New Users
+
+✅ **Auto-initialization**: Database sets up automatically on first use
+✅ **Validation script**: Check everything is working with one command
+✅ **Clear error messages**: Helpful hints when something goes wrong
+✅ **Example configs**: Copy-paste configurations for common setups
+✅ **Fallback options**: Works without OpenAI, VSS, or advanced features
+
+**Bottom line:** Set the environment variable, start Claude Code, and you're ready to go!

@@ -128,7 +128,7 @@ Now that it's working, try:
 - **Read the directives:** Search for "directive" entries to learn automatic knowledge capture patterns
 - **Explore tools:** See README.md "For AI Assistants" section for tool guide
 - **Customize:** Add your own entries, organize with tags, build your knowledge base
-- **Backup:** Run `./backup.sh` regularly (see BACKUP.md)
+- **Backup:** Export to JSON with `python export.py` and commit to git (see BACKUP.md)
 
 ## Troubleshooting
 

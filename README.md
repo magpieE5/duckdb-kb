@@ -2,7 +2,7 @@
 
 A Model Context Protocol (MCP) server that provides AI assistants with hybrid SQL + semantic search capabilities over a DuckDB knowledge base.
 
-**Current Status:** Production system managing 66+ knowledge entries with semantic search capabilities.
+**Current Status:** Fresh installation with 12 seed entries demonstrating core capabilities.
 
 ## For AI Assistants 🤖
 
@@ -50,18 +50,13 @@ pip install -r requirements.txt
 duckdb knowledge.duckdb < schema.sql
 ```
 
-### 3. Import Data (If starting fresh)
-
-If you're setting up a new knowledge base, you can import existing markdown files:
+### 3. Import Seed Data
 
 ```bash
-python migrate.py \
-    --vault-path /path/to/markdown/files \
-    --db-path knowledge.duckdb \
-    --skip-sessions
+python seed/import_seed.py
 ```
 
-**Note:** The current database already contains 66+ migrated entries with embeddings.
+This imports the 12 base seed entries into your database.
 
 ### 4. Generate Embeddings
 
@@ -118,12 +113,12 @@ Add to your MCP configuration:
 **Returns:**
 ```json
 {
-  "id": "mst-course-offering",
-  "category": "table",
-  "title": "MST_COURSE_OFFERING",
-  "tags": ["oracle", "table", "course-offering"],
-  "content": "Base table for course offerings...",
-  "metadata": {"schema": "BANNER"},
+  "id": "example-entry",
+  "category": "pattern",
+  "title": "Example Pattern",
+  "tags": ["example", "pattern", "best-practice"],
+  "content": "Example content...",
+  "metadata": {"author": "system"},
   "has_embedding": true,
   "created": "2025-10-29T10:00:00",
   "updated": "2025-10-30T12:00:00"
@@ -134,8 +129,8 @@ Add to your MCP configuration:
 
 ```json
 {
-  "category": "table",
-  "tags": ["oracle"],
+  "category": "pattern",
+  "tags": ["best-practice"],
   "limit": 20
 }
 ```
@@ -150,14 +145,13 @@ Add to your MCP configuration:
 
 **Example queries:**
 ```sql
--- Find all tables updated recently
+-- Find recently updated entries
 SELECT id, title, updated
 FROM knowledge
-WHERE category = 'table'
-  AND updated > NOW() - INTERVAL 7 DAYS
+WHERE updated > NOW() - INTERVAL 7 DAYS
 ORDER BY updated DESC;
 
--- Tag frequency
+-- Tag frequency analysis
 SELECT unnest(tags) as tag, COUNT(*) as usage
 FROM knowledge
 GROUP BY tag
@@ -174,8 +168,8 @@ WHERE embedding IS NULL;
 
 ```json
 {
-  "query": "waitlist capacity enrollment issues",
-  "category": "table",
+  "query": "performance optimization techniques",
+  "category": "pattern",
   "similarity_threshold": 0.7,
   "limit": 10
 }
@@ -190,9 +184,9 @@ WHERE embedding IS NULL;
 
 ```json
 {
-  "query": "Oracle performance optimization techniques",
+  "query": "performance optimization techniques",
   "category": "pattern",
-  "tags": ["oracle"],
+  "tags": ["performance"],
   "date_after": "2025-10-01",
   "similarity_threshold": 0.65,
   "limit": 10
@@ -200,9 +194,9 @@ WHERE embedding IS NULL;
 ```
 
 **Use cases:**
-- "Recent Oracle performance issues"
-- "Troubleshooting patterns for uploads"
-- "Command examples from last month"
+- "Recent performance optimization patterns"
+- "Troubleshooting patterns from last month"
+- "Command examples with specific tags"
 
 ### Write Tools
 
@@ -210,12 +204,12 @@ WHERE embedding IS NULL;
 
 ```json
 {
-  "id": "new-table-doc",
-  "category": "table",
-  "title": "MY_NEW_TABLE",
-  "tags": ["oracle", "table"],
-  "content": "Documentation about MY_NEW_TABLE...",
-  "metadata": {"schema": "BANNER", "size": "large"},
+  "id": "pattern-new-approach",
+  "category": "pattern",
+  "title": "New Optimization Approach",
+  "tags": ["performance", "pattern", "best-practice"],
+  "content": "Documentation about optimization approach...",
+  "metadata": {"author": "system", "version": "1.0"},
   "generate_embedding": true
 }
 ```
@@ -237,8 +231,8 @@ WHERE embedding IS NULL;
 
 ```json
 {
-  "from_id": "issue-idr-3674",
-  "to_id": "msvgvc1",
+  "from_id": "pattern-optimization",
+  "to_id": "troubleshooting-performance",
   "link_type": "references"
 }
 ```
@@ -259,22 +253,22 @@ WHERE embedding IS NULL;
 ```json
 {
   "summary": {
-    "Total Entries": "60",
-    "With Embeddings": "60",
-    "Categories": "5",
-    "Unique Tags": "42"
+    "Total Entries": "12",
+    "With Embeddings": "12",
+    "Categories": "4",
+    "Unique Tags": "20"
   },
   "by_category": [
     {
-      "category": "table",
-      "count": 15,
-      "embeddings_generated": 15,
+      "category": "pattern",
+      "count": 4,
+      "embeddings_generated": 4,
       "embedding_pct": 100
     }
   ],
   "top_tags": [
-    {"tag": "oracle", "count": 32, "categories": ["table", "command", "issue"]},
-    {"tag": "performance", "count": 18, "categories": ["pattern", "issue"]}
+    {"tag": "layer:base", "count": 12, "categories": ["pattern", "command", "reference"]},
+    {"tag": "meta", "count": 6, "categories": ["pattern", "reference"]}
   ]
 }
 ```
@@ -293,8 +287,8 @@ WHERE embedding IS NULL;
 ```json
 {
   "status": "success",
-  "total_entries": 60,
-  "updated": 60,
+  "total_entries": 12,
+  "updated": 12,
   "provider": "OpenAI",
   "model": "text-embedding-3-small",
   "dimensions": 1536
@@ -303,21 +297,21 @@ WHERE embedding IS NULL;
 
 ## Usage Examples
 
-### Example 1: Finding Related Issues
+### Example 1: Finding Related Patterns
 
 ```
-User: "Find issues similar to the MSVGVC1 waitlist problem"
+User: "Find patterns similar to performance optimization"
 
 Claude calls:
 find_similar({
-  "query": "MSVGVC1 waitlist capacity enrollment missing students",
-  "category": "issue",
+  "query": "performance optimization caching strategies",
+  "category": "pattern",
   "limit": 5
 })
 
 Results:
-- IDR-3674: MSVGVC1 waitlist issue (similarity: 0.92)
-- IDR-2341: Course enrollment capacity (similarity: 0.78)
+- pattern-caching-strategies (similarity: 0.92)
+- pattern-query-optimization (similarity: 0.78)
 - ...
 ```
 
@@ -340,17 +334,17 @@ Results: Recent performance-related entries, ranked by relevance
 ### Example 3: Complex Analysis
 
 ```
-User: "Show me all tables we've documented, grouped by database"
+User: "Show me all entries grouped by category"
 
 Claude calls:
 query_knowledge({
-  "sql": "SELECT metadata->>'database' as db, COUNT(*) as tables, list(title) as table_names FROM knowledge WHERE category = 'table' GROUP BY db"
+  "sql": "SELECT category, COUNT(*) as count, list(title) as titles FROM knowledge GROUP BY category"
 })
 
 Results:
 [
-  {"db": "Oracle", "tables": 12, "table_names": ["MST_COURSE_OFFERING", ...]},
-  {"db": "MSSQL", "tables": 3, "table_names": ["..."]},
+  {"category": "pattern", "count": 4, "titles": ["Embedding Best Practices", ...]},
+  {"category": "reference", "count": 5, "titles": ["MCP Server Tools", ...]},
   ...
 ]
 ```
@@ -358,16 +352,16 @@ Results:
 ### Example 4: Adding Documentation
 
 ```
-User: "Document a new table called STUDENT_WAITLIST"
+User: "Document a new caching pattern we discovered"
 
 Claude calls:
 upsert_knowledge({
-  "id": "student-waitlist",
-  "category": "table",
-  "title": "STUDENT_WAITLIST",
-  "tags": ["oracle", "table", "waitlist"],
-  "content": "Table tracking students waiting for course enrollment...",
-  "metadata": {"schema": "BANNER", "database": "Oracle"},
+  "id": "pattern-cache-invalidation",
+  "category": "pattern",
+  "title": "Cache Invalidation Strategy",
+  "tags": ["caching", "pattern", "performance"],
+  "content": "A pattern for handling cache invalidation...",
+  "metadata": {"version": "1.0"},
   "generate_embedding": true
 })
 
@@ -375,6 +369,8 @@ Result: Entry created with embedding generated automatically
 ```
 
 ## Architecture
+
+### Technical Architecture
 
 ```
 ┌─────────────────┐
@@ -410,85 +406,142 @@ Result: Entry created with embedding generated automatically
 └─────────────────┘
 ```
 
-## Performance
+### Fork Architecture (Layered Knowledge Bases)
+
+**IMPORTANT**: Layers are **forks**, not concurrent MCPs. You run ONE MCP at your current layer.
+
+```
+┌─────────────────────────────────────────────┐
+│ Layer 1: duckdb-kb (Base/Public)           │
+│ ├── 12 entries (layer:base)                │
+│ └── Generic platform knowledge             │
+└─────────────────┬───────────────────────────┘
+                  │ FORK (cp -r)
+                  ↓
+┌─────────────────────────────────────────────┐
+│ Layer 2: team-kb (Organization/Team)       │
+│ ├── 12 base entries (layer:base)           │
+│ ├── 50+ team entries (layer:team)          │
+│ └── Total: 62+ entries in ONE database     │
+└─────────────────┬───────────────────────────┘
+                  │ FORK (cp -r)
+                  ↓
+┌─────────────────────────────────────────────┐
+│ Layer 3: personal-kb (Individual)          │
+│ ├── 12 base entries (layer:base)           │
+│ ├── 50+ team entries (layer:team)          │
+│ ├── 20+ personal entries (layer:personal)  │
+│ └── Total: 82+ entries in ONE database     │
+└─────────────────────────────────────────────┘
+```
+
+**Key Points:**
+- Each layer is a **complete copy** (fork) of the previous layer
+- You configure Claude Code to use **only ONE** MCP server (your current layer)
+- Layer tags enable **filtering during export** for distribution
+- Personal layer contains everything: base + team + personal knowledge
+
+**Creating a Fork:**
+```bash
+# Create team fork
+cp -r duckdb-kb team-kb
+cd team-kb
+# Add team-specific entries with layer:team tag
+
+# Create personal fork
+cp -r team-kb personal-kb
+cd personal-kb
+# Add personal entries with layer:personal tag
+```
+
+**Distribution:**
+- **Layer 1**: Export entries with `layer:base` → share publicly
+- **Layer 2**: Export entries with `layer:base` + `layer:team` → share with team
+- **Layer 3**: Keep private (not distributed)
+
+## Performance Characteristics
 
 ### Token Efficiency
 
-| Operation | Traditional File Reading | DuckDB MCP | Savings |
-|-----------|-------------------------|------------|---------|
-| MCP overhead | N/A | 4-5k tokens | N/A |
-| Find Oracle tables | Read 5 files (10k) | SQL query (500) | 95% |
-| Semantic search | Full scan required | find_similar (800) | 90%+ |
+MCP protocol overhead: ~4-5k tokens per connection
 
-### Query Performance
-
-| Dataset Size | SQL Query | Semantic Search (brute force) | Semantic (HNSW) |
-|--------------|-----------|------------------------------|-----------------|
-| 60 entries | < 1ms | ~5ms | ~2ms |
-| 1,000 entries | ~2ms | ~50ms | ~10ms |
-| 10,000 entries | ~5ms | ~500ms | ~15ms |
-
-**M2 Max optimizations:** DuckDB's vectorized execution + GPU-accelerated cosine similarity
+**Estimated benefits** (not benchmarked):
+- SQL queries return structured data without file I/O
+- Semantic search returns ranked results without full scans
+- Embeddings enable conceptual search vs keyword matching
 
 ### Embedding Generation
 
-| Provider | 60 entries | 1 entry | Cost | Quality |
-|----------|------------|---------|------|---------|
-| OpenAI | ~5-10s | ~1-2s | $0.0008 | Excellent (1536 dims) |
-| Local | ~2s | ~50ms | Free | Good (384 dims) |
+| Provider | Typical Speed | Cost | Quality |
+|----------|---------------|------|---------|
+| OpenAI | ~1-2s/entry | ~$0.00002/entry | Excellent (1536 dims) |
+| Local | Variable | Free | Good (384 dims) |
+
+**Note:** Performance varies based on network, hardware, and dataset size.
 
 ## File Structure
 
 ```
-duckdb-mcp/
+duckdb-kb/
 ├── schema.sql              # Database schema with VSS extension
 ├── mcp_server.py          # MCP server with 10 tools
-├── migrate.py             # Import markdown files to database
 ├── generate_embeddings.py # Batch embedding generator
-├── backup.sh              # Binary backup script
 ├── export.py              # Export to JSON/SQL (git-friendly)
 ├── restore.py             # Restore from backups
 ├── requirements.txt       # Python dependencies
+├── seed/                  # Seed data (12 base entries)
+│   ├── seed.json
+│   └── import_seed.py
+├── scripts/               # Utility scripts
+│   ├── defrag.py          # Quality control & maintenance
+│   └── init_db.py         # Database initialization
 ├── knowledge.duckdb       # DuckDB database (DO NOT GIT COMMIT)
-├── backups/               # Binary backups (DO NOT GIT COMMIT)
+├── backups/               # Optional manual backups (DO NOT GIT COMMIT)
 ├── exports/               # JSON/SQL exports (GIT FRIENDLY)
-├── README.md             # This file
-├── BACKUP.md             # Backup strategy guide
-└── MCP-EXPLAINED.md      # Deep dive into MCP architecture
+├── README.md              # This file
+├── SETUP.md               # Setup guide
+├── QUICKSTART.md          # 5-minute quick start
+├── BACKUP.md              # Backup strategy guide
+└── CLAUDE_DIRECTIVES.md   # AI usage directives
 ```
 
 ## Backup & Recovery
 
-**Critical**: Your knowledge base is stored in a single `knowledge.duckdb` file. Loss or corruption would be catastrophic.
+**Critical**: Your knowledge base is stored in a single `knowledge.duckdb` file. Regular backups are essential.
 
-### Quick Backup
+### Recommended: JSON Exports
 
 ```bash
-# Binary backup (fast, includes embeddings)
-./backup.sh
-
-# JSON export (git-friendly, human-readable)
+# Export to JSON (human-readable, git-friendly)
 python export.py
+
+# Commit to git
+git add exports/knowledge_latest.json exports/links_latest.json
+git commit -m "Backup $(date +%Y-%m-%d)"
 ```
+
+**Benefits:**
+- ✅ Review and edit before restore
+- ✅ Git version control with diffs
+- ✅ Human-readable
+- ❌ Requires regenerating embeddings (~$0.0002 for 12 entries)
 
 ### Restore
 
 ```bash
-# From binary backup
-python restore.py --from-backup backups/knowledge_20250130.duckdb
-
-# From JSON export (requires regenerating embeddings)
+# From JSON export
 python restore.py --from-json exports/knowledge_latest.json
 python generate_embeddings.py
 ```
 
-### Recommended Strategy
+### Quick Manual Backup
 
-1. **Daily**: Export to JSON and commit to git
-2. **Weekly**: Create binary backup with `./backup.sh`
-3. **Before major changes**: Always create a backup first
+```bash
+# Optional: Manual copy before major changes
+cp knowledge.duckdb knowledge.duckdb.backup
+```
 
-See [BACKUP.md](./BACKUP.md) for complete backup strategy and automation setup.
+See [BACKUP.md](./BACKUP.md) for complete backup strategies and automation.
 
 ## Troubleshooting
 
@@ -582,32 +635,19 @@ EXPLAIN SELECT * FROM knowledge WHERE category = 'table';
 CREATE INDEX idx_custom ON knowledge(your_field);
 ```
 
-## Data Import from Markdown
+## Importing Your Own Data
 
-The `migrate.py` script can import markdown files into the knowledge base. It preserves:
-- ✅ Frontmatter metadata
-- ✅ Tags (frontmatter + inline #tags)
-- ✅ Wikilinks ([[links]])
-- ✅ Timestamps (created/updated)
-- ✅ Content (markdown body)
+To import existing markdown files or custom data, you can:
 
-And automatically infers:
-- ✅ Category (from directory, filename, tags, frontmatter)
-- ✅ Relationships (from wikilinks)
+1. **Use the seed import script** as a template
+2. **Create entries via MCP tools** during Claude sessions
+3. **Bulk import via custom script** using `upsert_knowledge`
 
-```bash
-python migrate.py \
-    --vault-path /path/to/markdown/directory \
-    --db-path knowledge.duckdb \
-    --skip-jira \
-    --skip-sessions
-```
-
-**Note:** The current system has already been populated with migrated data.
+See `seed/import_seed.py` for an example import script.
 
 ## Contributing
 
-This is a custom MCP server for PDS work. Extend as needed:
+This is a baseline MCP server for DuckDB-based knowledge bases. Extend as needed:
 
 1. **Add new tool:**
    ```python
@@ -626,9 +666,7 @@ This is a custom MCP server for PDS work. Extend as needed:
 
 2. **Add new category:**
    ```python
-   # In migrate.py CATEGORY_MAPPING:
-   'MyCategory': 'mycategory'
-
+   # Categories: table, command, issue, pattern, troubleshooting, reference, other
    # Use in knowledge base:
    upsert_knowledge(category="mycategory", ...)
    ```
@@ -644,7 +682,7 @@ This is a custom MCP server for PDS work. Extend as needed:
 
 ## License
 
-Custom internal tool for PDS work.
+Open source baseline MCP server for knowledge management.
 
 ## Resources
 

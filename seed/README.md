@@ -18,27 +18,12 @@ Seed data provides:
 
 ## Seed Entries (Layer 1 - Base)
 
-The seed.json contains 10 platform-focused entries:
+The seed.json contains 12 platform-focused entries:
 
-### 1. Reference Entries (4)
-- **kb-maintenance-comprehensive-guide** - How to maintain and defragment the KB
-- **directive-auto-knowledge-capture** - Claude directive on when to save knowledge
-- **directive-conflict-detection** - Claude directive on detecting/resolving conflicts
-- **duckdb-mcp-architecture** - MCP server architecture overview
-- **reference-mcp-server-tools** - Complete tool reference
-
-### 2. Pattern Entries (4)
-- **pattern-embedding-best-practices** - Embedding generation guidelines
-- **pattern-semantic-search-tips** - How to use semantic search effectively
-- **pattern-knowledge-organization** - ID naming, tagging, content structure
-- **pattern-layer-tagging** - Three-layer architecture explained
-
-### 3. Command Entry (1)
-- **command-backup-restore** - Backup and restore procedures
-
-### 4. Troubleshooting Entries (2)
-- **troubleshooting-missing-embeddings** - Fix missing embeddings
-- **troubleshooting-slow-semantic-search** - Performance optimization
+- **5 Reference entries** - KB maintenance, directives, MCP architecture
+- **4 Pattern entries** - Embedding best practices, semantic search, organization, layer tagging
+- **2 Troubleshooting entries** - Missing embeddings, slow search
+- **1 Command entry** - Backup and restore procedures
 
 ## Importing Seed Data
 
@@ -184,16 +169,13 @@ After importing, verify:
 duckdb knowledge.duckdb
 
 # Check entry count
-SELECT COUNT(*) FROM knowledge;
--- Should show 10 entries (or more if you had existing)
+SELECT COUNT(*) FROM knowledge;  -- Should be 12
 
 # Check entries imported
-SELECT id, title, category FROM knowledge WHERE list_contains(tags, 'layer:base');
+SELECT id, category FROM knowledge WHERE list_contains(tags, 'layer:base');
 
 # Check embedding status
-SELECT COUNT(*) as total,
-       COUNT(embedding) as with_embeddings
-FROM knowledge;
+SELECT COUNT(*) as total, COUNT(embedding) as with_embeddings FROM knowledge;
 ```
 
 ## Updating Seed Data
@@ -225,11 +207,9 @@ python ../export.py \
 
 ## Best Practices
 
-1. **Keep seed minimal** - 10-15 entries max for Layer 1
-2. **Update regularly** - As platform evolves, update seed docs
-3. **Test imports** - Periodically test seed import on fresh database
-4. **Document changes** - Note what changed when updating seed
-5. **Version control** - Commit seed.json changes with clear messages
+1. **Keep seed minimal** - 12-15 entries for Layer 1
+2. **Test imports** - Verify on fresh database periodically
+3. **Version control** - Commit seed.json changes with clear messages
 
 ## Troubleshooting
 
@@ -264,24 +244,44 @@ Run schema.sql to create tables:
 duckdb knowledge.duckdb < schema.sql
 ```
 
-## Advanced: Layered Seed Strategy
+## Advanced: Fork-Based Layer Strategy
 
-For three-layer architecture:
+**IMPORTANT**: Layers are forks, not separate databases. Each layer contains all previous layers.
 
-```
-duckdb-kb/seed/
-  └── seed.json                 # 10 base entries (layer:base)
-
-pds-kb/seed/
-  └── pds_seed.json            # 20-30 PDS-specific entries (layer:pds)
-      (imports layer:base automatically)
-
-brock-kb/seed/
-  └── personal_seed.json       # Personal entries (layer:personal)
-      (imports layer:base + layer:pds automatically)
+### Layer 1: Base (duckdb-kb)
+```bash
+# This repo - 12 base entries
+seed/seed.json  # Contains layer:base entries for public distribution
 ```
 
-Each layer imports previous layers' seed data plus its own additions.
+### Layer 2: Team Fork
+```bash
+# Fork the entire repo
+cp -r duckdb-kb team-kb
+cd team-kb
+
+# Database now has 12 base entries
+# Add team-specific entries with layer:team tag
+# Result: ONE database with base + team knowledge
+
+# Export for team distribution
+python export.py --filter-tags layer:base,layer:team
+```
+
+### Layer 3: Personal Fork
+```bash
+# Fork the team repo
+cp -r team-kb personal-kb
+cd personal-kb
+
+# Database has: base + team entries
+# Add personal entries with layer:personal tag
+# Result: ONE database with ALL layers
+
+# Keep private (don't distribute)
+```
+
+**Key Concept**: You run only ONE MCP server at your current layer. It contains everything you need from all previous layers.
 
 ## Related Documentation
 
