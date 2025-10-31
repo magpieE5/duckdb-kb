@@ -11,14 +11,25 @@ Get the DuckDB Knowledge Base MCP server running in 5 minutes.
 ## Installation (2 minutes)
 
 ```bash
-# Clone or download this repository
-cd duckdb-mcp
+# Clone the repository
+git clone https://github.com/yourusername/duckdb-kb.git
+cd duckdb-kb
 
 # Create virtual environment (recommended)
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
+pip install -r requirements.txt
+```
+
+**Alternative: Clone to a specific location**
+```bash
+# Clone to your preferred directory
+git clone https://github.com/yourusername/duckdb-kb.git ~/my-knowledge-base
+cd ~/my-knowledge-base
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
