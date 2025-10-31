@@ -155,9 +155,110 @@ def generate_embeddings_batch(texts: List[str]) -> List[List[float]]:
 app = Server("duckdb-knowledge")
 
 
+def ensure_schema_initialized(con):
+    """
+    Auto-initialize database schema if it doesn't exist.
+    This ensures new users don't have to manually run setup scripts.
+    """
+    try:
+        # Quick check: does knowledge table exist?
+        con.execute("SELECT 1 FROM knowledge LIMIT 1")
+        # Schema exists, we're good
+        return
+    except:
+        # Schema doesn't exist, need to initialize
+        pass
+
+    print("⚙️  Initializing database schema (first-time setup)...", flush=True)
+
+    try:
+        # Get paths to SQL files
+        script_dir = Path(__file__).parent
+        schema_path = script_dir / 'schema.sql'
+        functions_path = script_dir / 'add_functions.sql'
+
+        if not schema_path.exists() or not functions_path.exists():
+            print(f"❌ Error: Schema files not found in {script_dir}", flush=True)
+            print("   Please run: python scripts/init_db.py", flush=True)
+            return
+
+        # Install VSS extension first
+        try:
+            con.execute("INSTALL vss")
+            con.execute("LOAD vss")
+        except:
+            pass  # VSS optional
+
+        # Read schema and skip problematic MACRO definitions
+        with open(schema_path) as f:
+            schema_sql = f.read()
+
+        # Execute schema line by line, skipping MACRO definitions
+        lines = []
+        in_macro = False
+        paren_depth = 0
+
+        for line in schema_sql.split('\n'):
+            stripped = line.strip()
+
+            if stripped.startswith('--') or not stripped:
+                continue
+
+            # Skip upsert_knowledge MACRO (has MERGE issues)
+            if 'CREATE MACRO' in line and 'upsert_knowledge' in line:
+                in_macro = True
+                continue
+
+            if in_macro:
+                if '(' in line:
+                    paren_depth += line.count('(')
+                if ')' in line:
+                    paren_depth -= line.count(')')
+                if paren_depth == 0 and ');' in line:
+                    in_macro = False
+                continue
+
+            lines.append(line)
+
+        # Execute schema statements
+        statements = '\n'.join(lines).split(';')
+        for stmt in statements:
+            stmt = stmt.strip()
+            if stmt and not stmt.startswith('--'):
+                try:
+                    con.execute(stmt + ';')
+                except Exception as e:
+                    if 'already exists' not in str(e):
+                        # Ignore "already exists" errors
+                        pass
+
+        # Execute functions SQL
+        with open(functions_path) as f:
+            functions_sql = f.read()
+
+        # Execute function statements
+        for stmt in functions_sql.split(';'):
+            stmt = stmt.strip()
+            if stmt and not stmt.startswith('--') and not stmt.upper().startswith('SELECT'):
+                try:
+                    con.execute(stmt + ';')
+                except Exception as e:
+                    if 'already exists' not in str(e):
+                        pass
+
+        print("✅ Database schema initialized successfully!", flush=True)
+
+    except Exception as e:
+        print(f"⚠️  Warning: Could not auto-initialize schema: {e}", flush=True)
+        print("   Please run manually: python scripts/init_db.py", flush=True)
+
+
 def get_connection():
     """Get DuckDB connection with VSS extension loaded"""
     con = duckdb.connect(DB_PATH)
+
+    # Auto-initialize schema if needed (first-time setup)
+    ensure_schema_initialized(con)
 
     # Load VSS extension
     try:
