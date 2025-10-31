@@ -4,6 +4,26 @@ A Model Context Protocol (MCP) server that provides AI assistants with hybrid SQ
 
 **Current Status:** Fresh installation with 12 seed entries demonstrating core capabilities.
 
+## What Is This?
+
+A searchable knowledge base that remembers your coding discoveries using AI-powered semantic search. Instead of:
+- ❌ Grepping through notes hoping to find that fix from 3 months ago
+- ❌ Re-solving the same problem because you forgot where you documented it
+- ❌ Asking your AI assistant the same questions repeatedly across sessions
+
+You get:
+- ✅ "Find that caching pattern we used" → instant results with semantic search
+- ✅ Your AI assistant remembers project-specific knowledge between sessions
+- ✅ Team knowledge sharing with layered privacy (base/team/personal)
+
+**Use cases:**
+- **Troubleshooting**: "How did we fix that slow PostgreSQL query last month?"
+- **Patterns**: "What's our standard approach for API rate limiting?"
+- **Commands**: "What was that duckdb command for exporting to parquet?"
+- **Project context**: Your AI assistant can reference decisions, patterns, and solutions from previous work
+
+**New here?** Start with [QUICKSTART.md](./QUICKSTART.md) for a 5-minute guided setup.
+
 ## For AI Assistants 🤖
 
 **First time connecting?** Start here:
