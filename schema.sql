@@ -43,9 +43,10 @@ CREATE INDEX idx_knowledge_category ON knowledge(category);
 CREATE INDEX idx_knowledge_updated ON knowledge(updated);
 
 -- HNSW index for vector similarity search (using VSS extension)
--- Only create after embeddings are populated
--- Uncomment when ready:
--- CREATE INDEX idx_knowledge_embedding_hnsw ON knowledge USING HNSW (embedding) WITH (metric = 'cosine');
+-- Provides 10-50x speedup for semantic search on datasets >1K entries
+-- Note: Requires hnsw_enable_experimental_persistence = true for persistent databases
+SET hnsw_enable_experimental_persistence = true;
+CREATE INDEX idx_knowledge_embedding_hnsw ON knowledge USING HNSW(embedding);
 
 -- =============================================================================
 -- LINKS TABLE (for knowledge graph relationships)
