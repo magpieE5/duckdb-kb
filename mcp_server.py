@@ -47,8 +47,8 @@ EMBEDDINGS_AVAILABLE = OPENAI_AVAILABLE or LOCAL_EMBEDDINGS_AVAILABLE
 DB_PATH = os.getenv('KNOWLEDGE_DB_PATH', 'knowledge.duckdb')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 EMBEDDING_PROVIDER = os.getenv('EMBEDDING_PROVIDER', 'openai')  # 'openai' or 'local'
-EMBEDDING_MODEL = 'text-embedding-3-small'  # OpenAI model
-EMBEDDING_DIM = 1536  # OpenAI dimensions
+EMBEDDING_MODEL = 'text-embedding-3-large'  # OpenAI model (best quality)
+EMBEDDING_DIM = 3072  # OpenAI text-embedding-3-large dimensions
 
 # Local model fallback
 LOCAL_MODEL = 'all-MiniLM-L6-v2'

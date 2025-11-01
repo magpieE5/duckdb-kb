@@ -26,7 +26,7 @@ CREATE TABLE knowledge (
     metadata JSON DEFAULT '{}'::JSON,
 
     -- Vector embedding for semantic search (nullable for lazy generation)
-    embedding FLOAT[1536] DEFAULT NULL,  -- Using OpenAI text-embedding-3-small (1536 dimensions)
+    embedding FLOAT[3072] DEFAULT NULL,  -- Using OpenAI text-embedding-3-large (3072 dimensions)
 
     -- Timestamps
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -246,33 +246,7 @@ CREATE MACRO hybrid_search(
     LIMIT result_limit
 );
 
--- 4. Find similar to existing entry
-CREATE MACRO find_similar_to(
-    reference_id,
-    similarity_threshold := 0.7,
-    result_limit := 10
-) AS TABLE (
-    SELECT
-        k1.id,
-        k1.category,
-        k1.title,
-        k1.tags,
-        k1.content,
-        array_cosine_similarity(k1.embedding, k2.embedding) as similarity,
-        k1.updated
-    FROM knowledge k1
-    CROSS JOIN knowledge k2
-    WHERE
-        k2.id = reference_id
-        AND k1.id != reference_id
-        AND k1.embedding IS NOT NULL
-        AND k2.embedding IS NOT NULL
-        AND array_cosine_similarity(k1.embedding, k2.embedding) > similarity_threshold
-    ORDER BY similarity DESC
-    LIMIT result_limit
-);
-
--- 5. Get knowledge with related links
+-- 4. Get knowledge with related links
 CREATE MACRO get_with_related(entry_id) AS TABLE (
     SELECT
         k.id,
@@ -381,12 +355,6 @@ SELECT * FROM hybrid_search(
     tag_filter := ['oracle', 'performance'],
     date_after := CURRENT_TIMESTAMP - INTERVAL 30 DAYS,
     similarity_threshold := 0.65
-);
-
--- Find similar to existing entry
-SELECT * FROM find_similar_to(
-    reference_id := 'issue-idr-3674',
-    similarity_threshold := 0.75
 );
 
 -- Get entry with related links
