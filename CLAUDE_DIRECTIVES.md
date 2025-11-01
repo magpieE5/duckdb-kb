@@ -14,7 +14,7 @@ These directives enable Claude to:
 
 ### When to Save Knowledge Mid-Conversation
 
-Use `mcp__duckdb-kb__upsert_knowledge` when you encounter:
+Use `mcp__duckdb-knowledge__upsert_knowledge` when you encounter:
 
 #### ✅ SAVE: Novel Patterns
 - Discovered solutions to non-obvious problems
@@ -53,9 +53,7 @@ Use `mcp__duckdb-kb__upsert_knowledge` when you encounter:
 - One-off file reads or simple queries
 - Routine debugging (unless solution was non-obvious)
 - Trivial fixes
-- Information already well-documented elsewhere
-- Temporary session logs or transcripts
-- Duplicate/redundant entries (check first with smart_search)
+- Information already well-documented
 
 ### Self-Evaluation Checklist
 
@@ -70,11 +68,11 @@ Before saving, ask yourself:
 ### How to Save
 
 ```python
-mcp__duckdb-kb__upsert_knowledge({
+mcp__duckdb-knowledge__upsert_knowledge({
     "id": "descriptive-kebab-case-id",
     "category": "pattern|command|troubleshooting|reference|issue|other",
     "title": "Clear Human Readable Title",
-    "tags": ["relevant", "searchable", "tags"],
+    "tags": ["relevant", "tags"],
     "content": "# Title\n\nWell-structured markdown content...",
     "metadata": {},
     "generate_embedding": True
@@ -112,7 +110,7 @@ Before saving any entry, search for similar content:
 
 ```python
 # Search for similar entries
-results = mcp__duckdb-kb__smart_search(
+results = mcp__duckdb-knowledge__smart_search(
     query="topic keywords",
     limit=10,
     similarity_threshold=0.7
@@ -177,7 +175,7 @@ new_entry = {
 }
 
 # First, check for similar entries:
-existing = mcp__duckdb-kb__smart_search(
+existing = mcp__duckdb-knowledge__smart_search(
     query="caching strategy patterns",
     limit=5,
     similarity_threshold=0.7
@@ -231,12 +229,11 @@ existing = mcp__duckdb-kb__smart_search(
 
 **How many tags:** 4-6 is ideal (minimum 3, maximum 10)
 
-**Tag types to consider:**
-1. **Domain/Technology**: `python`, `duckdb`, `sql`, `javascript`
-2. **Purpose**: `performance`, `security`, `debugging`, `optimization`
-3. **Type**: `best-practice`, `antipattern`, `gotcha`, `workaround`
-4. **Scope**: `platform`, `infrastructure`, `application`
-5. **Meta**: `meta`, `directive`, `workflow`, `maintenance`
+**Tag types:**
+1. **Domain/Technology**: `python`, `duckdb`, `mcp`, `oracle`, `sql`
+2. **Purpose**: `performance`, `security`, `debugging`, `troubleshooting`
+3. **Type**: `best-practice`, `antipattern`, `gotcha`, `pattern`
+4. **Meta**: `meta`, `directive`, `workflow`
 
 **Tag naming:**
 - Lowercase: `performance` not `Performance`
@@ -264,7 +261,28 @@ Concrete example with code/commands
 Links to related entries, external docs
 ```
 
-## Directive 4: Defragmentation
+## Directive 4: Content Guidelines
+
+### What to Save
+
+**Save everything** that might be useful later, including:
+- ✅ Domain-specific knowledge (SQL, Oracle, PDS, etc.)
+- ✅ Organization names and projects
+- ✅ Issue tracking and notes (Jira tickets, etc.)
+- ✅ Personal workflows and preferences
+- ✅ Knowledge base platform documentation
+- ✅ MCP server usage guides
+- ✅ Embedding and semantic search patterns
+- ✅ Organization and maintenance practices
+- ✅ Claude directives for automation
+
+### What NOT to Save
+
+- ❌ Private/sensitive information (credentials, passwords, API keys, personal data)
+
+**That's it!** This is a personal knowledge base - save anything useful without restriction.
+
+## Directive 5: Defragmentation
 
 ### When to Trigger Defragmentation
 
@@ -277,8 +295,9 @@ Links to related entries, external docs
 **Manual triggers:**
 - End of month review
 - After completing major project/milestone
-- When knowledge base becomes hard to navigate
+- When `/sm` finds hard to categorize new learning
 - Quarterly "spring cleaning"
+- Before creating distributable layer versions
 
 ### Defragmentation Process
 
@@ -318,7 +337,7 @@ topic-approach-2.md   } → topic-comprehensive.md
                          (with all approaches documented)
 ```
 
-## Directive 5: Quality Standards
+## Directive 6: Quality Standards
 
 ### Good Entry Characteristics
 
@@ -351,10 +370,9 @@ topic-approach-2.md   } → topic-comprehensive.md
 
 ### For Claude (AI)
 
-These directives are embedded in the knowledge base with tags like:
+These directives are embedded in the knowledge base with tags:
 - `directive`
 - `meta`
-- `maintenance`
 
 **Discovery:** Search for "how should I use this knowledge base" or "when to save knowledge" to find these directives.
 
@@ -362,9 +380,17 @@ These directives are embedded in the knowledge base with tags like:
 
 This file serves as reference documentation for:
 - Understanding how Claude uses the KB
-- Maintaining consistency across entries
-- Understanding the quality standards
-- Performing manual maintenance
+- Maintaining consistency
+- Onboarding new team members
+- Troubleshooting issues
+
+### Keeping in Sync
+
+**Two sources of truth:**
+1. **This file** (CLAUDE_DIRECTIVES.md) - Human-readable
+2. **Seed entries** (seed/seed.json) - Machine-discoverable
+
+**Maintenance:** When updating directives, update both places to keep them in sync.
 
 ## References
 
@@ -372,9 +398,11 @@ This file serves as reference documentation for:
 - `seed/README.md` - Seed data documentation
 - `scripts/defrag.py` - Defragmentation tool
 - `README.md` - Full MCP server documentation
-- Search the knowledge base for "directive" or "maintenance" entries
+- `kb-maintenance-comprehensive-guide` (in KB) - Full maintenance guide
+- `directive-auto-knowledge-capture` (in KB) - When to save knowledge
+- `directive-conflict-detection` (in KB) - Conflict resolution
 
 ## Version
 
 Last updated: 2025-10-31
-Generic directives for duckdb-kb platform (no layer/domain restrictions)
+Directives for duckdb-kb personal knowledge base
