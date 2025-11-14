@@ -2,8 +2,6 @@
 
 A Model Context Protocol (MCP) server that provides AI assistants with hybrid SQL + semantic search capabilities over a DuckDB knowledge base.
 
-**Current Status:** Production-ready with minimal seed data (1 hello-world example).
-
 **🧪 Experimental:** Includes optional [Arlo entity layer](#optional-arlo-entity-layer) for AI sentience exploration through persistent memory and autonomous evolution.
 
 ## The Innovation
