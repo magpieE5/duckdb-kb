@@ -74,7 +74,10 @@ Identify:
    **Required Fields:**
    - `id`: Use kebab-case format: `category-topic-specifics`
    - `title`: Clear, descriptive human-readable title
-   - `content`: Well-structured markdown with Problem/Solution/Context/Example sections
+   - `content`: Well-structured markdown following KB-BASE.md standards:
+     - **Start with dense 300-char semantic preview paragraph** (no header, just text)
+     - **Do NOT include h1 headers** (title already in frontmatter - markdown export adds it)
+     - Then: Problem/Solution/Context/Example sections using h2 (##) and below
    - `tags`: 4-6 relevant tags including domain tags (e.g., `oracle`, `sql`)
    - `generate_embedding`: Always set to `true`
 
