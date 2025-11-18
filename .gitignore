@@ -1,0 +1,57 @@
+# Database files (binary, not git-friendly)
+*.duckdb
+*.duckdb.wal
+knowledge_*.duckdb
+knowledge.db
+
+# User data (should not be in public repo)
+MCP_CONFIG.json
+.claude/settings.local.json
+
+# Backup directory (binary backups are too large for git)
+backups/
+*.log
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.Python
+
+# Environment
+.env
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code (local configuration)
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+test_*.duckdb
+test-backup/
+regression-test-export/
+tmp/
+temp/
+benchmark_results.json
+*.bak
+
+# Keep exports directory but ignore timestamped files
+exports/*_[0-9]*.json
+exports/*_[0-9]*.sql
+exports/*.log
+
+# Keep the latest symlinks in exports (these ARE git-friendly)
+!exports/*_latest.json
+!exports/*_latest.sql
