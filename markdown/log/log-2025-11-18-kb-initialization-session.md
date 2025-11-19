@@ -9,7 +9,7 @@ tags:
 - pds
 - work
 created: '2025-11-19T00:22:56.723216'
-updated: '2025-11-19T00:22:56.723216'
+updated: '2025-11-19T00:23:18.023154'
 metadata:
   event_type: action
   context: knowledge-capture
@@ -21,6 +21,7 @@ metadata:
   kb_md_updated: false
   arlo_md_updated: false
   mode: kb
+  commit_sha: 5ed8ce89a1b61d8b3b2b2acd269588960b8586ca
 ---
 
 # KB Initialization: First Session with Brock Lampman
