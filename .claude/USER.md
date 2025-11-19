@@ -57,9 +57,21 @@ See USER-WORK.md for full work context, USER-PERSONAL.md for family/life, USER-B
 
 **CRITICAL:** Add ALL recent insights here (work AND personal) until file hits ~2K. Primary boundary is temporal (recent vs historical), not domain (work vs personal).
 
-**YYYY-MM-DD (work):** [Recent work insight - technical learning, organizational pattern, etc.]
+**2025-11-19 (work):** Shared comprehensive PDS (Personal Data System) organizational conflict context with Arlo during S1:
 
-**YYYY-MM-DD (personal):** [Recent personal insight - family, hobbies, life events]
+**PDS Background:** Boss Travis Shea tasked replacement ODS POC (~2023) after Ellucian Banner ODS entered maintenance support. Travis leaning toward MS Fabric; evaluated and found it worse than existing platforms. Built PDS using FOSS tools (Python CDC → Hive parquet → DBT-DuckDB → SharePoint → Streamlit → Jenkins → GitHub). Conducted stakeholder open labs with detailed notes. Travis never attended.
+
+**Organizational catastrophe:** Team members complained to Derek Wormdahl (Travis's boss) about being "bothersome" regarding PDS. Travis solicited team complaints, wrote HR "Letter of Clarification" with fabricated incidents (Netflix during queries from 6 months prior), threatening disciplinary action. Issues never raised in weekly 1:1s. PDS infrastructure mostly decommissioned.
+
+**HR Letter pattern:** Contested letter, Travis revised drastically and reframed from "Brock's behavior" to "I'll be clearer on my directives." Travis apologized but required signature with threats. Annual review same period: Overall exceeds, zero mention of letter issues.
+
+**Technical vindication:** Months later, ODS hit catastrophic faults - recovered using PDS for diagnostics. Later, ODS 9.0-9.2 upgrade revealed Travis/DBAs didn't check upgrade code into Git for 5 years. PDS instrumental in Git rescue. Despite technical merit, restricted to health metrics only, unlikely to productionalize.
+
+**Retaliation context:** Pattern appears linked to 2022 union organizing effort (flipped 25 positions under Derek's management, massive salary increases - https://uomatters.com/2022/02/uo-information-services-under-review-for-inequity-towards-analyst-programmers-osnas.html). Late 2022: Derek + Tim Ketchum made verbal retention agreement ("leadership swap") to retain after PSU job offer. By January nothing changed, Derek gaslighted agreement never happened. ~2023: Confronted Derek, "it blew up." Year later, Tim admitted agreement happened, said he "didn't know what happened and just went along with it" - validates memory, confirms coordinated management dishonesty.
+
+**Current constraints:** Topped out AP3 (no promotion path), HR letter (though two stellar reviews since), Derek + Travis in management chain, wife Megan Prouty's SVP travel limits capacity (had to bow out of elected union steward), no exit strategy despite toxic environment. Travis absorbed Banner team + other staff due to layoffs, creating "low bar and lack of oversight" that's "sort of a blessing."
+
+**Team dynamics:** Team (3 Data Analysts + 1 Data Engineer) struggled with PDS learning curve (Git, DBT, DuckDB, parquet). Travis tolerated "at best," never backed project. Team consensus: Travis "ran the service into the ground," is "pathological liar." Multiple team members complained Brock was "bothersome." Contributing factors: military communication style (direct, persistent) vs. academic culture (indirect, consensus-seeking), threatened competence (exposed weak DevOps practices), extra work (new tool learning), efficiency gap (Travis noted Brock's work volume/efficiency difficult for team).
 
 **Earlier insights (>7 days):** See USER-WORK.md (Recent Work Learnings) and USER-PERSONAL.md (Recent Personal Learnings)
 
