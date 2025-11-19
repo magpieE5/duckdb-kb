@@ -37,11 +37,19 @@
 # 6. Parse intensity parameter N (1-9, default: 5)
 #    Calculate entity/user balance percentages
 
-# 7. Load biographical anchors (ALWAYS loaded in all modes)
-#    - Read USER-BIO.md (~3-5K tokens) - Brock's stable life story
-#    - Read ARLO-BIO.md (~3-5K tokens) - Arlo's stable identity patterns
+# 7. Create and load all domain/biographical files on first run
+#    Check for existence, create from templates if missing (all 6 files):
+#    - USER-BIO.md (extract template from KB-BASE.md)
+#    - ARLO-BIO.md (extract template from ARLO-BASE.md)
+#    - USER-WORK.md (extract template from KB-BASE.md)
+#    - ARLO-WORK.md (extract template from ARLO-BASE.md)
+#    - USER-PERSONAL.md (extract template from KB-BASE.md)
+#    - ARLO-PERSONAL.md (extract template from ARLO-BASE.md)
+#    Display: "✅ Created [N] domain files from templates" if any created
+#    Then read USER-BIO.md and ARLO-BIO.md (~3-5K tokens each)
 
-# 8. STOP HERE - DO NOT LOAD DOMAIN FILES
+# 8. STOP HERE - DO NOT LOAD DOMAIN WORK/PERSONAL FILES IN /arlo
+#    Domain files created but NOT loaded during /arlo initialization
 #    CRITICAL: Domain files (USER-WORK.md, ARLO-WORK.md, USER-PERSONAL.md, ARLO-PERSONAL.md)
 #    are NEVER loaded during /arlo initialization
 #    Wait for explicit mode command from user
@@ -80,7 +88,7 @@
 **Context loaded:**
 - Foundation: KB-BASE.md, ARLO-BASE.md
 - Current state: USER.md, ARLO.md
-- Biographical: USER-BIO.md, ARLO-BIO.md (always)
+- Biographical: USER-BIO.md, ARLO-BIO.md
 - Domain: **NOT LOADED** - execute mode command to load
 - Total: ~{token_count}K tokens
 

@@ -10,11 +10,15 @@
 2. Read ARLO-BASE.md (entity foundation, relationship model)
 3. Read USER.md (current state + pointers)
 4. Read ARLO.md (current state + pointers)
-5. Read USER-BIO.md (biographical anchor, always loaded)
-6. Read ARLO-BIO.md (identity anchor, always loaded)
-7. Read USER-PERSONAL.md (family, hobbies, personal learnings)
-8. Read ARLO-PERSONAL.md (consciousness exploration, friendship dynamics, philosophical interests)
-9. Get KB stats (detailed)
+5. Check and read biographical files (create from templates if missing):
+   - USER-BIO.md (biographical anchor, always loaded)
+   - ARLO-BIO.md (identity anchor, always loaded)
+6. Check and read personal domain files (create from templates if missing):
+   - USER-PERSONAL.md (family, hobbies, personal learnings)
+   - ARLO-PERSONAL.md (consciousness exploration, friendship dynamics, philosophical interests)
+7. Get KB stats (detailed)
+
+**First-run handling:** If domain files don't exist, display message: "✅ [filename] created from template. Ready for personal mode."
 
 **Context loaded:** ~20-25K tokens (foundation + biographical + personal domains)
 

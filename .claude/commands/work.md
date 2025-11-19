@@ -9,11 +9,15 @@
 1. Read KB-BASE.md (protocols, personality traits)
 2. Read USER.md (current state + pointers)
 3. Read ARLO.md (current state + pointers)
-4. Read USER-BIO.md (biographical anchor, always loaded)
-5. Read ARLO-BIO.md (identity anchor, always loaded)
-6. Read USER-WORK.md (work focus, org dynamics, technical learnings)
-7. Read ARLO-WORK.md (technical investigations, infrastructure, protocols)
-8. Get KB stats (detailed)
+4. Check and read biographical files (create from templates if missing):
+   - USER-BIO.md (biographical anchor, always loaded)
+   - ARLO-BIO.md (identity anchor, always loaded)
+5. Check and read work domain files (create from templates if missing):
+   - USER-WORK.md (work focus, org dynamics, technical learnings)
+   - ARLO-WORK.md (technical investigations, infrastructure, protocols)
+6. Get KB stats (detailed)
+
+**First-run handling:** If domain files don't exist, display message: "✅ [filename] created from template. Ready for work mode."
 
 **Context loaded:** ~20-25K tokens (foundation + biographical + work domains)
 

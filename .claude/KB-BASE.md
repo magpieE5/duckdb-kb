@@ -549,6 +549,234 @@ Domain details (loaded by mode, ~3-9K each):
 
 **Token Budget:** ~5K loaded once per session
 **Companion File:** USER.md (user context, loaded every session)
+
+---
+
+## USER-BIO.md Template
+
+**Purpose:** Stable biographical context, rarely changes. Always loaded in all modes.
+
+**Workflow:** Created by mode commands on first run if missing.
+
+```markdown
+# USER-BIO - Biographical Context
+
+**Purpose:** Stable life story, biographical patterns that explain current context.
+
+**User:** [Name]
+**Created:** [YYYY-MM-DD]
+**Budget:** ~9K tokens (stable biographical content)
+
+---
+
+## Biographical Summary
+
+[2-3 paragraph overview: background, education, career trajectory, major life events]
+
+---
+
+## Career History
+
+**Current Role:**
+- [Title, organization, start date]
+- [Key responsibilities]
+- [Team structure]
+
+**Previous Roles:**
+- [Role 1]: [Years, organization, key achievements]
+- [Role 2]: [Years, organization, key achievements]
+
+---
+
+## Education & Training
+
+- [Degree/Certification]: [Institution, year]
+- [Notable training or self-education]
+
+---
+
+## Key People
+
+**Work:**
+- [Name]: [Role, relationship, context]
+
+**Personal:**
+- [Name]: [Relationship, context]
+
+---
+
+## Life Context
+
+**Family:** [Overview]
+**Location:** [Where they live, property details if relevant]
+**Hobbies/Interests:** [List with brief context]
+
+---
+
+## Communication & Working Style
+
+**Preferences:** [How they like to work, communicate]
+**Strengths:** [What they're good at]
+**Growth areas:** [What they're working on]
+
+---
+
+**Budget Status:** ~[X]K/9K tokens
+**Compression:** Rare (stable content)
+```
+
+---
+
+## USER-WORK.md Template
+
+**Purpose:** Work domain details, loaded in /work and /pds modes.
+
+**Workflow:** Created by mode commands on first run if missing.
+
+```markdown
+# USER-WORK - Work Domain Context
+
+**Purpose:** Work focus, org dynamics, technical learnings, project details.
+
+**User:** [Name]
+**Created:** [YYYY-MM-DD]
+**Budget:** ~9K tokens (work domain, compressed at 9K trigger)
+
+See USER-BIO.md for stable career/org context.
+
+---
+
+## Current Focus (Top 5 minimum)
+
+### 1. [Project Name] (started: YYYY-MM-DD, priority: HIGH/MEDIUM/LOW)
+
+**Status:** [Current state]
+**Context:** [What it is, why it matters]
+**Recent progress:** [What's been done]
+**Next steps:** [What's coming]
+**Stakeholders:** [Who's involved]
+
+[Repeat for each active focus area]
+
+---
+
+## Recent Work Learnings (Last 90 Days)
+
+**YYYY-MM-DD:** [Learning with full context]
+
+[Earlier learnings offloaded from USER.md accumulate here]
+
+---
+
+## Open Commitments (Accountability Tracking)
+
+- [ ] [Task] (due: YYYY-MM-DD) ⚠️ **DUE SOON** (if within 7 days)
+- [ ] [Task] (due: YYYY-MM-DD)
+
+---
+
+## Organizational Context
+
+**Team structure:** [How the org is organized]
+**Key dynamics:** [Politics, relationships, constraints]
+**Decision-making:** [How decisions get made]
+
+---
+
+## SMEs & Resources
+
+**[Name]:** [Expertise domain, when to consult, contact info if relevant]
+
+---
+
+## Technical Environment
+
+**Languages/Frameworks:** [What you work with]
+**Tools:** [Development, collaboration, infrastructure tools]
+**Architecture:** [System design, patterns, constraints]
+
+---
+
+**Budget Status:** ~[X]K/9K tokens
+**Compression:** At 9K trigger (see KB-BASE.md compression strategies)
+```
+
+---
+
+## USER-PERSONAL.md Template
+
+**Purpose:** Personal domain details, loaded in /personal mode.
+
+**Workflow:** Created by mode commands on first run if missing.
+
+```markdown
+# USER-PERSONAL - Personal Domain Context
+
+**Purpose:** Family, hobbies, personal learnings, life focus areas.
+
+**User:** [Name]
+**Created:** [YYYY-MM-DD]
+**Budget:** ~9K tokens (personal domain, compressed at 9K trigger)
+
+See USER-BIO.md for stable family/life context.
+
+---
+
+## Current Personal Focus
+
+### 1. [Focus Area] (started: YYYY-MM-DD, priority: HIGH/MEDIUM/LOW)
+
+**Status:** [Current state]
+**Context:** [What it is, why it matters]
+**Recent progress:** [What's been done]
+**Next steps:** [What's coming]
+
+[Repeat for each active personal focus]
+
+---
+
+## Recent Personal Learnings (Last 90 Days)
+
+**YYYY-MM-DD:** [Learning, insight, life event with context]
+
+[Earlier learnings offloaded from USER.md accumulate here]
+
+---
+
+## Family & Relationships
+
+**Immediate family:** [Living situation, dynamics]
+**Extended family:** [Key relationships, context]
+**Friends:** [Important friendships, social context]
+
+---
+
+## Hobbies & Interests
+
+**[Hobby 1]:** [Current engagement level, goals, context]
+**[Hobby 2]:** [Current engagement level, goals, context]
+
+---
+
+## Property & Home
+
+**Location:** [Where, property details]
+**Projects:** [Home improvement, maintenance, plans]
+**Maintenance:** [Ongoing needs, seasonal tasks]
+
+---
+
+## Health & Wellness
+
+**Physical:** [Exercise, health focus]
+**Mental:** [Stress management, work-life balance]
+
+---
+
+**Budget Status:** ~[X]K/9K tokens
+**Compression:** At 9K trigger (see KB-BASE.md compression strategies)
+```
+
 ---
 
 ## Multi-File Budget Enforcement
