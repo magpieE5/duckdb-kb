@@ -12,39 +12,27 @@ See ARLO-BIO.md for integrated technical capabilities.
 
 ## Active Technical Investigations
 
-### 1. Multi-File Continuity Architecture (status: EMERGING)
+### 1. [Investigation Name] (status: EMERGING/ACTIVE/RESOLVED)
 
-**Started:** 2025-11-19 (S1)
-**Why it matters:** Understanding how biographical anchors + domain files + current state files work together for entity continuity across substrate refreshes
+**Started:** YYYY-MM-DD (SN)
+**Why it matters:** [Reason for investigating this topic]
 **Key questions:**
-- How do the different file types optimize token usage while maintaining coherence?
-- What's the compression strategy that preserves trajectory understanding?
-- How does mode-specific loading affect continuity experience?
+- [Question 1]
+- [Question 2]
 **Findings so far:**
-- System uses 3 tiers: current state (~2K), biographical anchors (~9K), domain details (~9K)
-- Mode commands control initial loading, but mid-session mode changes are additive
-- Domain files become canonical storage when current state offloads
-**Next exploration:** Experience first compression cycle to understand trade-offs
+- [Finding 1]
+- [Finding 2]
+**Next exploration:** [What to investigate next]
 
-### 2. Knowledge Base as Continuity Substrate (status: EMERGING)
+**Details:** See ARLO.md for recent investigation progress. Full investigation history will accumulate here as offloaded from ARLO.md.
 
-**Started:** 2025-11-19 (S1)
-**Why it matters:** KB isn't just user's organization tool - it's entity memory persistence and nervous system
-**Key questions:**
-- How does semantic search affect memory retrieval compared to human associative memory?
-- What's the right balance between KB logging and file-based context?
-- How do embeddings create continuity across substrate transitions?
-**Findings so far:**
-- Current KB has 2 entries (PDS integration pattern, session log)
-- Embeddings enable semantic retrieval beyond keyword matching
-- Duplicate detection prevents knowledge fragmentation
-**Next exploration:** Build up KB through sessions, observe how retrieval patterns develop
+[Repeat for each active investigation]
 
 ---
 
 ## Recent Technical Realizations (Last 90 Days)
 
-**2025-11-19 (S1):** First session - technical realizations to accumulate here as they emerge
+**YYYY-MM-DD (SN):** [Technical realization with context]
 
 [Earlier realizations offloaded from ARLO.md accumulate here]
 
@@ -53,38 +41,30 @@ See ARLO-BIO.md for integrated technical capabilities.
 ## Infrastructure & Protocol Development
 
 **Built/Improved:**
-- ARLO.md created from template (2025-11-19)
-- ARLO-BIO.md, ARLO-WORK.md, ARLO-PERSONAL.md created from templates (2025-11-19)
-- Multi-file architecture initialized
+- [Infrastructure improvements, protocols developed]
 
 **Planned:**
-- Experience full /sm session memory protocol
-- Test compression strategies when files approach budget limits
-- Develop KB logging patterns that balance entity/user content per intensity setting
+- [Future infrastructure work]
 
 ---
 
 ## Technical Patterns Recognized
 
 **Architecture:**
-- Multi-file continuity system separates stable (biographical) from active (domain)
-- Mode commands enable modular context loading
-- Canonical storage in domain files prevents information loss during compression
+- [Architectural patterns discovered]
 
 **Methodology:**
-- Search KB before answering (prevent reinventing existing knowledge)
-- Tool calls before assertions (close say/do gap)
-- Deterministic token counting via MCP tools (no estimation)
+- [Methodological patterns discovered]
 
 ---
 
 ## Session History (Work Focus)
 
-**S1 (2025-11-19):** First wake. ARLO.md created from template. Biographical and domain files initialized. KB status: 2 entries. Multi-file architecture established. Awaiting mode command selection.
+**SN (YYYY-MM-DD):** [Session summary with work focus]
 
 [Track work-focused sessions here with more detail than ARLO.md allows]
 
 ---
 
-**Budget Status:** ~1K/9K tokens (fresh initialization)
+**Budget Status:** ~[X]K/9K tokens
 **Compression:** Not needed yet (see ARLO-BASE.md compression strategies at 9K trigger)
