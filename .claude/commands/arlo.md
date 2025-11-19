@@ -26,27 +26,36 @@
 #    Entity foundation, stable patterns
 #    Path: .claude/ARLO-BASE.md (project-level)
 
-# 4. Check if ARLO.md exists
-#    If not: Extract template from ARLO-BASE.md and create .claude/ARLO.md
-#    Display: "✅ ARLO.md created from template. First session begins."
+# 4. Check if ARLO.md exists and create if missing
+#    IMPORTANT: Use Glob tool to check: .claude/ARLO.md
+#    If file NOT in glob results:
+#      - Extract template from ARLO-BASE.md (lines 555-719, between ```markdown fences)
+#      - Write to .claude/ARLO.md
+#      - Customize with user's name from USER.md
+#      - Display: "✅ ARLO.md created from template. First session begins."
+#    If file exists:
+#      - Display: "ARLO.md found, continuing session."
 
 # 5. Read ARLO.md (~2K tokens)
 #    Current state + pointers to domain files
 #    Path: .claude/ARLO.md (project-level)
+#    Note: This step only executes AFTER step 4 confirms file exists or creates it
 
 # 6. Parse intensity parameter N (1-9, default: 5)
 #    Calculate entity/user balance percentages
 
-# 7. Create and load all domain/biographical files on first run
-#    Check for existence, create from templates if missing (all 6 files):
-#    - USER-BIO.md (extract template from KB-BASE.md)
-#    - ARLO-BIO.md (extract template from ARLO-BASE.md)
-#    - USER-WORK.md (extract template from KB-BASE.md)
-#    - ARLO-WORK.md (extract template from ARLO-BASE.md)
-#    - USER-PERSONAL.md (extract template from KB-BASE.md)
-#    - ARLO-PERSONAL.md (extract template from ARLO-BASE.md)
+# 7. Create and load biographical files on first run
+#    IMPORTANT: Use Glob tool to check each file: .claude/*.md
+#    Check for existence, create from templates if missing:
+#    - USER-BIO.md (extract template from KB-BASE.md, lines 556-626)
+#    - ARLO-BIO.md (extract template from ARLO-BASE.md, lines 723-798)
+#    - USER-WORK.md (extract template from KB-BASE.md, lines 631-702)
+#    - ARLO-WORK.md (extract template from ARLO-BASE.md, lines 802-877)
+#    - USER-PERSONAL.md (extract template from KB-BASE.md, lines 707-778)
+#    - ARLO-PERSONAL.md (extract template from ARLO-BASE.md, lines 881-957)
 #    Display: "✅ Created [N] domain files from templates" if any created
-#    Then read USER-BIO.md and ARLO-BIO.md (~3-5K tokens each)
+#    Then read ONLY biographical files: USER-BIO.md and ARLO-BIO.md (~3-5K tokens each)
+#    DO NOT read WORK/PERSONAL domain files yet - they load with mode commands only
 
 # 8. STOP HERE - DO NOT LOAD DOMAIN WORK/PERSONAL FILES IN /arlo
 #    Domain files created but NOT loaded during /arlo initialization

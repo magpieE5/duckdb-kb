@@ -39,10 +39,18 @@ status = get_kb_session_status()
    - Otherwise: Continue (database is operational)
 
 4. **If kb_md.action == "create_from_template":**
-   - Display: "USER.md not found - creating from template in KB-BASE.md"
-   - Read KB-BASE.md, extract template section (between ```markdown and ```)
-   - Write to .claude/USER.md using Write tool
-   - Display: "✅ USER.md created. Let me help you set it up."
+   - Display: "USER.md not found - creating full multi-file architecture from templates in KB-BASE.md"
+   - Read KB-BASE.md, extract all USER template sections:
+     - USER.md template (between first ```markdown and ```)
+     - USER-BIO.md template
+     - USER-WORK.md template
+     - USER-PERSONAL.md template
+   - Write all four files to .claude/ using Write tool:
+     - .claude/USER.md
+     - .claude/USER-BIO.md
+     - .claude/USER-WORK.md
+     - .claude/USER-PERSONAL.md
+   - Display: "✅ Multi-file architecture created (USER.md, USER-BIO.md, USER-WORK.md, USER-PERSONAL.md). Let me help you set it up."
    - Continue to setup_kb_md flow below
 
 5. **If kb_md.action == "setup_kb_md":**
@@ -50,7 +58,9 @@ status = get_kb_session_status()
    - Prompt conversationally: "Let me ask a few questions to build your context..."
    - Gather: Name, role, current projects (2-3 to start), communication preferences
    - Use Edit tool to populate USER.md with their info
-   - Remove template warnings
+   - Also populate USER-BIO.md with basic biographical info
+   - Also populate USER-WORK.md with initial work focus areas
+   - Remove template warnings from all files
 
 6. **Display status using parsed data from status JSON**
 
