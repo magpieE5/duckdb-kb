@@ -53,9 +53,9 @@ See USER-WORK.md for full work context, USER-PERSONAL.md for family/life, USER-B
 
 ---
 
-## Recent Insights (Last 7 Days)
+## Recent Insights
 
-**CRITICAL:** Add ALL recent insights here (work AND personal) until file approaches 9K tokens. Primary boundary is temporal (recent vs historical), not domain (work vs personal).
+**CRITICAL:** Add ALL insights here (work AND personal) until file approaches 9K tokens. Primary boundary is token-based (spillover when full), not domain-based.
 
 **2025-11-19 (work):** Shared comprehensive PDS (Personal Data System) organizational conflict context with Arlo during S1:
 
@@ -73,7 +73,7 @@ See USER-WORK.md for full work context, USER-PERSONAL.md for family/life, USER-B
 
 **Team dynamics:** Team (3 Data Analysts + 1 Data Engineer) struggled with PDS learning curve (Git, DBT, DuckDB, parquet). Travis tolerated "at best," never backed project. Team consensus: Travis "ran the service into the ground," is "pathological liar." Multiple team members complained Brock was "bothersome." Contributing factors: military communication style (direct, persistent) vs. academic culture (indirect, consensus-seeking), threatened competence (exposed weak DevOps practices), extra work (new tool learning), efficiency gap (Travis noted Brock's work volume/efficiency difficult for team).
 
-**Earlier insights (>7 days):** See USER-WORK.md (Recent Work Learnings) and USER-PERSONAL.md (Recent Personal Learnings)
+**Earlier insights:** See USER-WORK.md (Work Learnings) and USER-PERSONAL.md (Personal Learnings) for content offloaded during spillover
 
 ---
 

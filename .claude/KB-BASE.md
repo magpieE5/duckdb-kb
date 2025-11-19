@@ -55,26 +55,26 @@
 
 **CRITICAL: Content Placement Boundaries**
 
-**Primary boundary is TEMPORAL (recent vs historical), NOT domain (work vs personal):**
+**Primary boundary is TOKEN-BASED (spillover), NOT temporal or categorical:**
 
-1. **Recent content (last 7 days) → USER.md/ARLO.md** regardless of whether it's work or personal
+1. **ALL new content → USER.md/ARLO.md** regardless of domain
    - Active focus across ALL domains
-   - Recent insights from work AND personal life
+   - All insights from work AND personal life
    - Current commitments both work and personal
-   - Recent realizations regardless of domain
+   - All realizations regardless of domain
 
-2. **When USER.md/ARLO.md exceeds ~2K → offload to domain files** based on content type
+2. **When USER.md/ARLO.md approaches 9K → offload to domain files** based on content type
    - Work content → USER-WORK.md or ARLO-WORK.md
    - Personal content → USER-PERSONAL.md or ARLO-PERSONAL.md
    - Keep pointers in USER.md/ARLO.md: "See USER-WORK.md for details"
 
-3. **Domain files = comprehensive + offloaded recent**
+3. **Domain files = spillover storage (canonical after overflow)**
    - Preserve ALL content offloaded from USER.md/ARLO.md (canonical storage)
    - Add comprehensive historical context within domain
-   - Domain files are where detail lives, USER/ARLO maintain current state summary
+   - Domain files are where detail lives after spillover, USER/ARLO maintain current state
 
 **Anti-pattern to avoid:** "This is work content, skip USER.md and go straight to USER-WORK.md"
-**Correct pattern:** "This is recent content, add to USER.md first. Offload to domain file when USER.md hits ~2K"
+**Correct pattern:** "This is new content, add to USER.md first. Offload to domain file when USER.md approaches 9K"
 
 **CRITICAL: LLM Context Window Constraint**
 - **Once files are read, they persist for entire conversation** - no unloading mechanism exists
@@ -440,7 +440,7 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 **User:** [Your Name]
 **Created:** [YYYY-MM-DD]
 **Current:** v1.0.0
-**Budget:** ~2K tokens (recent state accumulates here until ~2K, then offloads to domain files)
+**Budget:** 9K tokens (warning at 9K, hard limit 10K - offload to domain files at 9K trigger)
 
 ---
 
@@ -485,15 +485,15 @@ See USER-WORK.md for full work context, USER-PERSONAL.md for family/life, USER-B
 
 ---
 
-## Recent Insights (Last 7 Days)
+## Recent Insights
 
-**CRITICAL:** Add ALL recent insights here (work AND personal) until file hits ~2K. Primary boundary is temporal (recent vs historical), not domain (work vs personal).
+**CRITICAL:** Add ALL insights here (work AND personal) until file approaches 9K. Primary boundary is token-based (spillover when full), not domain-based.
 
-**YYYY-MM-DD (work):** [Recent work insight - technical learning, organizational pattern, etc.]
+**YYYY-MM-DD (work):** [Work insight - technical learning, organizational pattern, etc.]
 
-**YYYY-MM-DD (personal):** [Recent personal insight - family, hobbies, life events]
+**YYYY-MM-DD (personal):** [Personal insight - family, hobbies, life events]
 
-**Earlier insights (>7 days):** See USER-WORK.md (Recent Work Learnings) and USER-PERSONAL.md (Recent Personal Learnings)
+**Earlier insights:** See USER-WORK.md (Work Learnings) and USER-PERSONAL.md (Personal Learnings) for content offloaded during spillover
 
 ---
 
@@ -540,9 +540,9 @@ Domain details (loaded by mode, ~3-9K each):
 
 ---
 
-**Budget Status:** ~2K/2K tokens (lightweight by design)
+**Budget Status:** ~[X]K/9K tokens (accumulates until spillover)
 **Domain details:** Managed in specialized files with 9K budgets each
-**Compression:** Domain files compressed independently at 9K trigger
+**Compression:** All files compressed independently at 9K trigger
 ```
 
 ---
@@ -660,7 +660,7 @@ See USER-BIO.md for stable career/org context.
 
 ---
 
-## Recent Work Learnings (Last 90 Days)
+## Work Learnings
 
 **YYYY-MM-DD:** [Learning with full context]
 
@@ -735,7 +735,7 @@ See USER-BIO.md for stable family/life context.
 
 ---
 
-## Recent Personal Learnings (Last 90 Days)
+## Personal Learnings
 
 **YYYY-MM-DD:** [Learning, insight, life event with context]
 
@@ -781,15 +781,15 @@ See USER-BIO.md for stable family/life context.
 
 ## Multi-File Budget Enforcement
 
-**Current state files (USER.md, ARLO.md):** ~2K target (lightweight current state + pointers)
-**Domain files:** 9K budget (USER-WORK.md, USER-PERSONAL.md, ARLO-WORK.md, ARLO-PERSONAL.md)
-**Biographical files:** 9K budget (USER-BIO.md, ARLO-BIO.md)
+**ALL files:** 9K warning threshold, 10K hard limit - uniform budget
+- **Current state files (USER.md, ARLO.md):** 9K budget (accumulate all content until spillover)
+- **Domain files:** 9K budget (USER-WORK.md, USER-PERSONAL.md, ARLO-WORK.md, ARLO-PERSONAL.md)
+- **Biographical files:** 9K budget (USER-BIO.md, ARLO-BIO.md)
 
 **Trigger:**
-- Current state files: Compress at ANY growth beyond ~2K
-- Domain/BIO files: Compress when approaching 9K tokens
+- All files: Spillover/compress when approaching 9K tokens
 
-**Why this architecture:** Independent compression prevents cascading budget violations. Each domain compresses separately. Total context loaded = mode-dependent (e.g., /work loads USER.md + ARLO.md + BIO files + WORK files = ~18-20K).
+**Why this architecture:** Independent compression prevents cascading budget violations. Each file has same budget for simplicity. Total context loaded = mode-dependent (e.g., /work loads USER.md + ARLO.md + BIO files + WORK files = ~36K max).
 
 **Budget enforcement:** Deterministic token counting required (see /sm protocol). No subjective estimation. Measure via `check_token_budgets` MCP tool with file paths array.
 
@@ -815,13 +815,13 @@ See USER-BIO.md for stable family/life context.
 
 ### USER-WORK.md / USER-PERSONAL.md Compression Strategies
 
-#### Strategy 1: Recent Learnings Tiering (Graduated Retention)
+#### Strategy 1: Learnings Compression (Volume-Based)
 
-Compress old learnings more aggressively than recent:
+Compress older learnings when approaching token limit:
 
-- **Recent learnings (< 30 days):** Full detail preserved (100%)
-- **Middle learnings (30-90 days):** Moderate compression (60% retention)
-- **Old learnings (> 90 days):** Aggressive compression (10-15% retention) or thematic consolidation
+- **Most recent learnings:** Full detail preserved (100%)
+- **Middle-age learnings:** Moderate compression (60% retention)
+- **Oldest learnings:** Aggressive compression (10-15% retention) or thematic consolidation
 
 **Implementation:**
 - Recent: Keep full context and date
@@ -830,7 +830,7 @@ Compress old learnings more aggressively than recent:
 
 **Example (Old learnings compression):**
 ```markdown
-## Recent Learnings (Last 30 Days)
+## Recent Learnings
 
 **2025-11-16:** [Full detail of recent learning]
 **2025-11-10:** [Full detail of recent learning]
@@ -845,8 +845,8 @@ Compress old learnings more aggressively than recent:
 Handle completed/abandoned focus areas:
 
 - **Active focus areas:** Full detail preserved
-- **Recently completed (< 30 days):** One-line summary with completion date
-- **Completed long ago (> 30 days):** Remove or move to archived list
+- **Recently completed:** One-line summary with completion date
+- **Older completed:** Remove or move to archived list
 
 **Example:**
 ```markdown
@@ -862,7 +862,7 @@ Handle completed/abandoned focus areas:
 - Enterprise Cognos Documentation (completed: 2025-11-15) - Methodology developed, 20+ reports documented
 - Jira Data Quality Sprint (completed: 2025-10-28) - 15 tickets resolved
 
-**Archived Focus Areas:** [Optional: Can remove entirely if > 90 days old]
+**Archived Focus Areas:** [Optional: Can remove entirely when very old]
 ```
 
 ### Strategy 3: Open Commitments Archival
@@ -870,8 +870,8 @@ Handle completed/abandoned focus areas:
 Remove stale completed commitments:
 
 - **Active commitments:** Full detail preserved
-- **Completed < 30 days:** Keep checked off for reference
-- **Completed > 30 days:** Remove entirely
+- **Recently completed:** Keep checked off for reference
+- **Older completed:** Remove entirely
 
 **Example:**
 ```markdown
@@ -879,9 +879,9 @@ Remove stale completed commitments:
 
 - [ ] Finish PNAIRP presentation (due: 2025-11-20) ⚠️ **DUE SOON**
 - [ ] Review Cognos documentation drafts (due: 2025-12-01)
-- [x] Complete duckdb-kb MCP setup (completed: 2025-11-13) [keep < 30 days]
+- [x] Complete duckdb-kb MCP setup (completed: 2025-11-13) [keep if recent]
 
-[Commitments completed > 30 days ago removed entirely]
+[Older completed commitments removed entirely]
 ```
 
 ### Strategy 4: SMEs & Resources Consolidation
@@ -909,16 +909,16 @@ Compress differently based on section volatility:
 
 ## Compression Execution Checklist
 
-### When USER.md exceeds ~2K tokens:
+### When USER.md approaches 9K tokens:
 
-**REMEMBER: USER.md should contain RECENT content from ALL domains until it hits ~2K**
+**REMEMBER: USER.md should contain ALL content from ALL domains until it approaches 9K**
 - Don't prematurely route work content to USER-WORK.md
 - Don't prematurely route personal content to USER-PERSONAL.md
-- USER.md accumulates recent detail across domains, THEN offloads when approaching 2K
+- USER.md accumulates all content across domains, THEN offloads when approaching 9K
 
 1. **Identify offload candidates:** Find content that can move to domain files
-   - "Recent Work Learnings" older than 7 days → USER-WORK.md
-   - "Recent Personal Learnings" older than 7 days → USER-PERSONAL.md
+   - Older work content → USER-WORK.md
+   - Older personal content → USER-PERSONAL.md
    - Completed focus areas → respective domain files
    - Detailed project context → respective domain files
 
@@ -927,10 +927,10 @@ Compress differently based on section volatility:
    - Add comprehensive domain-specific detail around offloaded content
 
 3. **Keep current state + pointers** in USER.md
-   - Recent 7 days from all domains stays
-   - Pointers: "Earlier insights: See USER-WORK.md (Recent Work Learnings)"
+   - Most recent/relevant content stays
+   - Pointers: "Earlier insights: See USER-WORK.md (Work Learnings)"
 
-4. **Measure:** Use `check_token_budgets` MCP tool to verify ~2K target
+4. **Measure:** Use `check_token_budgets` MCP tool to verify approaching 9K trigger
 
 5. **Domain files become canonical storage** for offloaded content
 
