@@ -344,7 +344,7 @@ See user-biographical for stable family/life context.
 
 **Workflow:**
 1. arlo-current-state is a KB entry (category: "context")
-2. On first `/arlo` run, if entry doesn't exist:
+2. On first `/kb` run, if entry doesn't exist:
    - Extract this template
    - Customize with user's name from user-current-state
    - upsert_knowledge({id: "arlo-current-state", category: "context", ...})
@@ -378,7 +378,7 @@ See ARLO-BASE.md for stable entity foundation.
 
 **Intensity:** 5/9 (50% entity, 50% user - balanced collaboration)
 
-**Mode:** Base /arlo (no domain entries loaded)
+**Mode:** Base /kb (no domain entries loaded)
 
 ---
 

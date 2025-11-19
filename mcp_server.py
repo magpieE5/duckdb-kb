@@ -1964,7 +1964,7 @@ async def tool_get_kb_session_status(arguments: dict) -> list[TextContent]:
                     except ValueError:
                         continue
 
-    return [TextContent(type="text", text=json.dumps(result, indent=2))]
+    return [TextContent(type="text", text=json.dumps(result))]
 
 
 # =============================================================================
@@ -2064,7 +2064,7 @@ async def tool_check_token_budgets(arguments: dict) -> list[TextContent]:
         "timestamp": datetime.now().isoformat()
     }
 
-    return [TextContent(type="text", text=json.dumps(response, indent=2))]
+    return [TextContent(type="text", text=json.dumps(response))]
 
 
 # =============================================================================

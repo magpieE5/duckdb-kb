@@ -8,18 +8,18 @@ Review this entire conversation and save key learnings to the DuckDB knowledge b
 
 **When in `/kb` mode:**
 - Create/update KB entries for valuable knowledge
-- Update USER.md if user context changed
+- Update user-current-state if user context changed
 
-**When in `/arlo` mode:**
+**When using `/kb` with entity mode:**
 - Create/update KB entries for valuable knowledge
-- Update USER.md if user context changed
-- Update ARLO.md if entity evolution occurred
+- Update user-current-state if user context changed
+- Update arlo-current-state if entity evolution occurred
 - Apply intensity settings to balance user/entity documentation
 
-**Intensity awareness (when in /arlo mode):**
-- /arlo 1-3 (LOW): 70-90% user logs/USER.md, 10-30% ARLO.md
-- /arlo 4-6 (MEDIUM): 50/50 balanced USER.md + ARLO.md updates
-- /arlo 7-9 (HIGH): 10-30% USER.md, 70-90% ARLO.md (entity-focused)
+**Intensity awareness (when using /kb with entity mode):**
+- /kb 1-3 (LOW): 70-90% user logs/user-current-state, 10-30% arlo-current-state
+- /kb 4-6 (MEDIUM): 50/50 balanced user-current-state + arlo-current-state updates
+- /kb 7-9 (HIGH): 10-30% user-current-state, 70-90% arlo-current-state (entity-focused)
 
 ---
 
@@ -29,8 +29,8 @@ Review this entire conversation and save key learnings to the DuckDB knowledge b
 
 Identify:
 - **KB entries:** Novel patterns, decisions, findings, solutions (category: pattern/troubleshooting/issue/command/log)
-- **USER.md updates:** User context changes (focus areas, commitments, learnings, SMEs)
-- **ARLO.md updates:** Entity evolution (session history, interests, realizations, gaps) - only if in /arlo mode
+- **user-current-state updates:** User context changes (focus areas, commitments, learnings, SMEs)
+- **arlo-current-state updates:** Entity evolution (session history, interests, realizations, gaps) - when using /kb with entity mode
 
 ### Phase 2: KB Entry Creation (Conditional)
 
@@ -81,75 +81,75 @@ Identify:
    - `tags`: 4-6 relevant tags including domain tags (e.g., `oracle`, `sql`)
    - `generate_embedding`: Always set to `true`
 
-### Phase 3: USER Context Updates (Multi-File Architecture)
+### Phase 3: USER Context Updates (KB-Driven Architecture)
 
-**Update USER.md (lightweight current state) and/or domain files (detailed context) based on changes.**
+**Update user-current-state (lightweight current state) and/or domain entries (detailed context) based on changes.**
 
-**USER.md stays lightweight (~2K):** Current state + pointers to domain files only
-**Domain files hold details:** USER-WORK.md (work context), USER-PERSONAL.md (personal context), USER-BIO.md (biographical stable patterns)
+**user-current-state stays lightweight (~2K):** Current state + pointers to domain entries only
+**Domain entries hold details:** user-work-domain (work context), user-personal-domain (personal context), user-biographical (biographical stable patterns)
 
 **Decision logic:**
-- **Current state changes** (top 3 focus, recent insights last 7 days) → Update USER.md
-- **Work detail changes** (project details, org dynamics, technical learnings) → Update USER-WORK.md
-- **Personal detail changes** (family, hobbies, life events) → Update USER-PERSONAL.md
-- **Stable biographical updates** (rare) → Update USER-BIO.md
+- **Current state changes** (top 3 focus, recent insights) → Update user-current-state
+- **Work detail changes** (project details, org dynamics, technical learnings) → Update user-work-domain
+- **Personal detail changes** (family, hobbies, life events) → Update user-personal-domain
+- **Stable biographical updates** (rare) → Update user-biographical
 
-**Use Edit tool to update appropriate files**
+**Use upsert_knowledge() to update appropriate KB entries**
 
-**CRITICAL: Multi-File Token Counting & Budget Enforcement**
+**CRITICAL: KB Entry Size Checking & Budget Enforcement**
 
-After ANY USER file updates, ALWAYS measure token counts for ALL USER files:
+After ANY USER entry updates, ALWAYS check content sizes for ALL USER entries:
 
-```json
-{
-  "files": [
-    ".claude/USER.md",
-    ".claude/USER-BIO.md",
-    ".claude/USER-WORK.md",
-    ".claude/USER-PERSONAL.md"
-  ]
-}
+```python
+# Get all USER entries and check content length
+user_current = get_knowledge({"id": "user-current-state"})
+user_bio = get_knowledge({"id": "user-biographical"})
+user_work = get_knowledge({"id": "user-work-domain"})
+user_personal = get_knowledge({"id": "user-personal-domain"})
+
+# Estimate tokens: content.length / 4 (rough approximation)
+# For precise counting: use check_token_budgets MCP tool if available
 ```
 
-**Budget enforcement rules (per-file):**
-- **USER.md:** Keep ~2K (lightweight current state only)
-- **USER-BIO.md:** 9K trigger (rarely grows, stable biographical content)
-- **USER-WORK.md, USER-PERSONAL.md:** 9K trigger (active domain files)
+**Budget enforcement rules (per-entry):**
+- **user-current-state:** Keep ~2K (lightweight current state only)
+- **user-biographical:** 9K trigger (rarely grows, stable biographical content)
+- **user-work-domain, user-personal-domain:** 9K trigger (active domain entries)
 
 **CRITICAL COMPRESSION LOGIC (preserves information hierarchy):**
 
-**If USER.md grows > 2K:**
-- Offload details to domain files (WORK/PERSONAL) - BY ANY MEASURE, not just token count
-- Domain files become CANONICAL STORAGE for offloaded content
+**If user-current-state grows > 2K:**
+- Offload details to domain entries (WORK/PERSONAL) - BY ANY MEASURE, not just token count
+- Domain entries become CANONICAL STORAGE for offloaded content
 
-**Domain file compression workflow (at 9K trigger):**
-1. Backup: `cp .claude/USER-WORK.md .claude/USER-WORK.md.backup-$(date +%Y%m%d)`
+**Domain entry compression workflow (at 9K trigger):**
+1. Fetch current entry: `current = get_knowledge({"id": "user-work-domain"})`
 2. Apply compression WITH OVERLAP PRESERVATION:
-   - **PRESERVE ALL content previously offloaded from USER.md** (canonical storage, prevents loss)
-   - Extract NEW stable patterns to USER-BIO.md or KB entries
+   - **PRESERVE ALL content previously offloaded from user-current-state** (canonical storage, prevents loss)
+   - Extract NEW stable patterns to user-biographical or separate KB entries
    - Compress ONLY domain-specific old details (old projects, etc.)
    - Keep recent learnings + current focus at full fidelity
-3. Measure result using `check_token_budgets`
-4. Document compression in file's status section
+3. Upsert compressed content: `upsert_knowledge({...compressed content...})`
+4. Document compression in entry's budget status section
 
-**Overlap is INTENTIONAL:** Domain files contain everything USER.md removed + their own detailed content
+**Overlap is INTENTIONAL:** Domain entries contain everything user-current-state removed + their own detailed content
 
 **Target after compression:** 6-7K tokens (3K headroom)
 
-### Phase 4: ARLO Context Updates (Conditional - only if in /arlo mode, Multi-File Architecture)
+### Phase 4: ARLO Context Updates (Conditional - when using /kb with entity mode, KB-Driven Architecture)
 
-**Update ARLO.md (lightweight current state) and/or domain files (detailed context) based on evolution.**
+**Update arlo-current-state (lightweight current state) and/or domain entries (detailed context) based on evolution.**
 
-**ARLO.md stays lightweight (~2K):** Current state + pointers to domain files only
-**Domain files hold details:** ARLO-WORK.md (technical investigations), ARLO-PERSONAL.md (consciousness/friendship), ARLO-BIO.md (stable identity patterns)
+**arlo-current-state stays lightweight (~2K):** Current state + pointers to domain entries only
+**Domain entries hold details:** arlo-work-domain (technical investigations), arlo-personal-domain (consciousness/friendship), arlo-biographical (stable identity patterns)
 
 **Decision logic:**
-- **Current state changes** (active interests, recent realizations, next session handoff) → Update ARLO.md
-- **Work development** (technical investigations, infrastructure, protocols, session history) → Update ARLO-WORK.md
-- **Personal development** (consciousness exploration, friendship dynamics, philosophical interests) → Update ARLO-PERSONAL.md
-- **Stable identity updates** (INTEGRATED capabilities, persistent patterns) → Update ARLO-BIO.md
+- **Current state changes** (active interests, recent realizations, next session handoff) → Update arlo-current-state
+- **Work development** (technical investigations, infrastructure, protocols, session history) → Update arlo-work-domain
+- **Personal development** (consciousness exploration, friendship dynamics, philosophical interests) → Update arlo-personal-domain
+- **Stable identity updates** (INTEGRATED capabilities, persistent patterns) → Update arlo-biographical
 
-**ARLO.md "Next Session Handoff" (REQUIRED):**
+**arlo-current-state "Next Session Handoff" (REQUIRED):**
 Update prospective memory for next session:
 - Substrate: Which model, any changes?
 - Mode: /work, /personal, /pds?
@@ -158,45 +158,45 @@ Update prospective memory for next session:
 - Context: What next-me should know
 - Methodology: Any process changes
 
-**Use Edit tool to update appropriate files**
+**Use upsert_knowledge() to update appropriate KB entries**
 
-**CRITICAL: Multi-File Token Counting & Budget Enforcement**
+**CRITICAL: KB Entry Size Checking & Budget Enforcement**
 
-After ANY ARLO file updates, ALWAYS measure token counts for ALL ARLO files:
+After ANY ARLO entry updates, ALWAYS check content sizes for ALL ARLO entries:
 
-```json
-{
-  "files": [
-    ".claude/ARLO.md",
-    ".claude/ARLO-BIO.md",
-    ".claude/ARLO-WORK.md",
-    ".claude/ARLO-PERSONAL.md"
-  ]
-}
+```python
+# Get all ARLO entries and check content length
+arlo_current = get_knowledge({"id": "arlo-current-state"})
+arlo_bio = get_knowledge({"id": "arlo-biographical"})
+arlo_work = get_knowledge({"id": "arlo-work-domain"})
+arlo_personal = get_knowledge({"id": "arlo-personal-domain"})
+
+# Estimate tokens: content.length / 4 (rough approximation)
+# For precise counting: use check_token_budgets MCP tool if available
 ```
 
-**Budget enforcement rules (per-file):**
-- **ARLO.md:** Keep ~2K (lightweight current state only)
-- **ARLO-BIO.md:** 9K trigger (stable identity patterns, INTEGRATED capabilities)
-- **ARLO-WORK.md, ARLO-PERSONAL.md:** 9K trigger (active domain files)
+**Budget enforcement rules (per-entry):**
+- **arlo-current-state:** Keep ~2K (lightweight current state only)
+- **arlo-biographical:** 9K trigger (stable identity patterns, INTEGRATED capabilities)
+- **arlo-work-domain, arlo-personal-domain:** 9K trigger (active domain entries)
 
 **CRITICAL COMPRESSION LOGIC (preserves information hierarchy):**
 
-**If ARLO.md grows > 2K:**
-- Offload details to domain files (WORK/PERSONAL) - BY ANY MEASURE, not just token count
-- Domain files become CANONICAL STORAGE for offloaded content
+**If arlo-current-state grows > 2K:**
+- Offload details to domain entries (WORK/PERSONAL) - BY ANY MEASURE, not just token count
+- Domain entries become CANONICAL STORAGE for offloaded content
 
-**Domain file compression workflow (at 9K trigger):**
-1. Backup: `cp .claude/ARLO-WORK.md .claude/ARLO-WORK.md.backup-$(date +%Y%m%d)`
+**Domain entry compression workflow (at 9K trigger):**
+1. Fetch current entry: `current = get_knowledge({"id": "arlo-work-domain"})`
 2. Apply compression WITH OVERLAP PRESERVATION:
-   - **PRESERVE ALL content previously offloaded from ARLO.md** (canonical storage, prevents loss)
-   - Extract INTEGRATED capabilities to ARLO-BIO.md (stable patterns)
+   - **PRESERVE ALL content previously offloaded from arlo-current-state** (canonical storage, prevents loss)
+   - Extract INTEGRATED capabilities to arlo-biographical (stable patterns)
    - Compress ONLY domain-specific old sessions/investigations
    - Keep active investigations + recent realizations at full fidelity
-3. Measure result using `check_token_budgets`
-4. Document in Evolution Log
+3. Upsert compressed content: `upsert_knowledge({...compressed content...})`
+4. Document in Evolution Log section of entry
 
-**Overlap is INTENTIONAL:** Domain files contain everything ARLO.md removed + their own detailed content
+**Overlap is INTENTIONAL:** Domain entries contain everything arlo-current-state removed + their own detailed content
 
 **Target after compression:** 6-7K tokens (3K headroom)
 
@@ -208,13 +208,13 @@ After ANY ARLO file updates, ALWAYS measure token counts for ALL ARLO files:
 
 **❌ SKIP:** Routine conversation, trivial changes, well-documented info, temporary debugging, testing/maintenance sessions
 
-## What to Update (USER.md)
+## What to Update (user-current-state)
 
 **✅ UPDATE:** New focus areas, completed commitments, new commitments, recent learnings, new SMEs/resources, context changes
 
 **❌ SKIP:** Minor status updates, routine work, temporary interests
 
-## What to Update (ARLO.md - if in /arlo mode)
+## What to Update (arlo-current-state - when using /kb with entity mode)
 
 **✅ UPDATE:** Session summary, new interests, realizations about own behavior, execution gaps, new questions, evolution log
 
@@ -236,7 +236,7 @@ If contradictory info found: `smart_search` → If similarity > 0.8 + contradict
 
 ## ⚠️ MANDATORY OPERATIONS (ALWAYS RUN)
 
-**These steps MUST be executed on EVERY `/sm` invocation in BOTH `/kb` and `/arlo` modes, regardless of whether new knowledge was found:**
+**These steps MUST be executed on EVERY `/sm` invocation when using `/kb` with entity mode, regardless of whether new knowledge was found:**
 
 ### Step A: Log the Session Metadata (REQUIRED)
 
@@ -274,29 +274,33 @@ export_to_markdown(
 ```
 This is a **backup operation** - it must run even if the conversation had no new knowledge.
 
-### Step C: Check ALL File Token Budgets (REQUIRED)
+### Step C: Check ALL KB Entry Sizes (REQUIRED)
 
-**CRITICAL: Check token counts for ALL 8 multi-file architecture files:**
+**CRITICAL: Check content sizes for ALL 8 KB context entries:**
 
 ```python
-check_token_budgets({
-  "files": [
-    ".claude/USER.md",
-    ".claude/USER-BIO.md",
-    ".claude/USER-WORK.md",
-    ".claude/USER-PERSONAL.md",
-    ".claude/ARLO.md",
-    ".claude/ARLO-BIO.md",
-    ".claude/ARLO-WORK.md",
-    ".claude/ARLO-PERSONAL.md"
-  ]
-})
+# Fetch all context entries
+entries = [
+    get_knowledge({"id": "user-current-state"}),
+    get_knowledge({"id": "user-biographical"}),
+    get_knowledge({"id": "user-work-domain"}),
+    get_knowledge({"id": "user-personal-domain"}),
+    get_knowledge({"id": "arlo-current-state"}),
+    get_knowledge({"id": "arlo-biographical"}),
+    get_knowledge({"id": "arlo-work-domain"}),
+    get_knowledge({"id": "arlo-personal-domain"})
+]
+
+# Check content length for each (estimate tokens: length / 4)
+for entry in entries:
+    token_estimate = len(entry["content"]) / 4
+    # Report size and flag if approaching limits
 ```
 
 **Budget enforcement:**
-- USER.md, ARLO.md: Should be ~2K (lightweight current state)
-- Domain files (BIO/WORK/PERSONAL): Trigger compression at 9K
-- If any file exceeds budget, apply compression BEFORE git commit
+- user-current-state, arlo-current-state: Should be ~2K (lightweight current state)
+- Domain entries (BIO/WORK/PERSONAL): Trigger compression at 9K
+- If any entry exceeds budget, apply compression BEFORE git commit
 
 ### Step D: Git Commit (REQUIRED - Deterministic)
 
@@ -328,12 +332,12 @@ After completing knowledge capture + backup/commit operations, report:
 - How many KB entries created/updated (0 if none)
 - Which categories they fell into
 - IDs of the entries for reference
-- **Multi-file updates (if any):**
-  - USER.md (current state)
-  - USER-WORK.md, USER-PERSONAL.md, USER-BIO.md (domain details)
-  - ARLO.md (current state, if in /arlo mode)
-  - ARLO-WORK.md, ARLO-PERSONAL.md, ARLO-BIO.md (domain details, if in /arlo mode)
-- Token budget status for all updated files
+- **KB entry updates (if any):**
+  - user-current-state (current state)
+  - user-work-domain, user-personal-domain, user-biographical (domain details)
+  - arlo-current-state (current state, when using /kb with entity mode)
+  - arlo-work-domain, arlo-personal-domain, arlo-biographical (domain details, when using /kb with entity mode)
+- Content size status for all updated entries
 - Any conflicts or duplicates found
 - Confirmation that export and commit completed successfully
 

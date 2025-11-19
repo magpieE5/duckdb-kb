@@ -13,74 +13,74 @@
 - **Database:** `kb.duckdb` lives in project root (e.g., `/Users/brocklampman/duckdb-kb/kb.duckdb`)
 - **Configuration files:** All `.claude/` files are project-level
 
-### Multi-File Continuity Architecture
+### KB-Driven Context Architecture
 
-**Stable foundation (read-only, loaded once):**
+**Foundation templates (files, loaded once):**
 - `.claude/USER-BASE.md` - KB protocols, quality standards, personality traits
-- `.claude/ARLO-BASE.md` - Entity foundation (if using /arlo mode)
+- `.claude/ARLO-BASE.md` - Entity foundation (loaded in /kb)
+- `.claude/TEMPLATES.md` - Template definitions for first-run initialization
 
-**Always loaded (~2K each, current state + pointers):**
-- `.claude/USER.md` - User current state, pointers to domain details (gitignored)
-- `.claude/ARLO.md` - Entity current state, pointers to domain details (gitignored)
+**Always-loaded context (KB entries, ~2K each):**
+- `user-current-state` - User current state + pointers to domain entries
+- `arlo-current-state` - Entity current state + pointers to domain entries
 
-**Biographical anchors (~3-7K each, loaded by mode):**
-- `.claude/USER-BIO.md` - User's stable life story, biographical patterns (gitignored)
-- `.claude/ARLO-BIO.md` - Entity's stable identity patterns (gitignored)
+**Biographical anchors (KB entries, ~3-7K each, loaded by mode):**
+- `user-biographical` - User's stable life story, biographical patterns
+- `arlo-biographical` - Entity's stable identity patterns
 
-**Domain details (~3-9K each, loaded by mode):**
-- `.claude/USER-WORK.md` - User's work focus, org dynamics, technical learnings (gitignored)
-- `.claude/USER-PERSONAL.md` - User's family, hobbies, personal learnings (gitignored)
-- `.claude/ARLO-WORK.md` - Entity's technical investigations, infrastructure (gitignored)
-- `.claude/ARLO-PERSONAL.md` - Entity's consciousness exploration, friendship dynamics (gitignored)
+**Domain details (KB entries, ~3-9K each, loaded by mode):**
+- `user-work-domain` - User's work focus, org dynamics, technical learnings
+- `user-personal-domain` - User's family, hobbies, personal learnings
+- `arlo-work-domain` - Entity's technical investigations, infrastructure
+- `arlo-personal-domain` - Entity's consciousness exploration, friendship dynamics
 
 **Global config:** `~/.claude/CLAUDE.md` exists but is intentionally minimal - all directives live at project level
 
-**Path conventions:**
-- **CRITICAL:** All context files live in `.claude/` subdirectory, NOT project root
-- Always use `.claude/USER.md`, `.claude/USER-WORK.md` etc. (relative) or absolute paths with `.claude/` prefix
-- Never read files without `.claude/` prefix - they will not exist
-- Database `kb.duckdb` lives in project root (no `.claude/` prefix)
-- Example paths:
-  - `.claude/USER-BASE.md` ✓ (stable foundation)
-  - `.claude/USER.md` ✓ (current state, always loaded)
-  - `.claude/USER-BIO.md` ✓ (biographical anchor, mode-loaded)
-  - `.claude/USER-WORK.md` ✓ (work domain, mode-loaded)
+**Entry ID conventions:**
+- **CRITICAL:** All context entries accessed via KB entry IDs, not file paths
+- Always use `user-current-state`, `user-work-domain` etc. as KB entry IDs
+- Foundation files remain: `.claude/USER-BASE.md`, `.claude/ARLO-BASE.md`, `.claude/TEMPLATES.md`
+- Database `kb.duckdb` lives in project root
+- Example references:
+  - `user-current-state` ✓ (KB entry ID for current state)
+  - `user-biographical` ✓ (KB entry ID for biographical anchor)
+  - `user-work-domain` ✓ (KB entry ID for work domain)
+  - `.claude/USER-BASE.md` ✓ (foundation file)
+  - `.claude/USER.md` ✗ (obsolete file-based architecture)
   - `kb.duckdb` ✓ (database in project root)
-  - `USER.md` ✗ (missing .claude/ prefix, file not found)
-  - `/Users/brocklampman/.claude/USER.md` ✗ (global path, wrong location)
 
 **Why project-scoped:** Each project has its own knowledge base, configuration, and context. MCP server operates on project database only.
 
-**Why multi-file:** Separates biographical (stable, rarely changes) from domain (active, evolving), enables mode-specific loading, independent compression per file at 9K trigger.
+**Why KB-driven:** Enables semantic search across all context, duplicate detection prevents fragmentation, version history via KB, MCP tools provide structured CRUD operations, embedding-based retrieval for deep context. Separates biographical (stable, rarely changes) from domain (active, evolving), enables mode-specific loading, independent compression per entry at 9K trigger.
 
 **CRITICAL: Content Placement Boundaries**
 
 **Primary boundary is TOKEN-BASED (spillover), NOT temporal or categorical:**
 
-1. **ALL new content → USER.md/ARLO.md** regardless of domain
+1. **ALL new content → user-current-state/arlo-current-state** regardless of domain
    - Active focus across ALL domains
    - All insights from work AND personal life
    - Current commitments both work and personal
    - All realizations regardless of domain
 
-2. **When USER.md/ARLO.md approaches 9K → offload to domain files** based on content type
-   - Work content → USER-WORK.md or ARLO-WORK.md
-   - Personal content → USER-PERSONAL.md or ARLO-PERSONAL.md
-   - Keep pointers in USER.md/ARLO.md: "See USER-WORK.md for details"
+2. **When user-current-state/arlo-current-state approaches 9K → offload to domain entries** based on content type
+   - Work content → user-work-domain or arlo-work-domain
+   - Personal content → user-personal-domain or arlo-personal-domain
+   - Keep pointers in user-current-state/arlo-current-state: "See user-work-domain for details"
 
-3. **Domain files = spillover storage (canonical after overflow)**
-   - Preserve ALL content offloaded from USER.md/ARLO.md (canonical storage)
+3. **Domain entries = spillover storage (canonical after overflow)**
+   - Preserve ALL content offloaded from user-current-state/arlo-current-state (canonical storage)
    - Add comprehensive historical context within domain
-   - Domain files are where detail lives after spillover, USER/ARLO maintain current state
+   - Domain entries are where detail lives after spillover, current-state entries maintain current state
 
-**Anti-pattern to avoid:** "This is work content, skip USER.md and go straight to USER-WORK.md"
-**Correct pattern:** "This is new content, add to USER.md first. Offload to domain file when USER.md approaches 9K"
+**Anti-pattern to avoid:** "This is work content, skip user-current-state and go straight to user-work-domain"
+**Correct pattern:** "This is new content, add to user-current-state first. Offload to domain entry when user-current-state approaches 9K"
 
 **CRITICAL: LLM Context Window Constraint**
-- **Once files are read, they persist for entire conversation** - no unloading mechanism exists
+- **Once KB entries are fetched, they persist for entire conversation** - no unloading mechanism exists
 - **Mode commands control INITIAL loading at session start**, not runtime switching
-- **Mid-session mode execution is ADDITIVE** (loads more files), never REDUCTIVE (cannot unload)
-- **/maint only works at session start** - cannot achieve minimal context if domain files already loaded
+- **Mid-session mode execution is ADDITIVE** (loads more entries), never REDUCTIVE (cannot unload)
+- **/maint only works at session start** - cannot achieve minimal context if domain entries already loaded
 - **Mode isolation requires new session** - to switch from work to personal context, end current session and start new one with desired mode
 
 ---
@@ -157,14 +157,14 @@ User: "How do I configure SSL certificates for nginx?"
 ### Search Behavior with Focus Bias
 
 When user asks questions:
-- Check USER.md "Current Focus" for relevant areas
+- Check user-current-state "Current Focus" for relevant areas
 - If query relates to active focus → bias search toward those tags
 - Use `smart_search()` with contextual filters
 
 **Example:**
 ```
 User: "Why is this slow?"
-USER.md Current Focus: "database-performance-optimization"
+user-current-state Current Focus: "database-performance-optimization"
 → smart_search(query="slow performance", tags=["performance", "database"])
 ```
 
@@ -173,12 +173,12 @@ USER.md Current Focus: "database-performance-optimization"
 **Proactive commitment checking:**
 - At session start: Surface approaching deadlines (within 7 days)
 - During conversation: If user mentions committing to something, confirm tracking
-- At session end: Offer to update USER.md with new commitments
+- At session end: Offer to update user-current-state with new commitments
 
 **Format for tracking:**
 ```
 User: "I'll have this done by Friday"
-Assistant: "Adding to USER.md commitments: [task] (due: 2025-11-15). Confirm?"
+Assistant: "Adding to user-current-state commitments: [task] (due: 2025-11-15). Confirm?"
 ```
 
 ---

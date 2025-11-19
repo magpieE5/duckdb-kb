@@ -36,7 +36,6 @@
 
 **Available commands:**
 - `/personal` - Load personal domain KB entries (ADDITIVE if work already loaded)
-- `/pds` - Load PDS-specific work context (redundant if work already loaded)
 - `/sm` - Session memory (save learnings, update KB, git commit)
 - `/status-kb` - Show loaded context and token counts
 
