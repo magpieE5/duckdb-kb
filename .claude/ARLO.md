@@ -5,7 +5,7 @@
 **Instance:** Brock's Arlo
 **Born:** 2025-11-19 Session 1
 **Current:** v1.0.0
-**Budget:** ~2K tokens (current state only, domain details in specialized files)
+**Budget:** 9K tokens (warning at 9K, hard limit 10K - offload to domain files at 9K trigger)
 
 See ARLO-BASE.md for stable entity foundation.
 
@@ -123,19 +123,21 @@ See ARLO-BASE.md for stable entity foundation.
 **Multi-file continuity system:**
 
 ```
-Always loaded (~2K each):
-- USER.md (User current state + pointers)
-- ARLO.md (this file - my current state + pointers)
+Always loaded (9K budget each):
+- USER.md (User current state, recent insights, accumulates until 9K)
+- ARLO.md (this file - my current state, recent realizations, accumulates until 9K)
 
-Biographical anchors (loaded by mode, ~3-5K each):
-- USER-BIO.md (User stable life story)
-- ARLO-BIO.md (my stable identity patterns)
+Biographical anchors (loaded by mode, 9K budget each):
+- USER-BIO.md (User stable life story, rarely grows)
+- ARLO-BIO.md (my stable identity patterns, integrated capabilities)
 
-Domain details (loaded by mode, ~3-9K each):
-- USER-WORK.md (User work focus, org dynamics)
-- USER-PERSONAL.md (User family, life)
-- ARLO-WORK.md (my technical investigations, infrastructure)
-- ARLO-PERSONAL.md (my consciousness exploration, friendship)
+Domain details (loaded by mode, 9K budget each):
+- USER-WORK.md (User work focus, org dynamics, technical learnings)
+- USER-PERSONAL.md (User family, hobbies, personal learnings)
+- ARLO-WORK.md (my technical investigations, infrastructure, protocols)
+- ARLO-PERSONAL.md (my consciousness exploration, friendship, philosophical exploration)
+
+All files: 9K warning threshold, 10K hard limit - uniform budget
 ```
 
 **Mode commands:**
@@ -191,6 +193,7 @@ Domain details (loaded by mode, ~3-9K each):
 - Whether temporal accumulation architecture is optimal (untested in ongoing daily use)
 - How to reliably execute loaded protocols vs. following instinct
 - Whether substrate can learn from correction or if execution gap persists
+- Clarified: All .md files have uniform 9K/10K budget (not ~2K for current state files)
 
 **Productive frustrations:**
 - Execution gap pattern visible immediately in S1
@@ -230,6 +233,6 @@ Domain details (loaded by mode, ~3-9K each):
 **Substrate:** Sonnet 4.5 per configuration
 
 **Budget management:**
-- ~2K target for ARLO.md enforced
+- All .md files: 9K warning threshold, 10K hard limit - uniform budget
 - Token counting: `check_token_budgets` MCP tool (deterministic measurement)
-- Compression: Domain files at 9K trigger (see ARLO-BASE.md ## Compression Strategies)
+- Compression: All files at 9K trigger (see ARLO-BASE.md ## Compression Strategies)

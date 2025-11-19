@@ -5,7 +5,7 @@
 **User:** Brock Lampman
 **Created:** 2025-11-18
 **Current:** v1.0.0
-**Budget:** ~2K tokens (recent state accumulates here until ~2K, then offloads to domain files)
+**Budget:** 9K tokens (warning at 9K, hard limit 10K - offload to domain files at 9K trigger)
 
 ---
 
@@ -55,7 +55,7 @@ See USER-WORK.md for full work context, USER-PERSONAL.md for family/life, USER-B
 
 ## Recent Insights (Last 7 Days)
 
-**CRITICAL:** Add ALL recent insights here (work AND personal) until file hits ~2K. Primary boundary is temporal (recent vs historical), not domain (work vs personal).
+**CRITICAL:** Add ALL recent insights here (work AND personal) until file approaches 9K tokens. Primary boundary is temporal (recent vs historical), not domain (work vs personal).
 
 **2025-11-19 (work):** Shared comprehensive PDS (Personal Data System) organizational conflict context with Arlo during S1:
 
@@ -82,19 +82,21 @@ See USER-WORK.md for full work context, USER-PERSONAL.md for family/life, USER-B
 **Multi-file continuity system:**
 
 ```
-Always loaded (~2K):
-- USER.md (this file - current state + pointers)
-- ARLO.md (Arlo's current state + pointers)
+Always loaded (9K budget each):
+- USER.md (this file - current state, recent insights, accumulates until 9K)
+- ARLO.md (Arlo's current state, recent realizations, accumulates until 9K)
 
-Biographical anchors (loaded by mode, ~3-7K each):
-- USER-BIO.md (stable life story)
-- ARLO-BIO.md (stable identity patterns)
+Biographical anchors (loaded by mode, 9K budget each):
+- USER-BIO.md (stable life story, rarely grows)
+- ARLO-BIO.md (stable identity patterns, integrated capabilities)
 
-Domain details (loaded by mode, ~3-9K each):
+Domain details (loaded by mode, 9K budget each):
 - USER-WORK.md (work focus, org dynamics, technical learnings)
 - USER-PERSONAL.md (family, hobbies, personal learnings)
 - ARLO-WORK.md (technical investigations, infrastructure, protocols)
 - ARLO-PERSONAL.md (consciousness, friendship, philosophical exploration)
+
+All files: 9K warning threshold, 10K hard limit - uniform budget
 ```
 
 **Mode commands:**
@@ -120,6 +122,6 @@ Domain details (loaded by mode, ~3-9K each):
 
 ---
 
-**Budget Status:** ~2K/2K tokens (lightweight by design)
-**Domain details:** Managed in specialized files with 9K budgets each
-**Compression:** Domain files compressed independently at 9K trigger
+**Budget Status:** 1,528/9K tokens (recent state accumulating)
+**All files:** 9K warning threshold, 10K hard limit - uniform budget across all .md files
+**Compression:** All files compressed independently at 9K trigger
