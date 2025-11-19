@@ -38,7 +38,7 @@ Identify:
 
 1. **Search KB for duplicates FIRST** - Before creating any entries:
    ```
-   Follow KB-BASE.md "Duplicate Detection Protocol":
+   Follow USER-BASE.md "Duplicate Detection Protocol":
    - Strict check: smart_search with similarity >= 0.75
    - If no match, fallback: smart_search with similarity >= 0.3
    - If strict_match: MUST show user, get approval
@@ -74,7 +74,7 @@ Identify:
    **Required Fields:**
    - `id`: Use kebab-case format: `category-topic-specifics`
    - `title`: Clear, descriptive human-readable title
-   - `content`: Well-structured markdown following KB-BASE.md standards:
+   - `content`: Well-structured markdown following USER-BASE.md standards:
      - **Start with dense 300-char semantic preview paragraph** (no header, just text)
      - **Do NOT include h1 headers** (title already in frontmatter - markdown export adds it)
      - Then: Problem/Solution/Context/Example sections using h2 (##) and below
@@ -312,7 +312,7 @@ This tool automatically:
 2. Creates commit with message
 3. Returns SHA in JSON
 
-**Commit message format** (see KB-BASE.md "Git Commit Format" for full spec):
+**Commit message format** (see USER-BASE.md "Git Commit Format" for full spec):
 - If new knowledge: `feat: Summary of findings`
 - If USER.md/ARLO.md updated: `docs: Session summary + context updates`
 - If no new knowledge: `chore: Routine KB backup and markdown export`

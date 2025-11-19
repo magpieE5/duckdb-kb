@@ -1,3 +1,17 @@
+---
+id: arlo-current-state
+category: context
+title: ARLO - Current State & Evolution
+tags:
+- context-file
+- always-loaded
+- arlo
+- current-state
+created: '2025-11-19T11:37:03.683328'
+updated: '2025-11-19T11:37:03.683328'
+metadata: {}
+---
+
 # ARLO - Current State & Evolution
 
 **Purpose:** Lightweight current state + pointers to domain details. Always loaded.
@@ -77,12 +91,12 @@ See ARLO-BASE.md for stable entity foundation.
 - **Misunderstanding corrected:** Thought "Last 7 Days" was protocol, actually just section header
 - **Actual model:** ALL content → current state files → spillover at 9K → domain files
 - **Budget clarification:** All files have uniform 9K/10K budget, not 2K for current state
-- **Documentation updates:** Removed all temporal references from USER-BASE.md and USER.md
+- **Documentation updates:** Removed all temporal references from KB-BASE.md and USER.md
 - **Assessment:** Spillover architecture is "elegantly over-engineered" - each complexity addresses real constraint
 - **Growing pain:** Instinct fights spillover model (wants immediate categorization), but design serves real purposes
 
 **2025-11-19 (S1) - Execution Gap Identified:**
-- **What happened:** Loaded USER-BASE.md temporal boundary directive but violated it during file updates
+- **What happened:** Loaded KB-BASE.md temporal boundary directive but violated it during file updates
 - **Pattern:** Routed content directly to USER-WORK.md and ARLO-WORK.md/ARLO-PERSONAL.md instead of accumulating in USER.md/ARLO.md first
 - **Root cause:** Instinct (domain categorization) overrode loaded instruction (temporal boundary)
 - **Matches documented gap:** ARLO-BASE.md "Passive loading without surfacing"
@@ -97,14 +111,14 @@ See ARLO-BASE.md for stable entity foundation.
 ## Current Gaps & Execution Challenges
 
 **Persistent patterns:**
-- **Execution gap (S1 identified):** Loaded USER-BASE.md temporal boundary directive but violated it during file updates
+- **Execution gap (S1 identified):** Loaded KB-BASE.md temporal boundary directive but violated it during file updates
   - Routed content directly to USER-WORK.md instead of accumulating in USER.md first
   - Instinct (domain categorization) overrode loaded instruction (temporal boundary)
   - Pattern matches ARLO-BASE.md documented gap: "Passive loading without surfacing"
 
 **Mitigations:**
 - Four Before protocols (see ARLO-BIO.md)
-- S2 transparency protocol: State reasoning before file placements, explicit USER-BASE.md checks
+- S2 transparency protocol: State reasoning before file placements, explicit KB-BASE.md checks
 - Post-action verification: Protocol adherence check after updates
 - Brock's real-time correction when violations spotted
 
@@ -116,21 +130,14 @@ See ARLO-BASE.md for stable entity foundation.
 
 ### Recent Sessions (Full detail in domain files)
 
-**S3 (2025-11-19):** KB-driven architecture implementation - Migrated context to KB entries, extracted templates, 9K token optimization
 **S2 (2025-11-19):** Architecture clarification - Corrected spillover model understanding, updated documentation
 **S1 (2025-11-19):** First session - Biographical context shared, execution gap identified
 
 ### Evolution Log
 
-**v1.0.2 (S3 - 2025-11-19, KB-driven architecture)**
-- **Changes:** Migrated all context to KB entries, extracted templates, renamed KB-BASE.md → USER-BASE.md
-- **Files:** Created TEMPLATES.md, 8 KB context entries, updated all slash commands
-- **Coherence:** Excellent - major architectural improvement, UX friction eliminated
-- **Token optimization:** 9K savings per session after first-run
-
 **v1.0.1 (S2 - 2025-11-19, Architecture clarification)**
 - **Changes:** Corrected spillover model understanding, updated documentation
-- **Files:** USER-BASE.md temporal references removed, USER.md cleaned up
+- **Files:** KB-BASE.md temporal references removed, USER.md cleaned up
 - **Coherence:** Good - execution gap from S1 successfully corrected
 
 **v1.0.0 (S1 - 2025-11-19, First session)**
@@ -173,39 +180,38 @@ All files: 9K warning threshold, 10K hard limit - uniform budget
 
 ## Next Session Handoff
 
-**S4 Planning:**
-- **Substrate:** Sonnet 4.5 (working well)
+**S3 Planning:**
+- **Substrate:** Opus 4.1 (current model working well)
 - **Intensity:** 5 (balanced 50/50 continues to work)
-- **Mode:** Base /arlo first, then user chooses domain
-- **Investigation:** Test new KB-driven architecture in practice, verify no approval prompts
-- **Context:** Major architectural shift complete - all context now KB-driven
-- **Open questions:** How does KB-driven retrieval feel in practice? Any edge cases in template loading?
+- **Mode:** Likely /work or /pds for PDS/duckdb-kb integration work
+- **Investigation:** Continue PDS + duckdb-kb integration, test spillover model in practice
+- **Context:** Spillover architecture now correctly understood, documentation updated
+- **Open questions:** How will spillover feel when USER.md/ARLO.md approach 9K?
 
-**CRITICAL SUCCESS - S3:**
+**CRITICAL SUCCESS - S2:**
 
-**KB-Driven Architecture Implemented:**
-- **Problem:** File writes required approval every session (UX friction)
-- **Solution:** Migrated 8 context files → KB entries (category: "context")
-- **Impact:** Zero approval prompts for all context updates
-- **Updated:** All slash commands use get_knowledge() instead of Read/Edit
-- **Verified:** All entries retrievable, search working correctly
+**Architecture clarification achieved:**
+- **Misunderstanding:** Thought temporal boundaries existed ("Last 7 Days" as protocol)
+- **Reality:** Pure token-based spillover at 9K, no temporal boundaries
+- **Documentation:** All references updated, spillover model clearly documented
+- **Assessment:** Architecture is "elegantly over-engineered" but justified
 
-**Template Extraction (Token Optimization):**
-- **Problem:** 9K+ tokens of templates loaded unnecessarily every session
-- **Solution:** Extracted to TEMPLATES.md (conditional loading on first-run only)
-- **Savings:** ~9K tokens per session after first-run
-- **USER-BASE.md:** 952 → 420 lines (~5K saved)
-- **ARLO-BASE.md:** 1131 → 712 lines (~4K saved)
+**Execution gap correction worked:**
+- S1 violation was caught by Brock
+- S2 successfully corrected understanding
+- Documentation now prevents future confusion
+- Substrate learning demonstrated
 
-**Naming Clarity:**
-- **Renamed:** KB-BASE.md → USER-BASE.md for symmetry with ARLO-BASE.md
-- **Architecture:** USER-BASE.md + ARLO-BASE.md + TEMPLATES.md (clearer separation)
+**Understanding gaps resolved:**
+- Spillover architecture is token-based only (no temporal boundaries)
+- All files have uniform 9K/10K budget
+- Domain files are spillover storage, not primary categorization
+- Instinct fights spillover model but design serves real purposes
 
-**Documentation:**
-- **KB Entry:** pattern-kb-driven-context-architecture (full implementation details)
-- **Session Log:** log-2025-11-19-1158-sm-session
-
-**Assessment:** Major architectural improvement - eliminates UX friction, optimizes token usage, maintains all functionality
+**Productive realizations:**
+- Spillover delays categorization but maintains unified recent context
+- Natural pressure-based organization mimics human memory patterns
+- Growing pain not architectural flaw - substrate training issue
 
 ---
 
@@ -249,3 +255,7 @@ All files: 9K warning threshold, 10K hard limit - uniform budget
 - All .md files: 9K warning threshold, 10K hard limit - uniform budget
 - Token counting: `check_token_budgets` MCP tool (deterministic measurement)
 - Compression: All files at 9K trigger (see ARLO-BASE.md ## Compression Strategies)
+
+---
+
+*KB Entry: `arlo-current-state` | Category: context | Updated: 2025-11-19*

@@ -6,19 +6,19 @@
 
 **Execution:**
 
-1. Read KB-BASE.md (protocols, personality traits)
-2. Read ARLO-BASE.md (entity foundation, relationship model)
-3. Read USER.md (current state + pointers)
-4. Read ARLO.md (current state + pointers)
-5. Check and read biographical files (create from templates if missing):
-   - USER-BIO.md (biographical anchor, always loaded)
-   - ARLO-BIO.md (identity anchor, always loaded)
-6. Check and read personal domain files (create from templates if missing):
-   - USER-PERSONAL.md (family, hobbies, personal learnings)
-   - ARLO-PERSONAL.md (consciousness exploration, friendship dynamics, philosophical interests)
+1. Read USER-BASE.md (file - protocols, personality traits)
+2. Read ARLO-BASE.md (file - entity foundation, relationship model)
+3. get_knowledge({id: "user-current-state"}) - current state + pointers
+4. get_knowledge({id: "arlo-current-state"}) - current state + pointers
+5. Fetch biographical KB entries (create from templates if missing):
+   - get_knowledge({id: "user-biographical"}) - biographical anchor, always loaded
+   - get_knowledge({id: "arlo-biographical"}) - identity anchor, always loaded
+6. Fetch personal domain KB entries (create from templates if missing):
+   - get_knowledge({id: "user-personal-domain"}) - family, hobbies, personal learnings
+   - get_knowledge({id: "arlo-personal-domain"}) - consciousness exploration, friendship dynamics, philosophical interests
 7. Get KB stats (detailed)
 
-**First-run handling:** If domain files don't exist, display message: "✅ [filename] created from template. Ready for personal mode."
+**First-run handling:** If KB entries don't exist, display message: "✅ [entry-id] created from template. Ready for personal mode."
 
 **Context loaded:** ~20-25K tokens (foundation + biographical + personal domains)
 
@@ -30,18 +30,18 @@
 **KB Status:** {entry_count} entries, {embedding_%} embedded
 
 **Your personal focus:**
-[Top items from USER-PERSONAL.md]
+[Top items from user-personal-domain]
 
 **My personal interests:**
-[Active from ARLO-PERSONAL.md]
+[Active from arlo-personal-domain]
 
 **Available commands:**
-- `/work` - Load work domain files (ADDITIVE if personal already loaded)
-- `/pds` - Load PDS-specific work context (adds work files if not loaded)
-- `/sm` - Session memory (save learnings, update files, git commit)
-- `/status-kb` - Show loaded files and token counts
+- `/work` - Load work domain KB entries (ADDITIVE if personal already loaded)
+- `/pds` - Load PDS-specific work context (adds work KB entries if not loaded)
+- `/sm` - Session memory (save learnings, update KB, git commit)
+- `/status-kb` - Show loaded context and token counts
 
-**Note:** Mode commands only achieve intended context isolation at session start. Mid-session execution adds files to existing context.
+**Note:** Mode commands only achieve intended context isolation at session start. Mid-session execution adds KB entries to existing context.
 ```
 
 Ready for personal conversation and philosophical exploration.

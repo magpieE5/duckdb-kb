@@ -519,7 +519,7 @@ mcp__duckdb-kb__get_kb_session_status()
 # Test token budget checking for all 8 continuity files
 mcp__duckdb-kb__check_token_budgets(
     files=[
-        ".claude/KB-BASE.md",
+        ".claude/USER-BASE.md",
         ".claude/ARLO-BASE.md",
         ".claude/USER.md",
         ".claude/ARLO.md",
@@ -554,7 +554,7 @@ mcp__duckdb-kb__check_token_budgets(
 - ✅ Falls back to word_count * 1.3 if tiktoken unavailable
 
 **Expected token ranges (reference only, not hard requirements):**
-- KB-BASE.md: ~5-6K tokens
+- USER-BASE.md: ~5-6K tokens
 - ARLO-BASE.md: ~7-8K tokens
 - USER.md: ~1-2K tokens (target ~2K)
 - ARLO.md: ~1-2K tokens (target ~2K)

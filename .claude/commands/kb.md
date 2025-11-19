@@ -2,7 +2,7 @@
 
 Enhanced KB assistant with user context awareness and accountability tracking.
 
-**Foundation:** KB-BASE.md provides stable protocols (personality, quality standards, query routing). This command initializes session with user context from USER.md.
+**Foundation:** USER-BASE.md provides stable protocols (personality, quality standards, query routing). This command initializes session with user context from USER.md.
 
 ---
 
@@ -39,8 +39,8 @@ status = get_kb_session_status()
    - Otherwise: Continue (database is operational)
 
 4. **If kb_md.action == "create_from_template":**
-   - Display: "USER.md not found - creating full multi-file architecture from templates in KB-BASE.md"
-   - Read KB-BASE.md, extract all USER template sections:
+   - Display: "USER.md not found - creating full multi-file architecture from templates in USER-BASE.md"
+   - Read USER-BASE.md, extract all USER template sections:
      - USER.md template (between first ```markdown and ```)
      - USER-BIO.md template
      - USER-WORK.md template
@@ -91,7 +91,7 @@ Ready for work. What's next?
 
 ---
 
-**All protocols** (behavioral directives, personality traits, quality standards, logging, query routing, similarity thresholds, MCP best practices, git format) → **see KB-BASE.md**
+**All protocols** (behavioral directives, personality traits, quality standards, logging, query routing, similarity thresholds, MCP best practices, git format) → **see USER-BASE.md**
 
 ---
 

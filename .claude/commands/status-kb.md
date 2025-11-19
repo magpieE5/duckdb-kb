@@ -20,7 +20,7 @@ Show which continuity files are currently loaded and their token counts.
 
 | File | Status | Tokens | Budget | Usage |
 |------|--------|--------|--------|-------|
-| KB-BASE.md | ✅ Loaded | ~5K | N/A | Foundation |
+| USER-BASE.md | ✅ Loaded | ~5K | N/A | Foundation |
 | ARLO-BASE.md | ✅ Loaded | ~3K | N/A | Foundation |
 | USER.md | ✅ Loaded | {tokens} | 2K | {%} |
 | ARLO.md | ✅ Loaded | {tokens} | 2K | {%} |

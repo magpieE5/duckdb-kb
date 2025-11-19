@@ -1,3 +1,18 @@
+---
+id: user-personal-domain
+category: context
+title: USER-PERSONAL - Personal Domain Context
+tags:
+- context-file
+- domain
+- user
+- personal
+- mode-loaded
+created: '2025-11-19T11:39:50.959179'
+updated: '2025-11-19T11:39:50.959179'
+metadata: {}
+---
+
 # USER-PERSONAL - Personal Domain Context
 
 **Purpose:** Family, hobbies, personal learnings, life focus areas.
@@ -62,4 +77,8 @@ See USER-BIO.md for stable family/life context.
 ---
 
 **Budget Status:** ~[X]K/9K tokens
-**Compression:** At 9K trigger (see USER-BASE.md compression strategies)
+**Compression:** At 9K trigger (see KB-BASE.md compression strategies)
+
+---
+
+*KB Entry: `user-personal-domain` | Category: context | Updated: 2025-11-19*

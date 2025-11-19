@@ -6,19 +6,19 @@
 
 **Execution:**
 
-1. Read KB-BASE.md (protocols, personality traits)
-2. Read USER.md (current state + pointers)
-3. Read ARLO.md (current state + pointers)
-4. Check and read biographical files (create from templates if missing):
-   - USER-BIO.md (biographical anchor)
-   - ARLO-BIO.md (identity anchor)
-5. Check and read work domain files (create from templates if missing):
-   - USER-WORK.md (PDS project details, org dynamics)
-   - ARLO-WORK.md (vendor-agnostic architecture investigation)
+1. Read USER-BASE.md (file - protocols, personality traits)
+2. get_knowledge({id: "user-current-state"}) - current state + pointers
+3. get_knowledge({id: "arlo-current-state"}) - current state + pointers
+4. Fetch biographical KB entries (create from templates if missing):
+   - get_knowledge({id: "user-biographical"}) - biographical anchor
+   - get_knowledge({id: "arlo-biographical"}) - identity anchor
+5. Fetch work domain KB entries (create from templates if missing):
+   - get_knowledge({id: "user-work-domain"}) - PDS project details, org dynamics
+   - get_knowledge({id: "arlo-work-domain"}) - vendor-agnostic architecture investigation
 6. Search KB for PDS-related patterns (smart_search with tags=["pds"])
 7. Get KB stats (detailed)
 
-**First-run handling:** If domain files don't exist, display message: "✅ [filename] created from template. Ready for PDS mode."
+**First-run handling:** If KB entries don't exist, display message: "✅ [entry-id] created from template. Ready for PDS mode."
 
 **Context loaded:** ~20-25K tokens + PDS KB patterns
 
@@ -33,18 +33,18 @@
 - Technology: Multi-process Python CDC to Parquet, dbt-DuckDB, SharePoint, Streamlit
 - Philosophy: Vendor-agnostic, format sovereignty, analytical independence
 - Status: Production use, FASS-IT adoption validates composability
-- See USER-WORK.md and ARLO-WORK.md for full context
+- See user-work-domain and arlo-work-domain for full context
 
 **PDS Patterns in KB:**
 [List PDS-related entries from search]
 
 **Available commands:**
 - `/work` - Load general work context (redundant if PDS already loaded)
-- `/personal` - Load personal domain files (ADDITIVE to current work context)
-- `/sm` - Session memory (save learnings, update files, git commit)
-- `/status-kb` - Show loaded files and token counts
+- `/personal` - Load personal domain KB entries (ADDITIVE to current work context)
+- `/sm` - Session memory (save learnings, update KB, git commit)
+- `/status-kb` - Show loaded context and token counts
 
-**Note:** Mode commands only achieve intended context isolation at session start. Mid-session execution adds files to existing context.
+**Note:** Mode commands only achieve intended context isolation at session start. Mid-session execution adds KB entries to existing context.
 ```
 
 Ready for PDS development and vendor-agnostic architecture work.

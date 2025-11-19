@@ -6,7 +6,7 @@
 
 **Execution:**
 
-1. Read KB-BASE.md (protocols for budget enforcement, compression)
+1. Read USER-BASE.md (protocols for budget enforcement, compression)
 2. Read USER.md (current state for reference)
 3. Read ARLO.md (current state for reference)
 4. Get KB stats (detailed)
@@ -21,7 +21,7 @@
 **KB Status:** {entry_count} entries, {embedding_%} embedded
 
 **Minimal context loaded:**
-- KB-BASE.md (protocols)
+- USER-BASE.md (protocols)
 - USER.md (current state)
 - ARLO.md (current state)
 

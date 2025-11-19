@@ -1,3 +1,18 @@
+---
+id: user-work-domain
+category: context
+title: USER-WORK - Work Domain Context
+tags:
+- context-file
+- domain
+- user
+- work
+- mode-loaded
+created: '2025-11-19T11:39:49.915719'
+updated: '2025-11-19T11:39:49.915719'
+metadata: {}
+---
+
 # USER-WORK - Work Domain Context
 
 **Purpose:** Work focus, org dynamics, technical learnings, project details.
@@ -110,4 +125,8 @@ See USER-BIO.md for stable career/org context.
 ---
 
 **Budget Status:** ~1K/9K tokens (template baseline)
-**Compression:** At 9K trigger (see USER-BASE.md compression strategies)
+**Compression:** At 9K trigger (see KB-BASE.md compression strategies)
+
+---
+
+*KB Entry: `user-work-domain` | Category: context | Updated: 2025-11-19*
