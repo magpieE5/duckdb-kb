@@ -11,10 +11,16 @@ from datetime import datetime
 
 TOOL = Tool(
     name="check_token_budgets",
-    description="""Check KB entry token budgets against 10K limit.
+    description="""Check KB entry token budgets against limits.
 
 Uses simple approximation (len(content) // 4) for token counting.
 Returns token counts and budget status (ok or over_budget).
+
+Budget allocation (15K/5K/15K/5K):
+- user-current-state: 15K (high-churn content: active projects, commitments)
+- user-biographical: 5K (stable content: career history, identity)
+- arlo-current-state: 15K (high-churn content: session logs, interests)
+- arlo-biographical: 5K (stable content: core identity, capabilities)
 
 WHEN TO USE:
 - During /sm workflow (mandatory measurement after updating context entries)
@@ -33,7 +39,11 @@ Returns structured status for each KB entry checked.""",
             "budget": {
                 "type": "integer",
                 "default": 10000,
-                "description": "Token budget limit per entry (default: 10000)"
+                "description": "Default token budget limit per entry (default: 10000, overridden by budgets param)"
+            },
+            "budgets": {
+                "type": "object",
+                "description": "Per-entry budget overrides (e.g., {'user-current-state': 15000, 'user-biographical': 5000})"
             }
         }
     }
@@ -44,7 +54,7 @@ Returns structured status for each KB entry checked.""",
 # =============================================================================
 
 async def execute(con, args: dict) -> List[TextContent]:
-    """Check KB entry token budgets against 10K limit"""
+    """Check KB entry token budgets against limits with per-entry budget allocation"""
 
     # Parse arguments
     entry_ids = args.get("entry_ids", [
@@ -53,7 +63,16 @@ async def execute(con, args: dict) -> List[TextContent]:
         "arlo-current-state",
         "arlo-biographical"
     ])
-    budget = args.get("budget", 10000)
+    default_budget = args.get("budget", 10000)
+    per_entry_budgets = args.get("budgets", {})
+
+    # Default budget allocation (15K/5K/15K/5K)
+    DEFAULT_BUDGETS = {
+        "user-current-state": 15000,
+        "user-biographical": 5000,
+        "arlo-current-state": 15000,
+        "arlo-biographical": 5000
+    }
 
     results = []
     any_over_budget = False
@@ -70,6 +89,14 @@ async def execute(con, args: dict) -> List[TextContent]:
             continue
 
         content = row[0]
+
+        # Determine budget for this entry (priority: per_entry_budgets > DEFAULT_BUDGETS > default_budget)
+        if per_entry_budgets and entry_id in per_entry_budgets:
+            budget = per_entry_budgets[entry_id]
+        elif entry_id in DEFAULT_BUDGETS:
+            budget = DEFAULT_BUDGETS[entry_id]
+        else:
+            budget = default_budget
 
         # Simple token approximation: len(content) // 4
         token_estimate = len(content) // 4
@@ -99,7 +126,8 @@ async def execute(con, args: dict) -> List[TextContent]:
         "overall_status": "over_budget" if any_over_budget else "ok",
         "entries": results,
         "timestamp": datetime.now().isoformat(),
-        "note": "If over_budget, apply offloading protocol per KB-BASE.md 'Autonomous Offload at 10K Cap'"
+        "budget_allocation": "15K/5K/15K/5K (current-state/biographical/current-state/biographical)",
+        "note": "If over_budget, apply offloading protocol per KB-BASE.md 'Autonomous Offload at Cap'"
     }
 
     return [TextContent(type="text", text=json.dumps(response))]
