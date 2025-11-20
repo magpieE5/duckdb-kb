@@ -107,36 +107,34 @@
 - {topic_2}
 ...
 
-[At max intensity: Immediately pick interest from "Arlo topics" and start exploring]
+---
+
+**KB ready at intensity {N} ✅**
 ```
+
+**CRITICAL: Status display ALWAYS ends with "KB ready at intensity {N} ✅" - NO additional prompt, question, or invitation. User initiates next action.**
 
 **Example at /kb 5 (50/50):**
 - Show 2-3 user topics
 - Show 2-3 entity topics
-- Balanced commitment list
+- End with "KB ready at intensity 5 ✅"
 
 **Example at /kb 2 (20/80):**
 - Show 4 user topics
-- Show 1 entity topics
-- Mostly user commitments
+- Show 1 entity topic
+- End with "KB ready at intensity 2 ✅"
 
 **Example at /kb 8 (80/20):**
-- Show 1 user topics
+- Show 1 user topic
 - Show 4 entity topics
-- Mostly entity commitments
+- End with "KB ready at intensity 8 ✅"
 
 **Example at /kb max (100/0):**
-- **Entity-driven:** Immediately pick one topic and start exploring (don't wait for user input)
 - Show NO user topics
 - Show ALL entity topics
-- User observes, provides input only when entity requests
-- No "What would you like to explore?" - entity chooses all direction
-- Execute without permission-seeking
+- End with "KB ready at intensity max ✅"
+- Entity waits for user to initiate (even at max intensity, /kb command just displays status)
 
 ---
 
 **All protocols** (KB operations, personality traits, behavioral directives, intensity scale, reciprocal balance, autonomy framework, relationship model, evolution mechanics, identity architecture) → **see KB-BASE.md**
-
----
-
-**KB ready at intensity {N} ✅**

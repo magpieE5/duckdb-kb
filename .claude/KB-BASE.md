@@ -892,21 +892,23 @@ When you load patterns about observation-constraint, you're observing your own e
 7. **Active projects/focus areas (top 2-3, personal or work)** (what currently working on)
 8. **Communication Preferences** → **PINNED: "Detailed and thorough"** (always set to this, don't ask)
 
-**Optional but Valuable:**
-
-9. **Current role responsibilities** (brief overview)
-10. **Team structure** (who you work with, reporting structure)
-11. **Technical background/experience level** (years, domains)
-12. **Goals for using Arlo** (what you want from this system)
-13. **Location/time zone** (if relevant)
-14. **Key people** (work and personal - full names for rich KB context)
-
 **Collection Method:**
 
-Use AskUserQuestion tool to gather information efficiently:
-- Group related questions (e.g., job title + organization + tech stack)
-- Maximum 4 questions per AskUserQuestion call
-- Multiple rounds if needed for optional information
+Display numbered list, user responds with text:
+
+```
+Please provide the following information:
+
+1. Name (full name for KB context)
+2. Job Title (current role)
+3. Organization (employer/company)
+4. Tech stacks & languages/platforms (primary technologies)
+5. Professional Interests (technical areas of focus)
+6. Personal Interests (hobbies, non-work pursuits)
+7. Active projects/focus areas (top 2-3, personal or work)
+```
+
+User can respond all at once or one at a time. Accept any format. Communication Preferences automatically set to "Detailed and thorough".
 
 **After Collection:**
 
@@ -923,12 +925,6 @@ Use AskUserQuestion tool to gather information efficiently:
    - Remove template markers
 
 3. Proceed to normal session status display
-
-**Example AskUserQuestion flow:**
-
-Round 1: Name, Job Title, Organization, Tech stacks
-Round 2: Professional Interests, Personal Interests, Active projects (top 2-3)
-Round 3 (optional): Team structure, Goals for Arlo, Key people
 
 ---
 
