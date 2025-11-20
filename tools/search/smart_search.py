@@ -3,7 +3,7 @@
 from mcp.types import Tool, TextContent
 from typing import List, Optional, Dict
 import json
-from tools.base import generate_embedding, DEFAULT_SIMILARITY_THRESHOLD
+from tools.base import generate_embedding, DEFAULT_SIMILARITY_THRESHOLD, normalize_tags
 
 # =============================================================================
 # Tool Definition (for registration)
@@ -57,7 +57,7 @@ TIP: More filters = faster, more focused results.""",
 # Helper Functions
 # =============================================================================
 
-def search_logs_python(con, query_embedding: List[float], threshold: float) -> List[dict]:
+def search_logs_python(con, query_embedding: List[float], threshold: float) -> List[Dict]:
     """Search log entries with semantic ranking, sorted by time."""
     sql = """
         SELECT id, category, title, tags, content, metadata, created, updated,
@@ -83,8 +83,8 @@ def search_logs_python(con, query_embedding: List[float], threshold: float) -> L
 
 
 def search_exact_python(con, query_text: str,
-                       category: Optional[str], tags: Optional[list],
-                       date_after: Optional[str]) -> List[dict]:
+                       category: Optional[str], tags: Optional[List[str]],
+                       date_after: Optional[str]) -> List[Dict]:
     """Search knowledge table for exact text matches (LIKE)."""
     sql = """
         SELECT id, category, title, tags, content, metadata, created, updated,
@@ -118,8 +118,8 @@ def search_exact_python(con, query_text: str,
 
 
 def search_semantic_python(con, query_embedding: List[float],
-                          category: Optional[str], tags: Optional[list],
-                          date_after: Optional[str], threshold: float) -> List[dict]:
+                          category: Optional[str], tags: Optional[List[str]],
+                          date_after: Optional[str], threshold: float) -> List[Dict]:
     """Search knowledge table for semantic matches (cosine similarity)."""
     sql = """
         SELECT id, category, title, tags, content, metadata, created, updated,
@@ -152,7 +152,7 @@ def search_semantic_python(con, query_embedding: List[float],
     return [dict(zip(cols, row)) for row in results]
 
 
-def merge_results(exact_matches: List[dict], semantic_matches: List[dict], limit: int) -> List[dict]:
+def merge_results(exact_matches: List[Dict], semantic_matches: List[Dict], limit: int) -> List[Dict]:
     """Merge and deduplicate exact + semantic matches, keeping highest similarity per ID."""
     # Index by ID, keeping highest similarity
     merged = {}
@@ -184,7 +184,7 @@ async def execute(con, args: dict) -> List[TextContent]:
     tags = args.get("tags")
     # Normalize tag filters to match DB normalization
     if tags:
-        tags = [tag.lower().strip() for tag in tags]
+        tags = normalize_tags(tags)
     date_after = args.get("date_after")
     threshold = args.get("similarity_threshold", DEFAULT_SIMILARITY_THRESHOLD)
     limit = args.get("limit", 10)

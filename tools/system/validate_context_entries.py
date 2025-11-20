@@ -414,11 +414,16 @@ def customize_template(template_name: str, user_name: str = None, instance_name:
     date = datetime.now().strftime("%Y-%m-%d")
     model = "claude-sonnet-4-5-20250929"  # Current model
 
+    # Sanitize inputs to prevent format string injection
+    # Replace curly braces with escaped versions
+    safe_user_name = (user_name or "[Your Name]").replace("{", "{{").replace("}", "}}")
+    safe_instance_name = instance_name.replace("{", "{{").replace("}", "}}")
+
     return template.format(
-        user_name=user_name or "[Your Name]",
+        user_name=safe_user_name,
         date=date,
         model=model,
-        instance_name=instance_name
+        instance_name=safe_instance_name
     )
 
 # =============================================================================

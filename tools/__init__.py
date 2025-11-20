@@ -17,6 +17,7 @@ from mcp.types import Tool, TextContent
 # =============================================================================
 
 _tool_registry: Dict[str, Dict] = {}  # Maps tool_name -> {module, handler, requires_db, tool_def}
+_registration_failures: List[tuple] = []  # Tracks (module_name, error_msg) for failed registrations
 
 
 def register_tool(module_name: str, subdir: str):
@@ -45,8 +46,10 @@ def register_tool(module_name: str, subdir: str):
         }
 
     except Exception as e:
-        # Fail silently during auto-discovery (expected for __init__.py, etc.)
-        pass
+        # Expected failures: __init__.py, base.py (not tools)
+        # Log unexpected failures for debugging
+        if module_name not in ['__init__', 'base']:
+            _registration_failures.append((f"{subdir}.{module_name}", str(e)))
 
 
 def get_tool_handler(tool_name: str) -> Optional[Callable]:
@@ -74,6 +77,15 @@ def tool_requires_db(tool_name: str) -> bool:
 def get_all_tool_definitions() -> List[Tool]:
     """Get all tool definitions for list_tools() handler"""
     return [entry['tool_def'] for entry in _tool_registry.values()]
+
+
+def get_registration_failures() -> List[tuple]:
+    """Get list of tools that failed to register (for debugging)
+
+    Returns:
+        List of (module_name, error_message) tuples
+    """
+    return _registration_failures.copy()
 
 
 # =============================================================================

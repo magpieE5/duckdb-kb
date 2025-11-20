@@ -4,7 +4,7 @@ from mcp.types import Tool, TextContent
 from typing import List
 import json
 from datetime import datetime
-from tools.base import generate_embedding, EMBEDDINGS_AVAILABLE
+from tools.base import generate_embedding, EMBEDDINGS_AVAILABLE, normalize_tags
 
 # =============================================================================
 # Tool Definition (for registration)
@@ -90,9 +90,7 @@ async def execute(con, args: dict) -> List[TextContent]:
     category = args["category"]
     title = args["title"]
     content = args["content"]
-    tags = args.get("tags", [])
-    # Normalize tags: lowercase + trim whitespace for consistent matching
-    tags = [tag.lower().strip() for tag in tags]
+    tags = normalize_tags(args.get("tags", []))
     metadata = args.get("metadata", {})
     generate_emb = args.get("generate_embedding", True)
 

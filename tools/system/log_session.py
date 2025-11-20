@@ -15,6 +15,7 @@ from typing import List, Dict, Any
 import json
 from datetime import datetime
 import subprocess
+from tools.base import error_response, check_entry_budget, DEFAULT_BUDGETS
 
 # =============================================================================
 # Tool Definition (for registration)
@@ -110,7 +111,7 @@ Budget targets (after 15K/5K allocation):
 # =============================================================================
 
 async def execute(con, args: dict) -> List[TextContent]:
-    """Execute session logging workflow"""
+    """Execute session logging workflow with transaction support"""
 
     session_number = args["session_number"]
     intensity = args.get("intensity", 5)
@@ -129,30 +130,47 @@ async def execute(con, args: dict) -> List[TextContent]:
         "offload_suggestions": []
     }
 
-    # Step 1: Update user context entries
-    if user_updates.get("current_state"):
-        await _update_context_entry(con, "user-current-state", user_updates["current_state"])
-        results["updated_entries"].append("user-current-state")
+    try:
+        # Begin transaction - all DB operations atomic
+        con.begin()
 
-    if user_updates.get("biographical"):
-        await _update_context_entry(con, "user-biographical", user_updates["biographical"])
-        results["updated_entries"].append("user-biographical")
+        # Step 1: Update user context entries
+        if user_updates.get("current_state"):
+            await _update_context_entry(con, "user-current-state", user_updates["current_state"])
+            results["updated_entries"].append("user-current-state")
 
-    # Step 2: Update arlo context entries
-    if arlo_updates.get("current_state"):
-        await _update_context_entry(con, "arlo-current-state", arlo_updates["current_state"])
-        results["updated_entries"].append("arlo-current-state")
+        if user_updates.get("biographical"):
+            await _update_context_entry(con, "user-biographical", user_updates["biographical"])
+            results["updated_entries"].append("user-biographical")
 
-    if arlo_updates.get("biographical"):
-        await _update_context_entry(con, "arlo-biographical", arlo_updates["biographical"])
-        results["updated_entries"].append("arlo-biographical")
+        # Step 2: Update arlo context entries
+        if arlo_updates.get("current_state"):
+            await _update_context_entry(con, "arlo-current-state", arlo_updates["current_state"])
+            results["updated_entries"].append("arlo-current-state")
 
-    # Step 3: Create new KB entries
-    for entry in new_entries:
-        await _create_kb_entry(con, entry)
-        results["created_entries"].append(entry["id"])
+        if arlo_updates.get("biographical"):
+            await _update_context_entry(con, "arlo-biographical", arlo_updates["biographical"])
+            results["updated_entries"].append("arlo-biographical")
 
-    # Step 4: Git commit (auto-commit, always)
+        # Step 3: Create new KB entries
+        for entry in new_entries:
+            await _create_kb_entry(con, entry)
+            results["created_entries"].append(entry["id"])
+
+        # Commit transaction - all DB operations succeeded
+        con.commit()
+
+    except Exception as e:
+        # Rollback on any error
+        con.rollback()
+        error = error_response(
+            "database_error",
+            f"Transaction failed: {str(e)}",
+            {"partial_results": results}
+        )
+        return [TextContent(type="text", text=json.dumps(error, indent=2))]
+
+    # Step 4: Git commit (auto-commit, always) - outside transaction
     commit_sha = _git_commit(commit_message)
     results["commit_sha"] = commit_sha
 
@@ -238,36 +256,13 @@ def _git_commit(message: str) -> str:
 
 
 async def _check_budgets(con) -> Dict[str, Dict[str, Any]]:
-    """Check token budgets for context entries"""
-
-    DEFAULT_BUDGETS = {
-        "user-current-state": 15000,
-        "user-biographical": 5000,
-        "arlo-current-state": 15000,
-        "arlo-biographical": 5000
-    }
-
+    """Check token budgets for context entries using shared utility"""
     budgets = {}
 
-    for entry_id, budget in DEFAULT_BUDGETS.items():
-        row = con.execute(
-            "SELECT content FROM knowledge WHERE id = ?",
-            [entry_id]
-        ).fetchone()
-
-        if not row:
-            continue
-
-        content = row[0]
-        tokens = len(content) // 4
-        headroom = budget - tokens
-
-        budgets[entry_id] = {
-            "tokens": tokens,
-            "budget": budget,
-            "headroom": headroom,
-            "status": "over_budget" if tokens > budget else "ok"
-        }
+    for entry_id in DEFAULT_BUDGETS.keys():
+        result = check_entry_budget(con, entry_id)
+        if result["status"] != "missing":
+            budgets[entry_id] = result
 
     return budgets
 

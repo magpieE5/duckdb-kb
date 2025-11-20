@@ -6,6 +6,7 @@ import json
 import os
 import yaml
 from pathlib import Path
+from tools.base import normalize_tags
 
 # =============================================================================
 # Tool Definition (for registration)
@@ -41,6 +42,11 @@ BEST PRACTICE: Export to ~/duckdb-kb/markdown/ for version control + git backup"
                 "type": "boolean",
                 "description": "Create subdirectories by category (default: true)",
                 "default": True
+            },
+            "clear_existing": {
+                "type": "boolean",
+                "description": "Clear existing category directories before export (default: false, safer)",
+                "default": False
             }
         },
         "required": []
@@ -63,8 +69,9 @@ async def execute(con, args: dict) -> List[TextContent]:
     tags_filter = args.get("tags")
     # Normalize tag filters to match DB normalization
     if tags_filter:
-        tags_filter = [tag.lower().strip() for tag in tags_filter]
+        tags_filter = normalize_tags(tags_filter)
     organize_by_category = args.get("organize_by_category", True)
+    clear_existing = args.get("clear_existing", False)
 
     # Build query
     where_clauses = []
@@ -92,8 +99,9 @@ async def execute(con, args: dict) -> List[TextContent]:
     # Create output directory
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Clear existing category directories for clean export
-    if organize_by_category:
+    # Clear existing category directories for clean export (if requested)
+    # Safety: Default is False to prevent accidental data loss
+    if organize_by_category and clear_existing:
         for cat_dir in output_dir.iterdir():
             if cat_dir.is_dir() and cat_dir.name not in ['.obsidian', '.git']:
                 shutil.rmtree(cat_dir)
