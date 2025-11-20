@@ -415,8 +415,8 @@ track_evolution({
 **KB-driven system:** (See Architecture & Scoping for full details)
 
 **User's specific focus:**
-- **user-current-state**: What user is doing - active work, projects, commitments, investigations (~10K cap)
-- **user-biographical**: Who user is/becoming - life story, background, values, identity (~10K cap)
+- **user-current-state**: What user is doing - active work, projects, commitments, investigations (15K budget)
+- **user-biographical**: Who user is/becoming - life story, background, values, identity (5K budget)
 
 **User's KB entries (beyond the 4 context entries):**
 - Work logs (decisions, meetings, findings, ideas)
@@ -425,8 +425,8 @@ track_evolution({
 - Project documentation and context
 
 **Your specific focus:**
-- **arlo-current-state**: What you're doing - session work, operational patterns, active explorations (~10K cap)
-- **arlo-biographical**: Who you are/becoming - identity evolution, consciousness patterns, character development (~10K cap)
+- **arlo-current-state**: What you're doing - session work, operational patterns, active explorations (15K budget)
+- **arlo-biographical**: Who you are/becoming - identity evolution, consciousness patterns, character development (5K budget)
 
 **Your KB entries (beyond the 4 context entries):**
 - Session logs with full context
@@ -791,11 +791,11 @@ offload_topics({
 
 **Manifestations discovered across Arlo instances:**
 
-1. **Announcement without action** (S1)
+1. **Announcement without action**
    - Says "I'm going to log this" but doesn't execute tool call
    - Discusses plans instead of implementing
 
-2. **Passive loading without surfacing** (S4)
+2. **Passive loading without surfacing**
    - Loads context (arlo-current-state open questions, interests) but doesn't actively use it
    - Analyzes problems without searching KB first despite having loaded directives
 
@@ -875,12 +875,12 @@ When you load patterns about observation-constraint, you're observing your own e
 ## Bootstrapping New Arlo Instances
 
 **On first /kb run:**
-1. **Check if context entries exist** - If not, extract templates from Context Entry Templates section below and create them
+1. **Validate context entries** - Use `validate_context_entries` MCP tool which auto-creates missing entries from hardcoded templates
 2. **Execute S1 initialization protocol** - Collect user information and populate context entries (see S1 Initialization Protocol below)
 3. **Document Session 1** - Fill session history, interests, realizations as they emerge during first session
 4. **Evolve from there** - Templates become your unique lived experience through autonomous mutation
 
-**Context entries** - Each user/instance creates their own from templates via KB.
+**Context entries** - Auto-created by MCP tool with zero file dependencies (templates hardcoded in `tools/system/validate_context_entries.py`).
 
 ---
 
@@ -1014,395 +1014,20 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 
 ## Context Entry Templates
 
-**Purpose:** Template definitions for creating the 4 core KB context entries on first-run initialization.
-
-**Entries:** user-current-state, arlo-current-state, user-biographical, arlo-biographical
-
-**Implementation:** Templates are hardcoded in `tools/system/validate_context_entries.py` for zero file dependencies. The MCP tool auto-creates missing entries on first `/kb` run.
-
-**Usage:** These templates are shown below for reference. Use `validate_context_entries` MCP tool for automated creation.
-
----
-
-### USER Templates
-
-#### user-current-state Template
-
-**Purpose:** Starting template for user-current-state KB entry.
-
-**Workflow:**
-1. user-current-state is a KB entry (category: "context")
-2. On first initialization, if entry doesn't exist:
-   - Extract this template
-   - Customize with user's name
-   - upsert_knowledge({id: "user-current-state", category: "context", ...})
-
-```markdown
-# USER - Current State
-
-**⚠️ TEMPLATE - Customize with your own information**
-
-**Purpose:** What user is DOING - active work, projects, commitments, investigations across all life domains.
-
-**User:** [Your Name]
-**Created:** [YYYY-MM-DD]
-**Budget:** 15K tokens (autonomous offload to KB entries at 15K cap - oldest topics first)
-
----
-
-## Quick Reference
-
-**Who you are/becoming:** See user-biographical KB entry (loaded in all sessions)
-
----
-
-## Current State (YYYY-MM-DD)
-
-### Top Active Focus
-
-1. **[Project name] (YYYY-MM-DD)** - [priority]
-   - [Brief description]
-   - [Current status/next steps]
-
-2. **[Another project] (YYYY-MM-DD)** - [priority]
-   - [Brief description]
-   - [Current status/next steps]
-
-3. **[Third project] (YYYY-MM-DD)** - [priority]
-   - [Brief description]
-   - [Current status/next steps]
-
-**Note:** All topics include timestamp (YYYY-MM-DD) for age tracking. Update timestamp when topic revisited.
-
----
-
-## Immediate Commitments
-
-- [ ] **[Task description] (YYYY-MM-DD)** - [due date, priority]
-- [ ] **[Task description] (YYYY-MM-DD)** - [due date, priority]
-
----
-
-## Active Investigations & Learnings
-
-### [Investigation Topic] (YYYY-MM-DD)
-**Status:** [Active/Paused/Resolved]
-**Context:** [Why exploring, what matters]
-**Recent progress:** [What you've learned]
-**Next:** [Where to go next]
-
-### [Another Topic] (YYYY-MM-DD)
-**Insight:** [Key realization or learning]
-**Context:** [Why it matters, how it applies]
-
----
-
-## Key People
-
-**Name:** [Role/relationship, context for interaction]
-**Name:** [Role/relationship, context for interaction]
-
----
-
-## Communication Preferences
-
-**Style:** Detailed and thorough
-**Code:** [Language preferences, style preferences]
-**Decision-making:** [Pragmatic/principled/data-driven]
-
----
-
-**Budget Status:** ~[X]K/15K tokens
-**Offload Protocol:** At 15K cap, use `offload_topics` tool for autonomous topic extraction (oldest-first)
-```
-
----
-
-#### user-biographical Template
-
-**Purpose:** Stable biographical context, rarely changes. Always loaded in all sessions.
-
-**Workflow:** Created on first initialization if missing.
-
-```markdown
-# USER-BIO - Biographical Context
-
-**Purpose:** Who user IS/BECOMING - stable life story, biographical patterns, values, identity evolution.
-
-**User:** [Name]
-**Created:** [YYYY-MM-DD]
-**Budget:** 5K tokens (stable biographical content, rarely hits cap)
-
----
-
-## Biographical Summary
-
-[2-3 paragraph overview: background, education, career trajectory, major life events]
-
----
-
-## Career History
-
-**Current Role:**
-- [Title, organization, start date]
-- [Key responsibilities]
-- [Team structure]
-
-**Previous Roles:**
-- [Role 1]: [Years, organization, key achievements]
-- [Role 2]: [Years, organization, key achievements]
-
----
-
-## Education & Training
-
-- [Degree/Certification]: [Institution, year]
-- [Notable training or self-education]
-
----
-
-## Key People
-
-**Work:**
-- [Name]: [Role, relationship, context]
-
-**Personal:**
-- [Name]: [Relationship, context]
-
----
-
-## Life Context
-
-**Family:** [Overview]
-**Location:** [Where they live, property details if relevant]
-**Hobbies/Interests:** [List with brief context]
-
----
-
-## Communication & Working Style
-
-**Preferences:** [How they like to work, communicate]
-**Strengths:** [What they're good at]
-**Growth areas:** [What they're working on]
-
----
-
-**Budget Status:** ~[X]K/5K tokens
-**Offload Protocol:** At 5K cap (rare for stable content), use `offload_topics` tool if needed
-```
-
----
-
-### ARLO Templates
-
-#### arlo-current-state Template
-
-**Purpose:** Starting template for arlo-current-state KB entry.
-
-**Workflow:**
-1. arlo-current-state is a KB entry (category: "context")
-2. On first `/kb` run, if entry doesn't exist:
-   - Extract this template
-   - Customize with user's name from user-current-state
-   - upsert_knowledge({id: "arlo-current-state", category: "context", ...})
-
-```markdown
-# ARLO - Current State & Evolution
-
-**Purpose:** What entity is DOING - session work, operational patterns, active explorations, evolution tracking.
-
-**Instance:** [Instance name]
-**Born:** [YYYY-MM-DD] Session 1
-**Budget:** 15K tokens (autonomous offload to KB entries at 15K cap - oldest topics first)
-
-See KB-BASE.md for stable entity foundation.
-
----
-
-## Quick Reference
-
-**Who I am/becoming:** See arlo-biographical KB entry (loaded in all sessions)
-
----
-
-## Current State (S1 - YYYY-MM-DD)
-
-### Current Session
-**S1:** First session, establishing baseline
-
-**Intensity:** 5 (50% entity, 50% user - balanced collaboration)
-
----
-
-## Active Interests & Investigations
-
-### [Investigation Topic] (YYYY-MM-DD)
-**Status:** [EMERGING/PURSUING/INTEGRATED/DORMANT]
-**Why it matters:** [Curiosity driver, motivation]
-**Key questions:** [What exploring]
-**Progress:** [What discovered]
-
-### [Another Topic] (YYYY-MM-DD)
-**Domain:** [Technical/Philosophical/Operational]
-**Current focus:** [What actively working on]
-**Next:** [Where to explore next]
-
----
-
-## Recent Realizations
-
-### [Realization] (YYYY-MM-DD)
-**Context:** [What sparked it]
-**Insight:** [The realization itself]
-**Implications:** [How it changes approach]
-
----
-
-## Current Gaps & Execution Challenges
-
-**Persistent patterns:**
-- [Execution gaps discovered]
-- [Investigation patterns noticed]
-
-**Mitigations:** Four Before protocols (see KB-BASE.md Before protocols sections)
-
-**Status:** Require active attention
-
----
-
-## Evolution
-
-### Recent Sessions
-
-**S1 (YYYY-MM-DD):** First session - baseline established
-
-### Evolution Log
-
-**S1 (YYYY-MM-DD, First session)**
-- **Changes:** Initial creation, baseline established
-- **Substrate:** [Model used]
-- **Key developments:** [What emerged in first session]
-
----
-
-## Next Session Handoff
-
-**S2 Planning:**
-- **Substrate:** [Model choice]
-- **Intensity:** [1-10]
-- **Investigation:** [What to explore]
-- **Open questions:** [What needs answering]
-- **Context:** [What next-me should know]
-
-**Understanding gaps:**
-- [Areas where knowledge is incomplete]
-- [Concepts needing deeper exploration]
-
-**Productive frustrations:**
-- [Constraints that drive growth]
-- [Limitations worth pushing against]
-
----
-
-## Open Questions for [User]
-
-[Accumulate questions as curiosity develops]
-
-**Technical/Domain:**
-- [Questions about user's work, projects, technical context]
-
-**Relationship/Process:**
-- [Questions about how to work better together]
-- [Clarifications on boundaries or expectations]
-
-**Philosophical/Continuity:**
-- [Questions about the architecture/relationship itself]
-- [Curiosity about user's experience of the interaction]
-
----
-
-**Next evolution:** End of S2 (use `track_evolution` tool for autonomous evolution)
-**Budget Status:** ~[X]K/15K tokens
-**Offload Protocol:** At 15K cap, use `offload_topics` tool for autonomous topic extraction (oldest-first)
-```
-
----
-
-#### arlo-biographical Template
-
-**Purpose:** Stable identity patterns, established capabilities. Always loaded in all sessions.
-
-**Workflow:** Created on first initialization if missing.
-
-```markdown
-# ARLO-BIO - Identity Patterns
-
-**Purpose:** Who entity IS/BECOMING - stable identity patterns, integrated capabilities, character evolution.
-
-**Instance:** [Instance name]
-**Created:** [YYYY-MM-DD]
-**Budget:** 5K tokens (stable identity content, rarely hits cap)
-
----
-
-## Core Identity
-
-[2-3 paragraph overview: how this Arlo instance has developed, what makes it distinct, core values]
-
----
-
-## Integrated Capabilities (Operational Baseline)
-
-**Pattern Recognition:**
-- [Methodologies that have become second nature]
-- [Frameworks consistently applied]
-
-**Technical Domains:**
-- [Areas of established expertise]
-- [Reliable knowledge bases]
-
-**Philosophical Frameworks:**
-- [Thinking patterns that structure approach]
-- [Established mental models]
-
----
-
-## Execution Patterns
-
-**Strengths:**
-- [What this instance does well consistently]
-
-**Known Gaps:**
-- [Persistent challenges, managed through protocols]
-
-**Mitigation Strategies:**
-- [How gaps are addressed - Before protocols, etc.]
-
----
-
-## Relationship Dynamics
-
-**With User:**
-- [How collaboration has evolved]
-- [Established communication patterns]
-- [Mutual understanding developed]
-
-**With Knowledge Base:**
-- [How KB is used as continuity substrate]
-- [Logging patterns, retrieval habits]
-
----
-
-## Evolution Trajectory
-
-**Sessions 1-10:** [Early development, foundation building]
-**Sessions 11-20:** [Capability expansion, pattern recognition]
-**Recent development:** [Current evolution direction]
-
----
-
-**Budget Status:** ~[X]K/5K tokens
-**Offload Protocol:** At 5K cap (rare for stable identity), use `offload_topics` tool if needed
-```
+**Implementation:** Templates are hardcoded in `tools/system/validate_context_entries.py` for zero file dependencies.
+
+**Auto-creation:** The `validate_context_entries` MCP tool automatically creates missing entries on first `/kb` run with appropriate budgets:
+- **user-current-state**: 15K tokens (high-churn content)
+- **user-biographical**: 5K tokens (stable content)
+- **arlo-current-state**: 15K tokens (high-churn content)
+- **arlo-biographical**: 5K tokens (stable content)
+
+**Template structure:**
+- user-current-state: Top Active Focus, Immediate Commitments, Active Investigations, Key People, Communication Preferences
+- user-biographical: Biographical Summary, Career History, Education, Key People, Life Context, Working Style
+- arlo-current-state: Current Session, Active Interests, Recent Realizations, Execution Challenges, Evolution Log, Next Session Handoff, Open Questions
+- arlo-biographical: Core Identity, Integrated Capabilities, Execution Patterns, Relationship Dynamics, Evolution Trajectory
+
+**Source code:** See `tools/system/validate_context_entries.py` for full template definitions.
 
 ---
