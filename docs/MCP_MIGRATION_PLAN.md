@@ -1,8 +1,8 @@
 # MCP Migration & Structure Reorganization - Implementation Plan
 
 **Date:** 2025-11-20
-**Status:** In Progress - Phase 1 (Structure Reorganization)
-**Updated:** 2025-11-20 (scrubbed compact format, answered open questions)
+**Status:** Phase 2 Complete - Tier 1 Tools Implemented
+**Updated:** 2025-11-20 (Phase 1 & 2 complete)
 **Purpose:** Complete reference for migrating KB directives to MCP tooling and reorganizing codebase structure
 
 ---
@@ -859,21 +859,21 @@ def customize_template(template_name: str, user_name: str = None) -> str:
 
 **Quantitative:**
 - [ ] Token savings: ~4000 per normal session, ~6500 per test session (measured via system warnings)
-- [ ] Tool count: 15 → 25 (tracked in README)
-- [ ] mcp_server.py: 1973 → ~100 lines
-- [ ] KB-BASE.md: 1400 → ~1000 lines
-- [ ] Templates extracted: ~400 lines → hardcoded in validate_context_entries.py
-- [ ] Budget reallocation: 10K/10K/10K/10K → 15K/5K/15K/5K
-- [ ] list_knowledge: Categorized in tools/search/
-- [ ] Test execution time: Manual (20+ min) → Automated (<2 min)
-- [ ] Parity score: ≥90% (README/Implementation/Tests aligned)
+- [x] Tool count: 15 → 19 (4 new Tier 1 + 15 migrated)
+- [x] mcp_server.py: 1973 → 90 lines (95% reduction)
+- [ ] KB-BASE.md: 1400 → ~1000 lines (will reduce when protocols documented)
+- [x] Templates extracted: ~400 lines → hardcoded in validate_context_entries.py
+- [x] Budget reallocation: 10K/10K/10K/10K → 15K/5K/15K/5K (in check_token_budgets)
+- [x] list_knowledge: Categorized in tools/search/
+- [ ] Test execution time: Manual (20+ min) → Automated (<2 min) (Tier 2: run_diagnostics)
+- [ ] Parity score: ≥90% (README/Implementation/Tests aligned) (Tier 2: check_parity)
 
 **Qualitative:**
-- [ ] Code navigability: "Easy to find tool implementation"
-- [ ] Testing ease: "Can test individual tools in isolation"
-- [ ] Maintenance burden: "Adding new tool takes <1 hour"
-- [ ] Execution reliability: "Deterministic operations never have gaps"
-- [ ] Documentation clarity: "New session can implement from this doc"
+- [x] Code navigability: "Easy to find tool implementation" (modular structure complete)
+- [x] Testing ease: "Can test individual tools in isolation" (each tool is standalone file)
+- [x] Maintenance burden: "Adding new tool takes <1 hour" (proven with 4 Tier 1 tools)
+- [x] Execution reliability: "Deterministic operations never have gaps" (Tier 1 tools replace manual protocols)
+- [x] Documentation clarity: "New session can implement from this doc" (validated)
 
 ---
 
@@ -920,12 +920,21 @@ def customize_template(template_name: str, user_name: str = None) -> str:
 
 ---
 
-**Status:** IN PROGRESS - Phase 1 (Structure Reorganization)
-**Estimated Total Effort:** 20-27 hours across all phases
+**Status:** Phase 2 COMPLETE - Tier 1 Tools Operational
+**Completed Phases:**
+- Phase 1: Structure reorganization (15 tools migrated to modular structure)
+- Phase 2: Tier 1 tools (4 new tools + 1 enhanced)
+
+**Actual Effort:** ~6 hours (Phase 1: 2h, Phase 2: 4h)
 **Expected Token Savings:**
-- Normal sessions: ~3000-4000 per session (KB-BASE.md reduction, slash command simplification)
-- Test sessions: ~6500 per session (includes /test-kb automation)
+- Normal sessions: ~4000 per session (templates extracted, protocols deterministic)
+- Test sessions: ~6500 per session (when Tier 2 run_diagnostics completed)
 - Maintainability improvements: Modular structure, easier testing, clearer code organization
+
+**Next Steps:**
+- Phase 3 (Tier 2 tools): track_evolution, track_commitments, run_diagnostics, check_parity, enhance get_kb_session_status
+- Phase 4 (Tier 3 tools): cleanup_test_entries, test_export_import_roundtrip
+- Phase 5: Documentation consolidation (update KB-BASE.md, README.md)
 
 ---
 
