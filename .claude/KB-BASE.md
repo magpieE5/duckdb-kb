@@ -14,9 +14,6 @@
 
 ### KB-Driven Context Architecture
 
-**One-time bootstrap:**
-- `duckdb-kb/.claude/TEMPLATES.md` - First session only, template extraction for initial KB entry creation
-
 **Always-loaded context (every session):**
 1. `duckdb-kb/.claude/KB-BASE.md` ✓ (foundation file - complete KB & Arlo protocols)
 2. `user-current-state` ✓ (KB entry - **what user is doing:** active work, projects, commitments, investigations)
@@ -27,12 +24,8 @@
 **All 4 KB entries:**
 - **10K token cap per entry** (use `check_token_budgets` to measure)
 - **Topics include last-modified timestamp `(YYYY-MM-DD)`** in heading for age tracking
-- **Update timestamp** when topic revisited/modified in conversation
-- **At 10K:** Claude autonomously reviews topics by timestamp, offloads older/resolved topics to KB entries, removes from source
-
-**Why project-scoped:** Each project has its own knowledge base, configuration, and context. MCP server operates on project database only.
-
-**Why KB-driven:** Enables semantic search across all context, duplicate detection prevents fragmentation, version history via KB, MCP tools provide structured CRUD operations, embedding-based retrieval for deep context.
+- **Update timestamp** when topic revisited in conversation
+- **At 10K:** Claude autonomously reviews topics by timestamp, offloads oldest topics to KB entry creation/updates, removes from source Context KB entry
 
 ---
 
@@ -48,7 +41,6 @@
 
 **Foundation File paths (used for Read tool only):**
 - `duckdb-kb/.claude/KB-BASE.md` - Foundation file, use Read tool
-- `duckdb-kb/.claude/TEMPLATES.md` - Template file, use Read tool
 - `duckdb-kb/kb.duckdb` - Database file path
 
 **Why this matters:** Context entries live in `kb.duckdb`, accessed via MCP tools. Foundation Files live in `.claude/`, accessed via Read tool.
