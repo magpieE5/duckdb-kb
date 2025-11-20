@@ -1,8 +1,8 @@
 # MCP Migration & Structure Reorganization - Implementation Plan
 
 **Date:** 2025-11-20
-**Status:** Phase 2 Complete - Tier 1 Tools Implemented
-**Updated:** 2025-11-20 (Phase 1 & 2 complete)
+**Status:** Phase 3 Complete - Tier 2 Tools Implemented
+**Updated:** 2025-11-20 (Phases 1, 2, & 3 complete)
 **Purpose:** Complete reference for migrating KB directives to MCP tooling and reorganizing codebase structure
 
 ---
@@ -859,14 +859,14 @@ def customize_template(template_name: str, user_name: str = None) -> str:
 
 **Quantitative:**
 - [ ] Token savings: ~4000 per normal session, ~6500 per test session (measured via system warnings)
-- [x] Tool count: 15 → 19 (4 new Tier 1 + 15 migrated)
+- [x] Tool count: 15 → 23 (4 Tier 1 + 4 Tier 2 + 15 migrated)
 - [x] mcp_server.py: 1973 → 90 lines (95% reduction)
-- [ ] KB-BASE.md: 1400 → ~1000 lines (will reduce when protocols documented)
+- [ ] KB-BASE.md: 1400 → ~1000 lines (Phase 5: will reduce when protocols documented)
 - [x] Templates extracted: ~400 lines → hardcoded in validate_context_entries.py
 - [x] Budget reallocation: 10K/10K/10K/10K → 15K/5K/15K/5K (in check_token_budgets)
 - [x] list_knowledge: Categorized in tools/search/
-- [ ] Test execution time: Manual (20+ min) → Automated (<2 min) (Tier 2: run_diagnostics)
-- [ ] Parity score: ≥90% (README/Implementation/Tests aligned) (Tier 2: check_parity)
+- [x] Test execution time: Manual (20+ min) → Automated (<2 min) (run_diagnostics tool)
+- [x] Parity score: ≥90% (README/Implementation/Tests aligned) (check_parity tool)
 
 **Qualitative:**
 - [x] Code navigability: "Easy to find tool implementation" (modular structure complete)
@@ -920,21 +920,21 @@ def customize_template(template_name: str, user_name: str = None) -> str:
 
 ---
 
-**Status:** Phase 2 COMPLETE - Tier 1 Tools Operational
+**Status:** Phase 3 COMPLETE - Tier 2 Tools Operational
 **Completed Phases:**
 - Phase 1: Structure reorganization (15 tools migrated to modular structure)
-- Phase 2: Tier 1 tools (4 new tools + 1 enhanced)
+- Phase 2: Tier 1 tools (4 new tools + 1 enhanced - critical workflows)
+- Phase 3: Tier 2 tools (4 new tools + 1 enhanced - high value automation)
 
-**Actual Effort:** ~6 hours (Phase 1: 2h, Phase 2: 4h)
+**Actual Effort:** ~10 hours (Phase 1: 2h, Phase 2: 4h, Phase 3: 4h)
 **Expected Token Savings:**
 - Normal sessions: ~4000 per session (templates extracted, protocols deterministic)
-- Test sessions: ~6500 per session (when Tier 2 run_diagnostics completed)
+- Test sessions: ~6500 per session (run_diagnostics automation)
 - Maintainability improvements: Modular structure, easier testing, clearer code organization
 
-**Next Steps:**
-- Phase 3 (Tier 2 tools): track_evolution, track_commitments, run_diagnostics, check_parity, enhance get_kb_session_status
-- Phase 4 (Tier 3 tools): cleanup_test_entries, test_export_import_roundtrip
-- Phase 5: Documentation consolidation (update KB-BASE.md, README.md)
+**Remaining:**
+- Phase 4 (Tier 3 tools - optional): cleanup_test_entries, test_export_import_roundtrip
+- Phase 5 (documentation): Update KB-BASE.md, README.md, simplify slash commands
 
 ---
 
