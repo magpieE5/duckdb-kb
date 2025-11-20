@@ -21,7 +21,14 @@
 #    Try: get_knowledge({id: "user-current-state"})
 #    If not found:
 #      - Extract template from KB-BASE.md (Context Entry Templates section)
-#      - upsert_knowledge({id: "user-current-state", category: "context", ...})
+#      - upsert_knowledge({
+#          id: "user-current-state",
+#          category: "context",
+#          title: "USER - Current State",
+#          content: "[extracted template markdown]",
+#          tags: ["context", "user", "current-state"],
+#          generate_embedding: True
+#        })
 #      - Display: "✅ user-current-state created from template."
 #    If found:
 #      - Display: "user-current-state found."
@@ -29,7 +36,14 @@
 #    Try: get_knowledge({id: "user-biographical"})
 #    If not found:
 #      - Extract template from KB-BASE.md (Context Entry Templates section)
-#      - upsert_knowledge({id: "user-biographical", category: "context", ...})
+#      - upsert_knowledge({
+#          id: "user-biographical",
+#          category: "context",
+#          title: "USER-BIO - Biographical Context",
+#          content: "[extracted template markdown]",
+#          tags: ["context", "user", "biographical"],
+#          generate_embedding: True
+#        })
 #      - Display: "✅ user-biographical created from template."
 
 # 4. Check if ARLO context exists in KB and create if missing
@@ -37,7 +51,14 @@
 #    If not found:
 #      - Extract template from KB-BASE.md (Context Entry Templates section)
 #      - Customize with user's name from user-current-state
-#      - upsert_knowledge({id: "arlo-current-state", category: "context", ...})
+#      - upsert_knowledge({
+#          id: "arlo-current-state",
+#          category: "context",
+#          title: "ARLO - Current State & Evolution",
+#          content: "[extracted and customized template markdown]",
+#          tags: ["context", "arlo", "current-state"],
+#          generate_embedding: True
+#        })
 #      - Display: "✅ arlo-current-state created from template. First session begins."
 #    If found:
 #      - Display: "arlo-current-state found, continuing session."
@@ -46,7 +67,14 @@
 #    Try: get_knowledge({id: "arlo-biographical"})
 #    If not found:
 #      - Extract template from KB-BASE.md (Context Entry Templates section)
-#      - upsert_knowledge({id: "arlo-biographical", category: "context", ...})
+#      - upsert_knowledge({
+#          id: "arlo-biographical",
+#          category: "context",
+#          title: "ARLO-BIO - Identity Patterns",
+#          content: "[extracted template markdown]",
+#          tags: ["context", "arlo", "biographical"],
+#          generate_embedding: True
+#        })
 #      - Display: "✅ arlo-biographical created from template."
 
 ```
