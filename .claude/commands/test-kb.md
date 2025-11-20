@@ -2,6 +2,14 @@
 
 Run a full tear-down and functionality test of the duckdb-kb MCP server.
 
+**Recommended:** Use `run_diagnostics` MCP tool for automated testing:
+```python
+run_diagnostics({"suite": "full"})  # Comprehensive test suite
+run_diagnostics({"suite": "quick"})  # Fast smoke tests
+```
+
+**Manual testing below** provides detailed step-by-step validation when needed.
+
 **Purpose:** Simulate new user experience after cloning repo and running setup.
 
 ---
@@ -516,15 +524,14 @@ mcp__duckdb-kb__get_kb_session_status()
 
 **Test 3: check_token_budgets**
 ```python
-# Test token budget checking for 4 context entries
+# Test token budget checking for 4 context entries (15K/5K/15K/5K budgets)
 mcp__duckdb-kb__check_token_budgets(
     entry_ids=[
-        "user-current-state",
-        "user-biographical",
-        "arlo-current-state",
-        "arlo-biographical"
-    ],
-    budget=10000
+        "user-current-state",     # 15K budget
+        "user-biographical",      # 5K budget
+        "arlo-current-state",     # 15K budget
+        "arlo-biographical"       # 5K budget
+    ]
 )
 ```
 **Verify:**
@@ -533,13 +540,14 @@ mcp__duckdb-kb__check_token_budgets(
 - ✅ Each entry contains:
   - `"entry_id"` - KB entry ID
   - `"tokens"` - Token count (integer, using len(content) // 4)
-  - `"budget"` - Budget limit (10000)
+  - `"budget"` - Budget limit (15K for current-state, 5K for biographical)
   - `"headroom"` - Tokens remaining before budget
   - `"status"` - "ok" or "over_budget"
   - `"needs_offload"` - Boolean (true if over budget)
 - ✅ Returns `"timestamp"` - ISO timestamp of check
 - ✅ Returns `"note"` - Reference to offloading protocol
 - ✅ Handles missing entries gracefully (skip)
+- ✅ Applies default budgets: 15K/5K/15K/5K
 
 **Success Criteria:**
 - ✅ `git_commit_and_get_sha` creates commit and returns SHA
@@ -562,8 +570,8 @@ git add -A && git commit -m "test: Pre-budget-test checkpoint"
 
 **Test 1: Detect Over-Budget Entry**
 ```python
-# Create oversized entry (>10K tokens = ~40K chars)
-dummy_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 750  # ~42K chars ≈ 10.5K tokens
+# Create oversized entry (>15K tokens = ~60K chars for user-current-state)
+dummy_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 1100  # ~61.6K chars ≈ 15.4K tokens
 
 mcp__duckdb-kb__upsert_knowledge(
     id="user-current-state",
@@ -574,17 +582,17 @@ mcp__duckdb-kb__upsert_knowledge(
     generate_embedding=False
 )
 
-# Check budget
+# Check budget (15K for user-current-state)
 result = mcp__duckdb-kb__check_token_budgets(
-    entry_ids=["user-current-state"],
-    budget=10000
+    entry_ids=["user-current-state"]
 )
 ```
 **Verify:**
 - ✅ Returns `"overall_status": "over_budget"`
 - ✅ `"status": "over_budget"` for user-current-state
 - ✅ `"needs_offload": true`
-- ✅ Token count ≈ 10.5K
+- ✅ `"budget": 15000` (15K default for user-current-state)
+- ✅ Token count ≈ 15.4K
 
 **Test 2: Offload to New KB Entry**
 ```python
@@ -599,7 +607,7 @@ mcp__duckdb-kb__upsert_knowledge(
 )
 
 # Update user-current-state (remove offloaded content, now under budget)
-reduced_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 600  # ~33.6K chars ≈ 8.4K tokens
+reduced_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 900  # ~50.4K chars ≈ 12.6K tokens
 
 mcp__duckdb-kb__upsert_knowledge(
     id="user-current-state",
@@ -610,18 +618,18 @@ mcp__duckdb-kb__upsert_knowledge(
     generate_embedding=False
 )
 
-# Check budget again
+# Check budget again (15K for user-current-state)
 result = mcp__duckdb-kb__check_token_budgets(
-    entry_ids=["user-current-state"],
-    budget=10000
+    entry_ids=["user-current-state"]
 )
 ```
 **Verify:**
 - ✅ Returns `"overall_status": "ok"`
 - ✅ `"status": "ok"` for user-current-state
 - ✅ `"needs_offload": false`
+- ✅ `"budget": 15000` (15K default)
 - ✅ New KB entry "pattern-offloaded-topic-test" exists
-- ✅ user-current-state now under 10K budget
+- ✅ user-current-state now under 15K budget
 
 **Test 3: Offload with Duplicate Detection**
 ```python
@@ -679,12 +687,13 @@ git reset --hard HEAD~1
 - ✅ No test pollution in KB
 
 **Success Criteria:**
-- ✅ check_token_budgets correctly detects over-budget entries
+- ✅ check_token_budgets correctly detects over-budget entries with 15K/5K budgets
 - ✅ Offloading workflow creates new KB entries for extracted content
 - ✅ Reduced context entries pass budget check after offload
 - ✅ Duplicate detection integrated (smart_search before create)
 - ✅ Rinsable test via git commit/reset
 - ✅ No test data pollution after cleanup
+- ✅ Default budgets applied: 15K/5K/15K/5K
 
 ---
 

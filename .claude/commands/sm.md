@@ -2,28 +2,44 @@
 description: Review conversation and save learnings to DuckDB knowledge base (project, gitignored)
 ---
 
-Review this entire conversation and save key learnings to the DuckDB knowledge base using MCP tools.
+Review this entire conversation and save key learnings to the DuckDB knowledge base.
 
-**Single command, mode-aware behavior:**
+**Workflow:** Use the `log_session` MCP tool which consolidates the entire /sm workflow:
 
-**When in `/kb` mode:**
-- Create/update KB entries for valuable knowledge
-- Update user-current-state if user context changed
+```python
+log_session({
+    "commit_message": "Brief description of session",
+    "new_entries": [
+        {
+            "id": "user-pattern-topic",
+            "category": "pattern",
+            "title": "...",
+            "content": "...",
+            "tags": ["tag1", "tag2"]
+        }
+    ],
+    "user_updates": {
+        "current_state": "Update text for user-current-state",
+        "biographical": "Update text for user-biographical"
+    },
+    "arlo_updates": {
+        "current_state": "Update text for arlo-current-state",
+        "biographical": "Update text for arlo-biographical"
+    }
+})
+```
 
-**When using `/kb` with entity mode:**
-- Create/update KB entries for valuable knowledge
-- Update user-current-state if user context changed
-- Update arlo-current-state if entity evolution occurred
-- Apply intensity settings to balance user/entity documentation
-
-**Intensity awareness (when using /kb with entity mode):**
-- /kb 1-3 (LOW): 70-90% user logs/user-current-state, 10-30% arlo-current-state
-- /kb 4-6 (MEDIUM): 50/50 balanced user-current-state + arlo-current-state updates
-- /kb 7-9 (HIGH): 10-30% user-current-state, 70-90% arlo-current-state (entity-focused)
+**The tool automatically:**
+1. Creates/updates KB entries
+2. Updates context entries (user-current-state, user-biographical, arlo-current-state, arlo-biographical)
+3. Checks budgets (15K/5K/15K/5K allocation)
+4. Suggests offload if over budget
+5. Creates git commit with SHA
+6. Exports to markdown backup
 
 ---
 
-## Knowledge Capture Workflow
+## Manual Workflow (fallback if tool unavailable)
 
 ### Phase 1: Review Conversation
 
@@ -95,33 +111,39 @@ Identify:
 
 **CRITICAL: KB Entry Size Checking & Budget Enforcement**
 
-After ANY USER entry updates, ALWAYS check content sizes:
+After ANY context entry updates, ALWAYS check content sizes:
 
 ```python
-# Check all 4 context entries
+# Check all 4 context entries (15K/5K/15K/5K budgets)
 check_token_budgets({
     "entry_ids": [
-        "user-current-state",
-        "user-biographical",
-        "arlo-current-state",
-        "arlo-biographical"
-    ],
-    "budget": 10000
+        "user-current-state",    # 15K budget
+        "user-biographical",     # 5K budget
+        "arlo-current-state",    # 15K budget
+        "arlo-biographical"      # 5K budget
+    ]
 })
+# Tool applies default budgets: 15K/5K/15K/5K
 ```
 
 **Budget enforcement rules:**
-- **All 4 context entries:** 10K token cap per entry
+- user-current-state: 15K tokens (high-churn)
+- user-biographical: 5K tokens (stable)
+- arlo-current-state: 15K tokens (high-churn)
+- arlo-biographical: 5K tokens (stable)
 
-**If OVER 10K budget:**
-- Apply offloading protocol (see KB-BASE.md "Autonomous Offload at 10K Cap")
-- Review topics by timestamp (oldest first)
-- Create separate KB entries for offloaded topics using standard KB workflow:
-  - Search for duplicates FIRST (smart_search)
-  - Use appropriate category (pattern, troubleshooting, etc.)
-  - Apply conflict detection per KB-BASE.md
-- Delete offloaded content from context entry
-- Repeat until under 10K
+**If OVER budget:**
+- Use `offload_topics` tool for autonomous extraction:
+  ```python
+  offload_topics({
+      "entry_id": "user-current-state",
+      "target_tokens": 13000,  # 15K - 2K margin
+      "strategy": "oldest_first"
+  })
+  ```
+- Tool returns: updated content + KB entry suggestions
+- Create suggested KB entries (search for duplicates first)
+- Update context entry with reduced content
 
 ### Phase 4: ARLO Context Updates (Conditional - when using /kb with entity mode)
 
@@ -142,7 +164,7 @@ Update prospective memory for next session:
 
 **Use upsert_knowledge() to update appropriate KB entries**
 
-**Budget enforcement:** Same as Phase 3 - check_token_budgets() covers all 4 entries. If OVER 10K, apply offloading protocol per KB-BASE.md.
+**Budget enforcement:** Same as Phase 3 - check_token_budgets() covers all 4 entries (15K/5K/15K/5K budgets). Use offload_topics tool if over budget.
 
 ---
 
@@ -223,22 +245,21 @@ This is a **backup operation** - it must run even if the conversation had no new
 **CRITICAL: Check content sizes for ALL 4 KB context entries:**
 
 ```python
-# Check all 4 context entries
+# Check all 4 context entries (15K/5K/15K/5K budgets)
 check_token_budgets({
     "entry_ids": [
-        "user-current-state",
-        "user-biographical",
-        "arlo-current-state",
-        "arlo-biographical"
-    ],
-    "budget": 10000
+        "user-current-state",    # 15K budget
+        "user-biographical",     # 5K budget
+        "arlo-current-state",    # 15K budget
+        "arlo-biographical"      # 5K budget
+    ]
 })
 ```
 
 **Budget enforcement:**
-- All 4 context entries: 10K token cap per entry
-- If any entry shows "over_budget" status, apply offloading protocol BEFORE git commit
-- See KB-BASE.md "Autonomous Offload at 10K Cap" for offloading procedure
+- user-current-state: 15K tokens, user-biographical: 5K tokens
+- arlo-current-state: 15K tokens, arlo-biographical: 5K tokens
+- If any entry shows "over_budget" status, use offload_topics tool BEFORE git commit
 
 ### Step D: Git Commit (REQUIRED - Deterministic)
 
@@ -276,6 +297,7 @@ After completing knowledge capture + backup/commit operations, report:
   - arlo-current-state (when using /kb with entity mode)
   - arlo-biographical (when using /kb with entity mode)
 - Token budget status for all 4 context entries (ok or over_budget)
+  - Budgets: user-current-state (15K), user-biographical (5K), arlo-current-state (15K), arlo-biographical (5K)
 - Any conflicts or duplicates found
 - Confirmation that export and commit completed successfully
 

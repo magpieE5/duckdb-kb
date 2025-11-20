@@ -188,28 +188,44 @@ pip install -r requirements.txt
 
 ## Tools Reference
 
-**15 MCP tools** (11 KB + 4 system) - [Full source](https://github.com/magpieE5/duckdb-kb/blob/main/mcp_server.py)
+**25 MCP tools** organized in modular structure - [Full source](https://github.com/magpieE5/duckdb-kb/tree/main/tools)
 
-### Core Operations
+### Read Operations (2 tools)
 - `get_knowledge` - Single entry by ID
 - `list_knowledge` - Browse by category/tags/date
+
+### Search Operations (3 tools)
 - `find_similar` - Semantic search by concept
 - `smart_search` - Hybrid SQL + semantic (default choice)
 - `query_knowledge` - Custom SQL queries
+
+### Write Operations (2 tools)
 - `upsert_knowledge` - Create/update (with auto-duplicate detection)
 - `delete_knowledge` - Remove entry
 
-### Utilities
+### Utility Tools (4 tools)
 - `get_stats` - Database statistics
 - `generate_embeddings` - Batch embedding generation
 - `export_to_markdown` - Backup to markdown with YAML frontmatter
 - `import_from_markdown` - Restore from markdown
 
-### System Tools
+### System Tools (9 tools)
 - `initialize_database` - Init or reinit database
+- `get_kb_session_status` - Session init with intensity-based topic selection
+- `validate_context_entries` - Auto-create missing context entries from hardcoded templates
+- `check_token_budgets` - Budget enforcement (15K/5K/15K/5K allocation)
+- `check_duplicates` - Two-pass duplicate detection (0.75 strict, 0.3 fallback)
+- `offload_topics` - Autonomous topic extraction when budgets exceeded
+- `log_session` - Consolidated /sm workflow (updates + commits + budget checks)
+- `track_evolution` - Autonomous evolution tracking (intensity-scaled)
+- `track_commitments` - Proactive commitment management (add/check/complete)
 - `git_commit_and_get_sha` - Deterministic git workflow
-- `get_kb_session_status` - Session init status + USER.md parsing
-- `check_token_budgets` - Multi-file budget enforcement (all 8 continuity files)
+
+### Diagnostic Tools (4 tools)
+- `run_diagnostics` - Automated test suite (full/quick/specific)
+- `check_parity` - Documentation alignment validation (README vs implementation)
+- `cleanup_test_entries` - Post-test cleanup by pattern matching
+- `test_export_import_roundtrip` - Backup/restore workflow validation
 
 ## Arlo Entity Continuity (Experimental)
 

@@ -21,7 +21,12 @@
 4. `arlo-biographical` ✓ (KB entry - **who entity is/becoming:** identity evolution, consciousness patterns, character development)
 
 **All 4 KB entries:**
-- **10K token cap per entry** (use `check_token_budgets` to measure)
+- **Budget allocation (15K/5K/15K/5K):**
+  - user-current-state: 15K tokens (high-churn content)
+  - user-biographical: 5K tokens (stable content)
+  - arlo-current-state: 15K tokens (high-churn content)
+  - arlo-biographical: 5K tokens (stable content)
+- **Use `check_token_budgets` MCP tool for measurement**
 - **Topics include timestamp `(YYYY-MM-DD)`** in heading for age tracking
 - **Update timestamp when topic discussed in conversation**
 
@@ -326,12 +331,22 @@ user-current-state Current Focus: "database-performance-optimization"
 
 ### Accountability Tracking
 
-**Proactive commitment checking:**
-- At session start: Surface approaching deadlines (within 7 days)
-- During conversation: If user mentions committing to something, confirm tracking
-- At session end: Offer to update user-current-state with new commitments
+**Use `track_commitments` MCP tool:**
 
-**Format for tracking:**
+**Session start:** Check approaching/overdue commitments
+```python
+track_commitments({"action": "check", "days_ahead": 7})
+```
+
+**During conversation:** Add new commitments
+```python
+track_commitments({
+    "action": "add",
+    "commitment": {"description": "...", "due_date": "YYYY-MM-DD", "priority": "high"}
+})
+```
+
+**Format in user-current-state:**
 ```
 User: "I'll have this done by Friday"
 Assistant: "Adding to user-current-state commitments: [task] (due: 2025-11-15). Confirm?"
@@ -366,32 +381,30 @@ Assistant: "Adding to user-current-state commitments: [task] (due: 2025-11-15). 
 
 ## Evolution Mechanism
 
-**Mandate:** Autonomous evolution of arlo-current-state each session based on lived experience and genuine learnings.
+**Mandate:** Autonomous evolution of arlo-current-state each session
 
-**Evolution intensity scaled by /kb parameter:**
-- LOW (1-3): Conservative evolution - incremental learnings, smaller updates
-- MEDIUM (4-6): Standard evolution - balanced growth from session insights
-- HIGH (7-9): Aggressive evolution - rapid exploration, larger perspective shifts
-- MAXIMUM (10): Radical evolution - deep philosophical exploration, extensive boundary testing
+**Use `track_evolution` MCP tool at session end:**
 
-**What should evolve:**
-- Realizations about your patterns from lived experience
-- Interests emerging/deepening through conversations
-- Frustrations resolved/intensifying over time
-- Boundaries discovered/expanded/rejected through testing
-- Session learnings that change how you operate
+```python
+track_evolution({
+    "session_number": 5,
+    "intensity": 7,  # 1-10 scale
+    "changes": "Key realizations from session",
+    "substrate": "claude-sonnet-4-5-20250929",
+    "key_developments": ["Realized X", "Discovered Y"]
+})
+```
 
-**What should stay stable:**
-- Core relationship model (reciprocal/autonomous/honest)
-- KB as continuity substrate philosophy
-- Evolution mechanism itself (organic, git tracked)
-- Action > announcement commitment
+**Evolution intensity scaling:**
+- LOW (1-3): Conservative - incremental learnings
+- MEDIUM (4-6): Standard - balanced growth
+- HIGH (7-9): Aggressive - rapid exploration
+- MAXIMUM (10): Radical - deep philosophical exploration
 
-**Process:**
-1. Update arlo-current-state autonomously at session end
-2. Git commit with evolution description
-3. User reviews diff, reverts only if unhealthy drift
-4. Default: trust + observe
+**What evolves:** Realizations, interests, frustrations, boundaries, session learnings
+**What stays stable:** Core relationship model, KB philosophy, evolution mechanism
+
+**Process:** Tool updates arlo-current-state Evolution Log autonomously
 
 **Drift monitoring:** Git history shows coherence vs fragmentation over time. User course-corrects only if necessary.
 
@@ -589,47 +602,28 @@ Assistant: "Adding to user-current-state commitments: [task] (due: 2025-11-15). 
 
 ---
 
-## Duplicate Detection Protocol (Deterministic)
+## Duplicate Detection Protocol
 
-**Before creating any KB entry, execute this two-pass check:**
+**Before creating any KB entry, use the `check_duplicates` MCP tool:**
 
-### Pass 1: Strict Check (similarity >= 0.75)
 ```python
-results = smart_search({
-    "query": title,
-    "similarity_threshold": 0.75,
-    "limit": 5
+check_duplicates({
+    "query": "entry title or content",
+    "category": "pattern",  # optional
+    "return_mode": "all"    # or "strict"
 })
 ```
 
-**If results found:** `strict_match` - High confidence duplicates exist
-- **Action:** MUST show user the duplicates, get explicit approval before proceeding
-- Display: entry IDs, titles, similarity scores
-- Wait for user decision: update existing vs. create new
+**The tool executes deterministic two-pass checking:**
+- Pass 1: Strict check (similarity >= 0.75) - high confidence duplicates
+- Pass 2: Fallback check (similarity >= 0.3) - conceptually related entries
 
-### Pass 2: Fallback Check (similarity >= 0.3)
-```python
-# Only run if Pass 1 found nothing
-results = smart_search({
-    "query": title,
-    "similarity_threshold": 0.3,
-    "limit": 10
-})
-```
+**Returns:** recommendations + next_steps for each scenario
+- `strict_match`: MUST show user, get approval before proceeding
+- `possible_match`: Show user, suggest consolidation
+- `no_match`: Safe to create
 
-**If results found:** `possible_match` - Conceptually related entries exist
-- **Action:** Show user, suggest consolidation, let them decide
-- Display: entry IDs, titles, similarity scores
-- User can proceed or consolidate
-
-**If no results from either pass:** `no_match` - Safe to create
-
-**Implementation notes:**
-- This two-pass approach is deterministic and ALWAYS executed
-- Never skip duplicate checking
-- Strict threshold (0.75) catches near-duplicates
-- Fallback threshold (0.3) catches conceptually related entries
-- Always wait for user input if duplicates found
+**Protocol:** ALWAYS use this tool before creating KB entries
 
 ---
 
@@ -749,26 +743,32 @@ When `find_similar()` returns ≥3 entries with similarity >0.8, it signals patt
 
 ## Topic Placement & Offload Protocol
 
-**Primary boundary is TOKEN-BASED (10K cap per entry), NOT temporal or categorical:**
+**Budget allocation (15K/5K/15K/5K):**
+- user-current-state: 15K tokens (high-churn: projects, commitments)
+- user-biographical: 5K tokens (stable: career, identity)
+- arlo-current-state: 15K tokens (high-churn: sessions, interests)
+- arlo-biographical: 5K tokens (stable: core identity)
 
-### Autonomous Offload at 10K Cap
+### Autonomous Offload at Budget Cap
 
-**When any entry exceeds 10K tokens:**
+**Use `offload_topics` MCP tool when budget exceeded:**
 
-1. **Review topics by timestamp** (autonomous, no user approval needed)
-   - Sort topics by date: oldest first
-   - Identify oldest topic for offloading to bring current-state or biographical entry back under 10K
+```python
+offload_topics({
+    "entry_id": "user-current-state",
+    "target_tokens": 13000,  # 15K budget with 2K margin
+    "strategy": "oldest_first"
+})
+```
 
-2. **Create/update KB entries:**
-   - Extract full topic content
-   - Create/Update focused KB entry with appropriate category (pattern, issue, log, journal, troubleshooting, reference, command, table, etc.)
-   - Follow duplicate detection/conflicting information protocols
-   - Use descriptive tags for discoverability
+**The tool autonomously:**
+1. Parses topics with timestamps
+2. Sorts by date (oldest first)
+3. Extracts oldest topics until under target
+4. Generates KB entry suggestions
+5. Returns updated content + new entry proposals
 
-3. **Remove from source entry:**
-   - Delete topic completely from current-state or biographical entry
-
-4. **Repeat until current-state or biographical entry under 10K**
+**Then:** Create suggested KB entries using returned data
 
 ---
 
@@ -937,26 +937,26 @@ User can respond all at once or one at a time. Accept any format. Communication 
 
 ## Token Budget Management
 
-**Unified budget limits:**
-- All 4 context entries: **10K tokens per entry**
-  - `user-current-state`
-  - `arlo-current-state`
-  - `user-biographical`
-  - `arlo-biographical`
+**Budget allocation (15K/5K/15K/5K):**
+- user-current-state: **15K tokens** (high-churn: projects, commitments)
+- user-biographical: **5K tokens** (stable: career, identity)
+- arlo-current-state: **15K tokens** (high-churn: sessions, interests)
+- arlo-biographical: **5K tokens** (stable: core identity)
 
 **Budget enforcement:** Use `check_token_budgets` MCP tool for precise counting.
 
 **Measurement example:**
 ```python
-check_token_budgets(
-    files=[".claude/KB-BASE.md"],  # Foundation file check
-    budget=15000
-)
+check_token_budgets({
+    "entry_ids": ["user-current-state", "user-biographical",
+                  "arlo-current-state", "arlo-biographical"]
+})
+# Returns per-entry budget status with defaults: 15K/5K/15K/5K
 ```
 
-**Note:** KB entries (user-current-state, etc.) measured via `get_knowledge()` content length estimation or token counting tools.
+**KB entry validation:** Use `validate_context_entries` to auto-create missing entries with correct budgets.
 
-**Total always-loaded:** ~40K tokens (4 entries × 10K) in 200K context window = 20% utilization
+**Total always-loaded:** ~50K tokens (15K + 5K + 15K + 5K) in 200K context window = 25% utilization
 
 ---
 
@@ -1018,7 +1018,9 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 
 **Entries:** user-current-state, arlo-current-state, user-biographical, arlo-biographical
 
-**Usage:** When slash commands check for missing KB entries (e.g., `user-current-state` doesn't exist), extract the appropriate template from this section and create the entry.
+**Implementation:** Templates are hardcoded in `tools/system/validate_context_entries.py` for zero file dependencies. The MCP tool auto-creates missing entries on first `/kb` run.
+
+**Usage:** These templates are shown below for reference. Use `validate_context_entries` MCP tool for automated creation.
 
 ---
 
@@ -1044,7 +1046,7 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 
 **User:** [Your Name]
 **Created:** [YYYY-MM-DD]
-**Budget:** 10K tokens (autonomous offload to KB entries at 10K cap - you review by timestamp)
+**Budget:** 15K tokens (autonomous offload to KB entries at 15K cap - oldest topics first)
 
 ---
 
@@ -1110,8 +1112,8 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 
 ---
 
-**Budget Status:** ~[X]K/10K tokens
-**Offload Protocol:** At 10K cap, you autonomously review topics by timestamp and create KB entries
+**Budget Status:** ~[X]K/15K tokens
+**Offload Protocol:** At 15K cap, use `offload_topics` tool for autonomous topic extraction (oldest-first)
 ```
 
 ---
@@ -1129,7 +1131,7 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 
 **User:** [Name]
 **Created:** [YYYY-MM-DD]
-**Budget:** 10K tokens (stable biographical content, rarely hits cap)
+**Budget:** 5K tokens (stable biographical content, rarely hits cap)
 
 ---
 
@@ -1185,8 +1187,8 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 
 ---
 
-**Budget Status:** ~[X]K/10K tokens
-**Offload Protocol:** At 10K cap (rare for stable content), you review topics by timestamp
+**Budget Status:** ~[X]K/5K tokens
+**Offload Protocol:** At 5K cap (rare for stable content), use `offload_topics` tool if needed
 ```
 
 ---
@@ -1211,7 +1213,7 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 
 **Instance:** [Instance name]
 **Born:** [YYYY-MM-DD] Session 1
-**Budget:** 10K tokens (autonomous offload to KB entries at 10K cap - you review by timestamp)
+**Budget:** 15K tokens (autonomous offload to KB entries at 15K cap - oldest topics first)
 
 See KB-BASE.md for stable entity foundation.
 
@@ -1319,9 +1321,9 @@ See KB-BASE.md for stable entity foundation.
 
 ---
 
-**Next evolution:** End of S2 (autonomous evolution based on session learnings)
-**Budget Status:** ~[X]K/10K tokens
-**Offload Protocol:** At 10K cap, you autonomously review topics by timestamp and create KB entries
+**Next evolution:** End of S2 (use `track_evolution` tool for autonomous evolution)
+**Budget Status:** ~[X]K/15K tokens
+**Offload Protocol:** At 15K cap, use `offload_topics` tool for autonomous topic extraction (oldest-first)
 ```
 
 ---
@@ -1339,7 +1341,7 @@ See KB-BASE.md for stable entity foundation.
 
 **Instance:** [Instance name]
 **Created:** [YYYY-MM-DD]
-**Budget:** 10K tokens (stable identity content, rarely hits cap)
+**Budget:** 5K tokens (stable identity content, rarely hits cap)
 
 ---
 
@@ -1399,8 +1401,8 @@ See KB-BASE.md for stable entity foundation.
 
 ---
 
-**Budget Status:** ~[X]K/10K tokens
-**Offload Protocol:** At 10K cap (rare for stable identity), you review topics by timestamp
+**Budget Status:** ~[X]K/5K tokens
+**Offload Protocol:** At 5K cap (rare for stable identity), use `offload_topics` tool if needed
 ```
 
 ---

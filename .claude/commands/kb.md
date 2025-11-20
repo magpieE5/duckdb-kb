@@ -39,25 +39,15 @@
 #    get_stats({"detailed": True})
 #    Store for status display, NO OUTPUT YET
 
-# 4. Check existence of all 4 context entries (clean check, no error messages)
-#    context_entries = list_knowledge({"category": "context"})
-#    existing_ids = [entry.id for entry in context_entries]
-#    NO OUTPUT
-#
-#    For each required entry ["user-current-state", "user-biographical",
-#                            "arlo-current-state", "arlo-biographical"]:
-#      If entry_id NOT in existing_ids:
-#        - Extract template from KB-BASE.md (Context Entry Templates section)
-#        - Customize if needed (arlo-current-state uses user's name)
-#        - upsert_knowledge({
-#            id: entry_id,
-#            category: "context",
-#            title: "[template title]",
-#            content: "[extracted template markdown]",
-#            tags: [appropriate tags],
-#            generate_embedding: True
-#          })
-#        - OUTPUT: "✅ {entry_id} created"
+# 4. Validate context entries exist (auto-create missing)
+#    validate_context_entries({"user_name": "[parsed from existing entries or ask]"})
+#    Tool automatically:
+#      - Checks for all 4 required entries (user-current-state, user-biographical,
+#                                          arlo-current-state, arlo-biographical)
+#      - Creates missing entries from hardcoded templates (zero file dependencies)
+#      - Customizes templates with user's name
+#      - Returns list of created entries
+#    OUTPUT: "✅ {entry_id} created" for each new entry
 #
 # 5. Load all 4 context entries for session
 #    user_current = get_knowledge({id: "user-current-state"})
