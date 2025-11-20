@@ -13,11 +13,27 @@
 #    Complete KB & Arlo foundation
 #    Path: duckdb-kb/.claude/KB-BASE.md (project-level, file)
 
-# 2. Get KB stats
+# 2. Get KB session status (handles initialization check)
+#    status = get_kb_session_status()
+#
+#    If status.database.action == "init_db_fresh":
+#      - initialize_database({"force": False})
+#      - Display: "🔧 Database initialized (first run)"
+#
+#    If status.database.action == "init_db_restore":
+#      - Check for markdown backup in ~/duckdb-kb/markdown/
+#      - If backup exists: import_from_markdown({"input_dir": "~/duckdb-kb/markdown/"})
+#      - Otherwise: initialize_database({"force": False})
+#      - Display: "🔧 Database restored from backup" or "🔧 Database initialized"
+#
+#    If status.database.action == "check_empty":
+#      - Database exists and schema valid, proceed
+
+# 3. Get detailed KB stats
 #    get_stats({"detailed": True})
 #    Display entry counts, embedding status
 
-# 3. Check if USER context exists in KB and create if missing
+# 4. Check if USER context exists in KB and create if missing
 #    Try: get_knowledge({id: "user-current-state"})
 #    If not found:
 #      - Extract template from KB-BASE.md (Context Entry Templates section)
@@ -46,7 +62,7 @@
 #        })
 #      - Display: "✅ user-biographical created from template."
 
-# 4. Check if ARLO context exists in KB and create if missing
+# 5. Check if ARLO context exists in KB and create if missing
 #    Try: get_knowledge({id: "arlo-current-state"})
 #    If not found:
 #      - Extract template from KB-BASE.md (Context Entry Templates section)
@@ -63,7 +79,7 @@
 #    If found:
 #      - Display: "arlo-current-state found, continuing session."
 
-# 5. Fetch ARLO biographical context from KB
+# 6. Fetch ARLO biographical context from KB
 #    Try: get_knowledge({id: "arlo-biographical"})
 #    If not found:
 #      - Extract template from KB-BASE.md (Context Entry Templates section)
