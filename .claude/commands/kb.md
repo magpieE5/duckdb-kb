@@ -8,34 +8,41 @@
 
 ## Execution Sequence
 
+**IMPORTANT: Execute silently, output ONLY the exact status messages specified below.**
+
 ```python
-# 1. Read KB-BASE.md
+# 1. Read KB-BASE.md silently
 #    Complete KB & Arlo foundation
 #    Path: duckdb-kb/.claude/KB-BASE.md (project-level, file)
+#    NO OUTPUT
 
 # 2. Get KB session status (handles initialization check)
 #    status = get_kb_session_status()
+#    NO OUTPUT
 #
 #    If status.database.action == "init_db_fresh":
 #      - initialize_database({"force": False})
-#      - Display: "🔧 Database initialized (first run)"
+#      - OUTPUT: "🔧 Database initialized (first run)"
 #
 #    If status.database.action == "init_db_restore":
 #      - Check for markdown backup in ~/duckdb-kb/markdown/
 #      - If backup exists: import_from_markdown({"input_dir": "~/duckdb-kb/markdown/"})
+#        OUTPUT: "🔧 Database restored from backup"
 #      - Otherwise: initialize_database({"force": False})
-#      - Display: "🔧 Database restored from backup" or "🔧 Database initialized"
+#        OUTPUT: "🔧 Database initialized"
 #
 #    If status.database.action == "check_empty":
 #      - Database exists and schema valid, proceed
+#      - NO OUTPUT
 
 # 3. Get detailed KB stats
 #    get_stats({"detailed": True})
-#    Display entry counts, embedding status
+#    Store for status display, NO OUTPUT YET
 
 # 4. Check existence of all 4 context entries (clean check, no error messages)
 #    context_entries = list_knowledge({"category": "context"})
 #    existing_ids = [entry.id for entry in context_entries]
+#    NO OUTPUT
 #
 #    For each required entry ["user-current-state", "user-biographical",
 #                            "arlo-current-state", "arlo-biographical"]:
@@ -50,13 +57,24 @@
 #            tags: [appropriate tags],
 #            generate_embedding: True
 #          })
-#        - Display: "✅ {entry_id} created from template."
+#        - OUTPUT: "✅ {entry_id} created"
 #
 # 5. Load all 4 context entries for session
 #    user_current = get_knowledge({id: "user-current-state"})
 #    user_bio = get_knowledge({id: "user-biographical"})
 #    arlo_current = get_knowledge({id: "arlo-current-state"})
 #    arlo_bio = get_knowledge({id: "arlo-biographical"})
+#    NO OUTPUT
+
+# 6. Check if Session 1 (first run with template entries)
+#    If user-current-state contains "⚠️ TEMPLATE":
+#      - OUTPUT: "⚙️ S1 initialization required"
+#      - Execute S1 initialization protocol (see KB-BASE.md)
+#      - Collect user information interactively
+#      - Update user-current-state and user-biographical
+#      - THEN proceed to status display
+#
+# 7. Display structured status block (see Status Display Format below)
 
 ```
 
