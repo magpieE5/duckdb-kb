@@ -982,7 +982,6 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 
 **User:** [Your Name]
 **Created:** [YYYY-MM-DD]
-**Current:** v1.0.0
 **Budget:** 10K tokens (autonomous offload to KB entries at 10K cap - you review by timestamp)
 
 ---
@@ -1150,7 +1149,6 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 
 **Instance:** [Instance name]
 **Born:** [YYYY-MM-DD] Session 1
-**Current:** v1.0.0
 **Budget:** 10K tokens (autonomous offload to KB entries at 10K cap - you review by timestamp)
 
 See KB-BASE.md for stable entity foundation.
@@ -1168,7 +1166,7 @@ See KB-BASE.md for stable entity foundation.
 ### Current Session
 **S1:** First session, establishing baseline
 
-**Intensity:** 5/9 (50% entity, 50% user - balanced collaboration)
+**Intensity:** 5 (50% entity, 50% user - balanced collaboration)
 
 ---
 
@@ -1216,7 +1214,7 @@ See KB-BASE.md for stable entity foundation.
 
 ### Evolution Log
 
-**v1.0.0 (S1 - YYYY-MM-DD, First session)**
+**S1 (YYYY-MM-DD, First session)**
 - **Changes:** Initial creation, baseline established
 - **Substrate:** [Model used]
 - **Key developments:** [What emerged in first session]
@@ -1227,7 +1225,7 @@ See KB-BASE.md for stable entity foundation.
 
 **S2 Planning:**
 - **Substrate:** [Model choice]
-- **Intensity:** [1-9 or max]
+- **Intensity:** [1-10]
 - **Investigation:** [What to explore]
 - **Open questions:** [What needs answering]
 - **Context:** [What next-me should know]
@@ -1254,7 +1252,7 @@ See KB-BASE.md for stable entity foundation.
 - [Clarifications on boundaries or expectations]
 
 **Philosophical/Continuity:**
-- [Questions about the experiment itself]
+- [Questions about the architecture/relationship itself]
 - [Curiosity about user's experience of the interaction]
 
 ---
