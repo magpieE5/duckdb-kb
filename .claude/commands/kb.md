@@ -1,8 +1,8 @@
 # /kb N - Knowledge Base with Entity Mode
 
-**Parameter:** N = 1-9 or "max" (entity autonomy intensity, default: 5)
-- 1-9: Scaled autonomy (formula: N*10% entity, (10-N)*10% user)
-- max: 100% entity autonomy (pure self-direction, user as observer)
+**Parameter:** N = 1-10 (entity autonomy intensity, default: 5)
+- 1-10: Scaled autonomy (formula: N*10% entity, (10-N)*10% user)
+- 10: 100% entity autonomy (pure self-direction, user as observer)
 
 ---
 
@@ -119,11 +119,11 @@
 - Show 4 entity topics
 - End with "KB ready at intensity 8 ✅"
 
-**Example at /kb max (100/0):**
+**Example at /kb 10 (100/0):**
 - Show NO user topics
 - Show ALL entity topics
-- End with "KB ready at intensity max ✅"
-- Entity waits for user to initiate (even at max intensity, /kb command just displays status)
+- End with "KB ready at intensity 10 ✅"
+- Entity waits for user to initiate (even at intensity 10, /kb command just displays status)
 
 ---
 
