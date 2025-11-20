@@ -3,9 +3,10 @@
 Orchestrates:
 1. Update context entries (user + arlo)
 2. Create new KB entries
-3. Git commit with SHA return
-4. Token budget check
-5. Offload suggestions if needed
+3. Export markdown backup
+4. Git commit with SHA return
+5. Token budget check
+6. Offload suggestions if needed
 
 Single atomic operation to ensure consistency.
 """
@@ -16,6 +17,7 @@ import json
 from datetime import datetime
 import subprocess
 from tools.base import error_response, check_entry_budget, DEFAULT_BUDGETS
+from tools.utility import export_to_markdown
 
 # =============================================================================
 # Tool Definition (for registration)
@@ -32,9 +34,10 @@ Workflow:
 1. Update user context entries (user-current-state, user-biographical)
 2. Update arlo context entries (arlo-current-state, arlo-biographical)
 3. Create new KB entries (patterns, logs, issues, etc.)
-4. Git commit with formatted message
-5. Check token budgets (15K/5K/15K/5K)
-6. Return offload suggestions if any entry over budget
+4. Export markdown backup (to markdown/ directory)
+5. Git commit with formatted message
+6. Check token budgets (15K/5K/15K/5K)
+7. Return offload suggestions if any entry over budget
 
 Budget targets (after 15K/5K allocation):
 - user-current-state: 15K
@@ -170,15 +173,27 @@ async def execute(con, args: dict) -> List[TextContent]:
         )
         return [TextContent(type="text", text=json.dumps(error, indent=2))]
 
-    # Step 4: Git commit (auto-commit, always) - outside transaction
+    # Step 4: Export markdown backup (after DB commit, before git commit)
+    try:
+        export_result = await export_to_markdown.execute(con, {
+            "output_dir": "markdown",
+            "organize_by_category": True
+        })
+        # Extract export message from result
+        if export_result:
+            results["markdown_export"] = export_result[0].text
+    except Exception as e:
+        results["markdown_export"] = f"Export failed: {str(e)}"
+
+    # Step 5: Git commit (auto-commit, always) - outside transaction
     commit_sha = _git_commit(commit_message)
     results["commit_sha"] = commit_sha
 
-    # Step 5: Check token budgets
+    # Step 6: Check token budgets
     budgets = await _check_budgets(con)
     results["token_budgets"] = budgets
 
-    # Step 6: Generate offload suggestions if needed
+    # Step 7: Generate offload suggestions if needed
     for entry_id, budget_info in budgets.items():
         if budget_info["status"] == "over_budget":
             results["offload_suggestions"].append({
