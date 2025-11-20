@@ -35,7 +35,7 @@ Returns: Success status, VSS availability, and initial database stats""",
 # Implementation
 # =============================================================================
 
-async def execute(args: dict) -> List[TextContent]:
+async def execute(con, args: dict) -> List[TextContent]:
     """Initialize or reinitialize the database with schema"""
     force = args.get("force", False)
 

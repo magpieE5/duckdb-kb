@@ -33,7 +33,7 @@ Returns: {"success": true, "sha": "abc123..."} or error""",
 # Implementation
 # =============================================================================
 
-async def execute(args: dict) -> List[TextContent]:
+async def execute(con, args: dict) -> List[TextContent]:
     """Perform git add, commit, and return SHA"""
     message = args.get("message")
     if not message:

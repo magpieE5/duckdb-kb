@@ -46,7 +46,7 @@ Used by /kb command for deterministic initialization flow.""",
 # Implementation
 # =============================================================================
 
-async def execute(args: dict) -> List[TextContent]:
+async def execute(con, args: dict) -> List[TextContent]:
     """Get KB initialization status, parse context entries, check deadlines, select topics"""
     # Get project directory (2 levels up from this file)
     project_dir = Path(__file__).parent.parent.parent
