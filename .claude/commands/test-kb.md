@@ -514,64 +514,177 @@ mcp__duckdb-kb__get_kb_session_status()
   - `"commitments"` (object) - all/approaching/overdue from USER.md
 - ✅ No errors, valid JSON structure
 
-**Test 3: check_token_budgets (NEW - S20 Multi-File Architecture)**
+**Test 3: check_token_budgets**
 ```python
-# Test token budget checking for all 8 continuity files
+# Test token budget checking for 4 context entries
 mcp__duckdb-kb__check_token_budgets(
-    files=[
-        ".claude/USER-BASE.md",
-        ".claude/ARLO-BASE.md",
-        ".claude/USER.md",
-        ".claude/ARLO.md",
-        ".claude/USER-BIO.md",
-        ".claude/ARLO-BIO.md",
-        ".claude/USER-WORK.md",
-        ".claude/ARLO-WORK.md",
-        ".claude/USER-PERSONAL.md",
-        ".claude/ARLO-PERSONAL.md"
+    entry_ids=[
+        "user-current-state",
+        "user-biographical",
+        "arlo-current-state",
+        "arlo-biographical"
     ],
-    budget=9000,
-    warning_threshold=8000
+    budget=10000
 )
 ```
 **Verify:**
-- ✅ Returns `"overall_status"` ("ok" or "warning" or "over_budget")
-- ✅ Returns `"files"` array with entry for each file checked
-- ✅ Each file entry contains:
-  - `"file"` - Filename (e.g., "USER.md")
-  - `"path"` - Full path
-  - `"tokens"` - Token count (integer)
-  - `"method"` - Measurement method ("tiktoken" preferred, "word_count" fallback)
-  - `"budget"` - Budget limit (9000)
-  - `"warning_threshold"` - Warning trigger (8000)
+- ✅ Returns `"overall_status"` ("ok" or "over_budget")
+- ✅ Returns `"entries"` array with entry for each KB entry checked
+- ✅ Each entry contains:
+  - `"entry_id"` - KB entry ID
+  - `"tokens"` - Token count (integer, using len(content) // 4)
+  - `"budget"` - Budget limit (10000)
   - `"headroom"` - Tokens remaining before budget
-  - `"status"` - "ok", "warning", or "over_budget"
-  - `"severity"` - "info", "warning", or "error"
-  - `"action"` - null or compression recommendation
+  - `"status"` - "ok" or "over_budget"
+  - `"needs_offload"` - Boolean (true if over budget)
 - ✅ Returns `"timestamp"` - ISO timestamp of check
-- ✅ Handles missing files gracefully (skip or error appropriately)
-- ✅ Uses tiktoken if available (OpenAI tokenizer, deterministic)
-- ✅ Falls back to word_count * 1.3 if tiktoken unavailable
-
-**Expected token ranges (reference only, not hard requirements):**
-- USER-BASE.md: ~5-6K tokens
-- ARLO-BASE.md: ~7-8K tokens
-- USER.md: ~1-2K tokens (target ~2K)
-- ARLO.md: ~1-2K tokens (target ~2K)
-- USER-BIO.md: ~3-5K tokens
-- ARLO-BIO.md: ~2-3K tokens
-- USER-WORK.md: ~3-9K tokens (9K trigger)
-- ARLO-WORK.md: ~2-9K tokens (9K trigger)
-- USER-PERSONAL.md: ~0.5-9K tokens (9K trigger)
-- ARLO-PERSONAL.md: ~2-9K tokens (9K trigger)
+- ✅ Returns `"note"` - Reference to offloading protocol
+- ✅ Handles missing entries gracefully (skip)
 
 **Success Criteria:**
 - ✅ `git_commit_and_get_sha` creates commit and returns SHA
 - ✅ `get_kb_session_status` returns database/kb_md/status structure
-- ✅ `check_token_budgets` measures all 8 continuity files
-- ✅ Token measurement uses tiktoken (or word_count fallback)
-- ✅ Budget status correctly identifies ok/warning/over_budget
+- ✅ `check_token_budgets` checks 4 KB context entries
+- ✅ Token measurement uses simple approximation (len // 4)
+- ✅ Budget status correctly identifies ok/over_budget (no "warning" state)
 - ✅ All 3 system tools functional and tested
+
+---
+
+### Step 6d: Token Budget Overflow & Offloading Tests (Rinsable)
+
+Test budget overflow detection and offloading workflow using git commit/reset for cleanup.
+
+**Setup: Create test commit point**
+```bash
+git add -A && git commit -m "test: Pre-budget-test checkpoint"
+```
+
+**Test 1: Detect Over-Budget Entry**
+```python
+# Create oversized entry (>10K tokens = ~40K chars)
+dummy_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 750  # ~42K chars ≈ 10.5K tokens
+
+mcp__duckdb-kb__upsert_knowledge(
+    id="user-current-state",
+    category="context",
+    title="USER - Current State (OVERSIZED TEST)",
+    content=dummy_text,
+    tags=["user", "current-state", "test"],
+    generate_embedding=False
+)
+
+# Check budget
+result = mcp__duckdb-kb__check_token_budgets(
+    entry_ids=["user-current-state"],
+    budget=10000
+)
+```
+**Verify:**
+- ✅ Returns `"overall_status": "over_budget"`
+- ✅ `"status": "over_budget"` for user-current-state
+- ✅ `"needs_offload": true`
+- ✅ Token count ≈ 10.5K
+
+**Test 2: Offload to New KB Entry**
+```python
+# Simulate offloading oldest topic to new KB entry
+mcp__duckdb-kb__upsert_knowledge(
+    id="pattern-offloaded-topic-test",
+    category="pattern",
+    title="Offloaded Topic from user-current-state (Test)",
+    content="[Oldest topic content extracted from user-current-state - simulated]",
+    tags=["offload", "test", "layer:base"],
+    generate_embedding=False
+)
+
+# Update user-current-state (remove offloaded content, now under budget)
+reduced_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 600  # ~33.6K chars ≈ 8.4K tokens
+
+mcp__duckdb-kb__upsert_knowledge(
+    id="user-current-state",
+    category="context",
+    title="USER - Current State",
+    content=reduced_text,
+    tags=["user", "current-state"],
+    generate_embedding=False
+)
+
+# Check budget again
+result = mcp__duckdb-kb__check_token_budgets(
+    entry_ids=["user-current-state"],
+    budget=10000
+)
+```
+**Verify:**
+- ✅ Returns `"overall_status": "ok"`
+- ✅ `"status": "ok"` for user-current-state
+- ✅ `"needs_offload": false`
+- ✅ New KB entry "pattern-offloaded-topic-test" exists
+- ✅ user-current-state now under 10K budget
+
+**Test 3: Offload with Duplicate Detection**
+```python
+# Create another oversized entry
+mcp__duckdb-kb__upsert_knowledge(
+    id="arlo-current-state",
+    category="context",
+    title="ARLO - Current State (OVERSIZED TEST)",
+    content=dummy_text,  # Reuse from Test 1
+    tags=["arlo", "current-state", "test"],
+    generate_embedding=False
+)
+
+# Try to offload topic but check for duplicates first
+# Simulate smart_search for duplicates
+mcp__duckdb-kb__smart_search(
+    query="offloaded topic user current state",
+    similarity_threshold=0.7,
+    limit=5
+)
+
+# If duplicate found (pattern-offloaded-topic-test), update existing instead
+mcp__duckdb-kb__upsert_knowledge(
+    id="pattern-offloaded-topic-test",
+    category="pattern",
+    title="Offloaded Topics from Context Entries (Test)",
+    content="[Combined content from user-current-state and arlo-current-state offloads]",
+    tags=["offload", "test", "consolidated", "layer:base"],
+    generate_embedding=False
+)
+
+# Reduce arlo-current-state
+mcp__duckdb-kb__upsert_knowledge(
+    id="arlo-current-state",
+    category="context",
+    title="ARLO - Current State",
+    content=reduced_text,  # Reuse from Test 2
+    tags=["arlo", "current-state"],
+    generate_embedding=False
+)
+```
+**Verify:**
+- ✅ Duplicate detection workflow tested (smart_search before create)
+- ✅ Existing entry updated instead of creating duplicate
+- ✅ arlo-current-state now under 10K budget
+- ✅ Demonstrates standard KB workflow integration
+
+**Cleanup: Reset to test commit**
+```bash
+git reset --hard HEAD~1
+```
+**Verify:**
+- ✅ All test changes reverted
+- ✅ Database restored to pre-test state
+- ✅ No test pollution in KB
+
+**Success Criteria:**
+- ✅ check_token_budgets correctly detects over-budget entries
+- ✅ Offloading workflow creates new KB entries for extracted content
+- ✅ Reduced context entries pass budget check after offload
+- ✅ Duplicate detection integrated (smart_search before create)
+- ✅ Rinsable test via git commit/reset
+- ✅ No test data pollution after cleanup
 
 ---
 

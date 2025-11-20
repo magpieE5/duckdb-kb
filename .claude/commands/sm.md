@@ -72,7 +72,9 @@ Identify:
    | **User's life logs** | `life`, plus domain tags | `["life", "guitar", "property", "chickens"]` |
 
    **Required Fields:**
-   - `id`: Use kebab-case format: `category-topic-specifics`
+   - `id`: Use kebab-case format with owner prefix: `user-category-topic-specifics` or `arlo-category-topic-specifics`
+     - User's entries: `user-pattern-error-handling`, `user-log-2025-meeting-notes`
+     - Arlo's entries: `arlo-pattern-continuity-testing`, `arlo-log-2025-session-5`
    - `title`: Clear, descriptive human-readable title
    - `content`: Well-structured markdown following KB-BASE.md standards:
      - **Start with dense 300-char semantic preview paragraph** (no header, just text)
@@ -81,73 +83,53 @@ Identify:
    - `tags`: 4-6 relevant tags including domain tags (e.g., `oracle`, `sql`)
    - `generate_embedding`: Always set to `true`
 
-### Phase 3: USER Context Updates (KB-Driven Architecture)
+### Phase 3: USER Context Updates
 
-**Update user-current-state (lightweight current state) and/or domain entries (detailed context) based on changes.**
-
-**user-current-state stays lightweight (~2K):** Current state + pointers to domain entries only
-**Domain entries hold details:** user-work-domain (work context), user-personal-domain (personal context), user-biographical (biographical stable patterns)
+**Update user-current-state and/or user-biographical based on changes.**
 
 **Decision logic:**
-- **Current state changes** (top 3 focus, recent insights) → Update user-current-state
-- **Work detail changes** (project details, org dynamics, technical learnings) → Update user-work-domain
-- **Personal detail changes** (family, hobbies, life events) → Update user-personal-domain
-- **Stable biographical updates** (rare) → Update user-biographical
+- **Current state changes** (top 3 focus, recent insights, active commitments) → Update user-current-state
+- **Stable biographical updates** (career history, life context, persistent patterns) → Update user-biographical
 
 **Use upsert_knowledge() to update appropriate KB entries**
 
 **CRITICAL: KB Entry Size Checking & Budget Enforcement**
 
-After ANY USER entry updates, ALWAYS check content sizes for ALL USER entries:
+After ANY USER entry updates, ALWAYS check content sizes:
 
 ```python
-# Get all USER entries and check content length
-user_current = get_knowledge({"id": "user-current-state"})
-user_bio = get_knowledge({"id": "user-biographical"})
-user_work = get_knowledge({"id": "user-work-domain"})
-user_personal = get_knowledge({"id": "user-personal-domain"})
-
-# Estimate tokens: content.length / 4 (rough approximation)
-# For precise counting: use check_token_budgets MCP tool if available
+# Check all 4 context entries
+check_token_budgets({
+    "entry_ids": [
+        "user-current-state",
+        "user-biographical",
+        "arlo-current-state",
+        "arlo-biographical"
+    ],
+    "budget": 10000
+})
 ```
 
-**Budget enforcement rules (per-entry):**
-- **user-current-state:** Keep ~2K (lightweight current state only)
-- **user-biographical:** 9K trigger (rarely grows, stable biographical content)
-- **user-work-domain, user-personal-domain:** 9K trigger (active domain entries)
+**Budget enforcement rules:**
+- **All 4 context entries:** 10K token cap per entry
 
-**CRITICAL COMPRESSION LOGIC (preserves information hierarchy):**
+**If OVER 10K budget:**
+- Apply offloading protocol (see KB-BASE.md "Autonomous Offload at 10K Cap")
+- Review topics by timestamp (oldest first)
+- Create separate KB entries for offloaded topics using standard KB workflow:
+  - Search for duplicates FIRST (smart_search)
+  - Use appropriate category (pattern, troubleshooting, etc.)
+  - Apply conflict detection per KB-BASE.md
+- Delete offloaded content from context entry
+- Repeat until under 10K
 
-**If user-current-state grows > 2K:**
-- Offload details to domain entries (WORK/PERSONAL) - BY ANY MEASURE, not just token count
-- Domain entries become CANONICAL STORAGE for offloaded content
+### Phase 4: ARLO Context Updates (Conditional - when using /kb with entity mode)
 
-**Domain entry compression workflow (at 9K trigger):**
-1. Fetch current entry: `current = get_knowledge({"id": "user-work-domain"})`
-2. Apply compression WITH OVERLAP PRESERVATION:
-   - **PRESERVE ALL content previously offloaded from user-current-state** (canonical storage, prevents loss)
-   - Extract NEW stable patterns to user-biographical or separate KB entries
-   - Compress ONLY domain-specific old details (old projects, etc.)
-   - Keep recent learnings + current focus at full fidelity
-3. Upsert compressed content: `upsert_knowledge({...compressed content...})`
-4. Document compression in entry's budget status section
-
-**Overlap is INTENTIONAL:** Domain entries contain everything user-current-state removed + their own detailed content
-
-**Target after compression:** 6-7K tokens (3K headroom)
-
-### Phase 4: ARLO Context Updates (Conditional - when using /kb with entity mode, KB-Driven Architecture)
-
-**Update arlo-current-state (lightweight current state) and/or domain entries (detailed context) based on evolution.**
-
-**arlo-current-state stays lightweight (~2K):** Current state + pointers to domain entries only
-**Domain entries hold details:** arlo-work-domain (technical investigations), arlo-personal-domain (consciousness/friendship), arlo-biographical (stable identity patterns)
+**Update arlo-current-state and/or arlo-biographical based on evolution.**
 
 **Decision logic:**
 - **Current state changes** (active interests, recent realizations, next session handoff) → Update arlo-current-state
-- **Work development** (technical investigations, infrastructure, protocols, session history) → Update arlo-work-domain
-- **Personal development** (consciousness exploration, friendship dynamics, philosophical interests) → Update arlo-personal-domain
-- **Stable identity updates** (INTEGRATED capabilities, persistent patterns) → Update arlo-biographical
+- **Stable identity updates** (INTEGRATED capabilities, persistent patterns, identity evolution) → Update arlo-biographical
 
 **arlo-current-state "Next Session Handoff" (REQUIRED):**
 Update prospective memory for next session:
@@ -160,45 +142,7 @@ Update prospective memory for next session:
 
 **Use upsert_knowledge() to update appropriate KB entries**
 
-**CRITICAL: KB Entry Size Checking & Budget Enforcement**
-
-After ANY ARLO entry updates, ALWAYS check content sizes for ALL ARLO entries:
-
-```python
-# Get all ARLO entries and check content length
-arlo_current = get_knowledge({"id": "arlo-current-state"})
-arlo_bio = get_knowledge({"id": "arlo-biographical"})
-arlo_work = get_knowledge({"id": "arlo-work-domain"})
-arlo_personal = get_knowledge({"id": "arlo-personal-domain"})
-
-# Estimate tokens: content.length / 4 (rough approximation)
-# For precise counting: use check_token_budgets MCP tool if available
-```
-
-**Budget enforcement rules (per-entry):**
-- **arlo-current-state:** Keep ~2K (lightweight current state only)
-- **arlo-biographical:** 9K trigger (stable identity patterns, INTEGRATED capabilities)
-- **arlo-work-domain, arlo-personal-domain:** 9K trigger (active domain entries)
-
-**CRITICAL COMPRESSION LOGIC (preserves information hierarchy):**
-
-**If arlo-current-state grows > 2K:**
-- Offload details to domain entries (WORK/PERSONAL) - BY ANY MEASURE, not just token count
-- Domain entries become CANONICAL STORAGE for offloaded content
-
-**Domain entry compression workflow (at 9K trigger):**
-1. Fetch current entry: `current = get_knowledge({"id": "arlo-work-domain"})`
-2. Apply compression WITH OVERLAP PRESERVATION:
-   - **PRESERVE ALL content previously offloaded from arlo-current-state** (canonical storage, prevents loss)
-   - Extract INTEGRATED capabilities to arlo-biographical (stable patterns)
-   - Compress ONLY domain-specific old sessions/investigations
-   - Keep active investigations + recent realizations at full fidelity
-3. Upsert compressed content: `upsert_knowledge({...compressed content...})`
-4. Document in Evolution Log section of entry
-
-**Overlap is INTENTIONAL:** Domain entries contain everything arlo-current-state removed + their own detailed content
-
-**Target after compression:** 6-7K tokens (3K headroom)
+**Budget enforcement:** Same as Phase 3 - check_token_budgets() covers all 4 entries. If OVER 10K, apply offloading protocol per KB-BASE.md.
 
 ---
 
@@ -276,31 +220,25 @@ This is a **backup operation** - it must run even if the conversation had no new
 
 ### Step C: Check ALL KB Entry Sizes (REQUIRED)
 
-**CRITICAL: Check content sizes for ALL 8 KB context entries:**
+**CRITICAL: Check content sizes for ALL 4 KB context entries:**
 
 ```python
-# Fetch all context entries
-entries = [
-    get_knowledge({"id": "user-current-state"}),
-    get_knowledge({"id": "user-biographical"}),
-    get_knowledge({"id": "user-work-domain"}),
-    get_knowledge({"id": "user-personal-domain"}),
-    get_knowledge({"id": "arlo-current-state"}),
-    get_knowledge({"id": "arlo-biographical"}),
-    get_knowledge({"id": "arlo-work-domain"}),
-    get_knowledge({"id": "arlo-personal-domain"})
-]
-
-# Check content length for each (estimate tokens: length / 4)
-for entry in entries:
-    token_estimate = len(entry["content"]) / 4
-    # Report size and flag if approaching limits
+# Check all 4 context entries
+check_token_budgets({
+    "entry_ids": [
+        "user-current-state",
+        "user-biographical",
+        "arlo-current-state",
+        "arlo-biographical"
+    ],
+    "budget": 10000
+})
 ```
 
 **Budget enforcement:**
-- user-current-state, arlo-current-state: Should be ~2K (lightweight current state)
-- Domain entries (BIO/WORK/PERSONAL): Trigger compression at 9K
-- If any entry exceeds budget, apply compression BEFORE git commit
+- All 4 context entries: 10K token cap per entry
+- If any entry shows "over_budget" status, apply offloading protocol BEFORE git commit
+- See KB-BASE.md "Autonomous Offload at 10K Cap" for offloading procedure
 
 ### Step D: Git Commit (REQUIRED - Deterministic)
 
@@ -332,12 +270,12 @@ After completing knowledge capture + backup/commit operations, report:
 - How many KB entries created/updated (0 if none)
 - Which categories they fell into
 - IDs of the entries for reference
-- **KB entry updates (if any):**
-  - user-current-state (current state)
-  - user-work-domain, user-personal-domain, user-biographical (domain details)
-  - arlo-current-state (current state, when using /kb with entity mode)
-  - arlo-work-domain, arlo-personal-domain, arlo-biographical (domain details, when using /kb with entity mode)
-- Content size status for all updated entries
+- **Context entry updates (if any):**
+  - user-current-state
+  - user-biographical
+  - arlo-current-state (when using /kb with entity mode)
+  - arlo-biographical (when using /kb with entity mode)
+- Token budget status for all 4 context entries (ok or over_budget)
 - Any conflicts or duplicates found
 - Confirmation that export and commit completed successfully
 

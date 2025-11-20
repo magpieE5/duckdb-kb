@@ -21,24 +21,11 @@ from mcp.server import Server
 from mcp.types import Tool, TextContent, EmbeddedResource
 import mcp.server.stdio
 
-# Embedding generation
+# Embedding generation (OpenAI only)
 try:
     from openai import OpenAI
-    OPENAI_AVAILABLE = True
 except ImportError:
-    OPENAI_AVAILABLE = False
-    OpenAI = None
-
-# Fallback: Local embeddings
-try:
-    from sentence_transformers import SentenceTransformer
-    LOCAL_EMBEDDINGS_AVAILABLE = True
-except ImportError:
-    LOCAL_EMBEDDINGS_AVAILABLE = False
-    SentenceTransformer = None
-
-# Check if any embedding provider is available
-EMBEDDINGS_AVAILABLE = OPENAI_AVAILABLE or LOCAL_EMBEDDINGS_AVAILABLE
+    raise RuntimeError("openai package not installed. Run: pip install openai")
 
 
 # =============================================================================
@@ -47,28 +34,19 @@ EMBEDDINGS_AVAILABLE = OPENAI_AVAILABLE or LOCAL_EMBEDDINGS_AVAILABLE
 
 DB_PATH = os.getenv('KB_DB_PATH', 'kb.duckdb')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-EMBEDDING_PROVIDER = os.getenv('EMBEDDING_PROVIDER', 'openai')  # 'openai' or 'local'
 EMBEDDING_MODEL = 'text-embedding-3-large'  # OpenAI model (best quality)
 EMBEDDING_DIM = 3072  # OpenAI text-embedding-3-large dimensions
 
 # Semantic search default threshold
 DEFAULT_SIMILARITY_THRESHOLD = 0.5  # Conservative threshold for high-quality matches (lower for broader results)
 
-# Local model fallback
-LOCAL_MODEL = 'all-MiniLM-L6-v2'
-LOCAL_DIM = 384
-
-# Lazy-load embedding models (only when needed)
-_embedding_model = None
+# Lazy-load OpenAI client (only when needed)
 _openai_client = None
 
 
 def get_openai_client():
     """Lazy load OpenAI client"""
     global _openai_client
-
-    if not OPENAI_AVAILABLE:
-        raise RuntimeError("openai package not installed. Run: pip install openai")
 
     if not OPENAI_API_KEY:
         raise RuntimeError("OPENAI_API_KEY not set. Run: export OPENAI_API_KEY='sk-...'")
@@ -79,23 +57,9 @@ def get_openai_client():
     return _openai_client
 
 
-def get_local_embedding_model():
-    """Lazy load local embedding model"""
-    global _embedding_model
-
-    if not LOCAL_EMBEDDINGS_AVAILABLE:
-        raise RuntimeError("sentence-transformers not installed. Run: pip install sentence-transformers")
-
-    if _embedding_model is None:
-        _embedding_model = SentenceTransformer(LOCAL_MODEL)
-
-    return _embedding_model
-
-
-def generate_embedding_openai(text: str) -> List[float]:
+def generate_embedding(text: str) -> List[float]:
     """Generate embedding using OpenAI API"""
     client = get_openai_client()
-
     response = client.embeddings.create(
         model=EMBEDDING_MODEL,
         input=text
@@ -103,53 +67,15 @@ def generate_embedding_openai(text: str) -> List[float]:
     return response.data[0].embedding
 
 
-def generate_embedding_local(text: str) -> List[float]:
-    """Generate embedding using local model"""
-    model = get_local_embedding_model()
-    embedding = model.encode(text, convert_to_numpy=True)
-    return embedding.tolist()
-
-
-def generate_embedding(text: str) -> List[float]:
-    """Generate embedding (tries OpenAI first, falls back to local)"""
-    if EMBEDDING_PROVIDER == 'openai' and OPENAI_API_KEY:
-        try:
-            return generate_embedding_openai(text)
-        except Exception as e:
-            pass  # Fallback to local embeddings
-            if LOCAL_EMBEDDINGS_AVAILABLE:
-                return generate_embedding_local(text)
-            raise
-    elif LOCAL_EMBEDDINGS_AVAILABLE:
-        return generate_embedding_local(text)
-    else:
-        raise RuntimeError("No embedding provider available. Install openai or sentence-transformers")
-
-
 def generate_embeddings_batch(texts: List[str]) -> List[List[float]]:
-    """Generate embeddings for multiple texts (efficient batching)"""
-    if EMBEDDING_PROVIDER == 'openai' and OPENAI_API_KEY:
-        # OpenAI supports batch in single API call (up to ~2048 inputs)
-        try:
-            client = get_openai_client()
-            response = client.embeddings.create(
-                model=EMBEDDING_MODEL,
-                input=texts
-            )
-            return [item.embedding for item in response.data]
-        except Exception as e:
-            pass  # Fallback to local embeddings
-            if LOCAL_EMBEDDINGS_AVAILABLE:
-                model = get_local_embedding_model()
-                embeddings = model.encode(texts, convert_to_numpy=True, show_progress_bar=True)
-                return [emb.tolist() for emb in embeddings]
-            raise
-    elif LOCAL_EMBEDDINGS_AVAILABLE:
-        model = get_local_embedding_model()
-        embeddings = model.encode(texts, convert_to_numpy=True, show_progress_bar=True)
-        return [emb.tolist() for emb in embeddings]
-    else:
-        raise RuntimeError("No embedding provider available")
+    """Generate embeddings for multiple texts using OpenAI API (efficient batching)"""
+    client = get_openai_client()
+    # OpenAI supports batch in single API call (up to ~2048 inputs)
+    response = client.embeddings.create(
+        model=EMBEDDING_MODEL,
+        input=texts
+    )
+    return [item.embedding for item in response.data]
 
 
 # =============================================================================
@@ -661,34 +587,29 @@ Used by /kb command for deterministic initialization flow.""",
         ),
         Tool(
             name="check_token_budgets",
-            description="""Check USER.md and ARLO.md token budgets against 10K limit.
+            description="""Check KB entry token budgets against 10K limit.
 
-Uses tiktoken if available, falls back to word-count approximation (words × 1.3).
-Returns token counts, budget status, and compression triggers.
+Uses simple approximation (len(content) // 4) for token counting.
+Returns token counts and budget status (ok or over_budget).
 
 WHEN TO USE:
-- During /sm workflow (mandatory measurement)
-- Before manual compression
+- During /sm workflow (mandatory measurement after updating context entries)
+- Before manual offloading to verify budget status
 - Verifying budget compliance
 
-Returns structured status for each file checked.""",
+Returns structured status for each KB entry checked.""",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "files": {
+                    "entry_ids": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "File paths to check (default: ['.claude/USER.md', '.claude/ARLO.md'])"
+                        "description": "KB entry IDs to check (default: ['user-current-state', 'user-biographical', 'arlo-current-state', 'arlo-biographical'])"
                     },
                     "budget": {
                         "type": "integer",
                         "default": 10000,
-                        "description": "Token budget limit (default: 10000)"
-                    },
-                    "warning_threshold": {
-                        "type": "integer",
-                        "default": 9000,
-                        "description": "Warning threshold for compression trigger (default: 9000)"
+                        "description": "Token budget limit per entry (default: 10000)"
                     }
                 }
             }
@@ -705,7 +626,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls"""
 
     # Tools that don't need a database connection
-    NO_DB_TOOLS = {"initialize_database", "git_commit_and_get_sha", "get_kb_session_status", "check_token_budgets"}
+    NO_DB_TOOLS = {"initialize_database", "git_commit_and_get_sha", "get_kb_session_status"}
 
     # Only get connection for tools that need it
     con = None
@@ -742,7 +663,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         elif name == "get_kb_session_status":
             return await tool_get_kb_session_status(arguments)
         elif name == "check_token_budgets":
-            return await tool_check_token_budgets(arguments)
+            return await tool_check_token_budgets(con, arguments)
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
@@ -1971,97 +1892,63 @@ async def tool_get_kb_session_status(arguments: dict) -> list[TextContent]:
 # Tool 15: Check Token Budgets
 # =============================================================================
 
-async def tool_check_token_budgets(arguments: dict) -> list[TextContent]:
-    """Check USER.md and ARLO.md token budgets against 10K limit"""
-
-    # Try to import tiktoken, fall back to word-count approximation
-    try:
-        import tiktoken
-        enc = tiktoken.encoding_for_model("gpt-4")
-        has_tiktoken = True
-    except ImportError:
-        has_tiktoken = False
-
-    def count_tokens(filepath: Path) -> tuple[int, str]:
-        """Count tokens in file using tiktoken or word-count fallback"""
-        with open(filepath, "r") as f:
-            content = f.read()
-
-        if has_tiktoken:
-            tokens = len(enc.encode(content))
-            method = "tiktoken"
-        else:
-            # Fallback: tokens ≈ words × 1.3 (empirically validated for English)
-            words = len(content.split())
-            tokens = int(words * 1.3)
-            method = "word-count approximation"
-
-        return tokens, method
+async def tool_check_token_budgets(con: duckdb.DuckDBPyConnection, arguments: dict) -> list[TextContent]:
+    """Check KB entry token budgets against 10K limit"""
 
     # Parse arguments
-    files_arg = arguments.get("files")
+    entry_ids = arguments.get("entry_ids", [
+        "user-current-state",
+        "user-biographical",
+        "arlo-current-state",
+        "arlo-biographical"
+    ])
     budget = arguments.get("budget", 10000)
-    warning_threshold = arguments.get("warning_threshold", 9000)
-
-    # Default files if none specified
-    if not files_arg:
-        project_dir = Path(__file__).parent
-        files_arg = [
-            str(project_dir / ".claude" / "USER.md"),
-            str(project_dir / ".claude" / "ARLO.md")
-        ]
 
     results = []
-    all_ok = True
+    any_over_budget = False
 
-    for filepath_str in files_arg:
-        filepath = Path(filepath_str)
+    for entry_id in entry_ids:
+        # Fetch KB entry
+        row = con.execute(
+            "SELECT content FROM knowledge WHERE id = ?",
+            [entry_id]
+        ).fetchone()
 
-        # Skip if file doesn't exist
-        if not filepath.exists():
+        if not row:
+            # Entry doesn't exist - skip
             continue
 
-        tokens, method = count_tokens(filepath)
-        filename = filepath.name
+        content = row[0]
 
-        file_result = {
-            "file": filename,
-            "path": str(filepath),
-            "tokens": tokens,
-            "method": method,
+        # Simple token approximation: len(content) // 4
+        token_estimate = len(content) // 4
+        headroom = budget - token_estimate
+
+        # Determine status
+        if token_estimate > budget:
+            status = "over_budget"
+            needs_offload = True
+            any_over_budget = True
+        else:
+            status = "ok"
+            needs_offload = False
+
+        entry_result = {
+            "entry_id": entry_id,
+            "tokens": token_estimate,
             "budget": budget,
-            "warning_threshold": warning_threshold,
-            "headroom": budget - tokens
+            "headroom": headroom,
+            "status": status,
+            "needs_offload": needs_offload
         }
 
-        if tokens >= budget:
-            file_result["status"] = "exceeded"
-            file_result["severity"] = "error"
-            if filename == "ARLO.md":
-                file_result["action"] = "Apply compression immediately (see ARLO-BASE.md)"
-            else:
-                file_result["action"] = "Archive content to KB immediately"
-            all_ok = False
-
-        elif tokens >= warning_threshold:
-            file_result["status"] = "warning"
-            file_result["severity"] = "warning"
-            if filename == "ARLO.md":
-                file_result["action"] = "Compression required (see ARLO-BASE.md Compression Strategies)"
-            else:
-                file_result["action"] = "Archive old learnings/commitments to KB entries"
-
-        else:
-            file_result["status"] = "ok"
-            file_result["severity"] = "info"
-            file_result["action"] = None
-
-        results.append(file_result)
+        results.append(entry_result)
 
     response = {
-        "overall_status": "ok" if all_ok else "action_required",
-        "files": results,
-        "timestamp": datetime.now().isoformat()
+        "overall_status": "over_budget" if any_over_budget else "ok",
+        "entries": results,
+        "timestamp": datetime.now().isoformat(),
+        "note": "If over_budget, apply offloading protocol per KB-BASE.md 'Autonomous Offload at 10K Cap'"
     }
 
     return [TextContent(type="text", text=json.dumps(response))]

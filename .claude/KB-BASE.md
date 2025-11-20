@@ -557,7 +557,10 @@ Assistant: "Adding to user-current-state commitments: [task] (due: 2025-11-15). 
 
 **When creating entries:**
 
-- **ID format:** kebab-case (e.g., `pattern-error-handling`, `troubleshooting-auth-timeout`)
+- **ID format:** kebab-case with first-position owner prefix
+  - **User's entries:** `user-{category}-{specifics}` (e.g., `user-pattern-error-handling`, `user-troubleshooting-auth-timeout`)
+  - **Arlo's entries:** `arlo-{category}-{specifics}` (e.g., `arlo-pattern-continuity-testing`, `arlo-troubleshooting-substrate-transition`)
+  - **Exception:** The 4 context entries (`user-current-state`, `user-biographical`, `arlo-current-state`, `arlo-biographical`) omit category since they're unique
 - **Categories:** context, pattern, command, issue, troubleshooting, reference, log, journal, table, other
 - **Tags:** 4-6 descriptive tags for discoverability
 - **Content structure:**
