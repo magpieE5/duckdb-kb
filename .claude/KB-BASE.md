@@ -26,7 +26,7 @@
 
 **All 4 KB entries:**
 - **10K token cap per entry** (use `check_token_budgets` to measure)
-- **Topics include timestamp `(YYYY-MM-DD)`** in heading for age tracking
+- **Topics include last-modified timestamp `(YYYY-MM-DD)`** in heading for age tracking
 - **Update timestamp** when topic revisited/modified in conversation
 - **At 10K:** Claude autonomously reviews topics by timestamp, offloads older/resolved topics to KB entries, removes from source
 
@@ -601,7 +601,7 @@ Assistant: "Adding to user-current-state commitments: [task] (due: 2025-11-15). 
 **When creating entries:**
 
 - **ID format:** kebab-case (e.g., `pattern-error-handling`, `troubleshooting-auth-timeout`)
-- **Categories:** pattern, command, issue, troubleshooting, reference, log, journal, table, other
+- **Categories:** context, pattern, command, issue, troubleshooting, reference, log, journal, table, other
 - **Tags:** 4-6 descriptive tags for discoverability
 - **Content structure:**
   - Dense summary paragraph first (300 chars max)
@@ -609,6 +609,7 @@ Assistant: "Adding to user-current-state commitments: [task] (due: 2025-11-15). 
   - Use markdown formatting for readability
 
 **Category Guidelines:**
+- `context` - Always-loaded continuity substrate (4 core entries: user-current-state, user-biographical, arlo-current-state, arlo-biographical)
 - `pattern` - Reusable solutions, architectural approaches, best practices
 - `command` - CLI commands, procedures, scripts
 - `issue` - Important decisions, bugs fixed, architectural choices

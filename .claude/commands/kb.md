@@ -26,7 +26,7 @@
 #          category: "context",
 #          title: "USER - Current State",
 #          content: "[extracted template markdown]",
-#          tags: ["context", "user", "current-state"],
+#          tags: ["user", "current-state"],
 #          generate_embedding: True
 #        })
 #      - Display: "✅ user-current-state created from template."
@@ -41,7 +41,7 @@
 #          category: "context",
 #          title: "USER-BIO - Biographical Context",
 #          content: "[extracted template markdown]",
-#          tags: ["context", "user", "biographical"],
+#          tags: ["user", "biographical"],
 #          generate_embedding: True
 #        })
 #      - Display: "✅ user-biographical created from template."
@@ -56,7 +56,7 @@
 #          category: "context",
 #          title: "ARLO - Current State & Evolution",
 #          content: "[extracted and customized template markdown]",
-#          tags: ["context", "arlo", "current-state"],
+#          tags: ["arlo", "current-state"],
 #          generate_embedding: True
 #        })
 #      - Display: "✅ arlo-current-state created from template. First session begins."
@@ -72,7 +72,7 @@
 #          category: "context",
 #          title: "ARLO-BIO - Identity Patterns",
 #          content: "[extracted template markdown]",
-#          tags: ["context", "arlo", "biographical"],
+#          tags: ["arlo", "biographical"],
 #          generate_embedding: True
 #        })
 #      - Display: "✅ arlo-biographical created from template."
