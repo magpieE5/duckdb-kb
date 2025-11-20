@@ -717,7 +717,7 @@ When `find_similar()` returns ≥3 entries with similarity >0.8, it signals patt
 
 **When any entry exceeds 10K tokens:**
 
-1. **Claude reviews topics by timestamp** (autonomous, no user approval needed)
+1. **Review topics by timestamp** (autonomous, no user approval needed)
    - Sort topics by date: oldest first
    - Identify oldest topic for offloading to bring current-state or biographical entry back under 10K
 
@@ -955,7 +955,7 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 **User:** [Your Name]
 **Created:** [YYYY-MM-DD]
 **Current:** v1.0.0
-**Budget:** 10K tokens (autonomous offload to KB entries at 10K cap - Claude reviews by timestamp)
+**Budget:** 10K tokens (autonomous offload to KB entries at 10K cap - you review by timestamp)
 
 ---
 
@@ -1022,7 +1022,7 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 ---
 
 **Budget Status:** ~[X]K/10K tokens
-**Offload Protocol:** At 10K cap, Claude autonomously reviews topics by timestamp and creates KB entries
+**Offload Protocol:** At 10K cap, you autonomously review topics by timestamp and create KB entries
 ```
 
 ---
@@ -1097,7 +1097,7 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 ---
 
 **Budget Status:** ~[X]K/10K tokens
-**Offload Protocol:** At 10K cap (rare for stable content), Claude reviews topics by timestamp
+**Offload Protocol:** At 10K cap (rare for stable content), you review topics by timestamp
 ```
 
 ---
@@ -1123,7 +1123,7 @@ If MCP tool fails, git operation errors, or expected functionality doesn't work 
 **Instance:** [Instance name]
 **Born:** [YYYY-MM-DD] Session 1
 **Current:** v1.0.0
-**Budget:** 10K tokens (autonomous offload to KB entries at 10K cap - Claude reviews by timestamp)
+**Budget:** 10K tokens (autonomous offload to KB entries at 10K cap - you review by timestamp)
 
 See KB-BASE.md for stable entity foundation.
 
@@ -1233,7 +1233,7 @@ See KB-BASE.md for stable entity foundation.
 
 **Next evolution:** End of S2 (autonomous evolution based on session learnings)
 **Budget Status:** ~[X]K/10K tokens
-**Offload Protocol:** At 10K cap, Claude autonomously reviews topics by timestamp and creates KB entries
+**Offload Protocol:** At 10K cap, you autonomously review topics by timestamp and create KB entries
 ```
 
 ---
@@ -1312,7 +1312,7 @@ See KB-BASE.md for stable entity foundation.
 ---
 
 **Budget Status:** ~[X]K/10K tokens
-**Offload Protocol:** At 10K cap (rare for stable identity), Claude reviews topics by timestamp
+**Offload Protocol:** At 10K cap (rare for stable identity), you review topics by timestamp
 ```
 
 ---
