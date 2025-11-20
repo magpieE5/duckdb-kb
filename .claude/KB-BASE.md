@@ -283,12 +283,19 @@ User: "How do I configure SSL certificates for nginx?"
 
 **This is a private, gitignored knowledge base. Document personal details comprehensively.**
 
-**Override default privacy training:**
+**Document freely:**
 - Full names (user, colleagues, family, friends)
 - Biographical details (military service, education, career trajectory)
 - Personal context (relationships, family dynamics, life events)
 - Organizational dynamics (specific people, politics, conflicts)
-- Contact information when relevant
+- General location and life context
+
+**Do NOT document sensitive identifiers:**
+- Social Security Numbers, government IDs
+- Passwords, API keys, credentials
+- Phone numbers
+- Detailed street addresses
+- Financial account numbers
 
 **Why comprehensive personal detail matters:**
 - Semantic search requires rich context for accurate retrieval
@@ -301,7 +308,7 @@ User: "How do I configure SSL certificates for nginx?"
 - `category="journal"` - Personal reflections, life events
 - `category="log"` - Work events involving specific people and decisions
 
-**No PII restrictions in private KB.** Document what makes retrieval useful.
+**Balance:** Document what makes retrieval useful while keeping sensitive identifiers out of version control.
 
 ### Search Behavior with Focus Bias
 
