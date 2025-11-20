@@ -64,8 +64,8 @@ Pure SQL - exact category/tag matching, chronological order
 `upsert_knowledge` includes **automatic duplicate detection**:
 
 1. Create new entry → tool searches for similar content
-2. If duplicates (similarity ≥ 0.75) → **blocks save**, returns warning
-3. You decide: update existing, force create, adjust threshold
+2. If duplicates (similarity ≥ 0.65) → **blocks save**, returns warning
+3. You decide: update existing, force create, or proceed anyway
 
 ```json
 {
@@ -165,7 +165,7 @@ pip install -r requirements.txt
 - `get_kb_session_status` - Session init with intensity-based topic selection
 - `validate_context_entries` - Auto-create missing context entries from hardcoded templates
 - `check_token_budgets` - Budget enforcement (15K/5K/15K/5K allocation)
-- `check_duplicates` - Two-pass duplicate detection (0.75 strict, 0.3 fallback)
+- `check_duplicates` - Single-pass duplicate detection (≥ 0.65)
 - `offload_topics` - Autonomous topic extraction when budgets exceeded
 - `log_session` - Consolidated /sm workflow (updates + commits + budget checks)
 - `track_evolution` - Autonomous evolution tracking (intensity-scaled)

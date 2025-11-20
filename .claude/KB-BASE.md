@@ -609,19 +609,21 @@ track_evolution({
 ```python
 check_duplicates({
     "query": "entry title or content",
-    "category": "pattern",  # optional
-    "return_mode": "all"    # or "strict"
+    "category": "pattern"  # optional
 })
 ```
 
-**The tool executes deterministic two-pass checking:**
-- Pass 1: Strict check (similarity >= 0.75) - high confidence duplicates
-- Pass 2: Fallback check (similarity >= 0.3) - conceptually related entries
+**The tool executes single-pass checking:**
+- Single pass: similarity >= 0.65 (catches duplicates and consolidation candidates)
 
-**Returns:** recommendations + next_steps for each scenario
-- `strict_match`: MUST show user, get approval before proceeding
-- `possible_match`: Show user, suggest consolidation
-- `no_match`: Safe to create
+**Returns:** recommendations + next_steps
+- `matches`: Similar entries found (similarity >= 0.65) - blocks save, returns entry IDs/titles/scores
+- `no matches`: Safe to create (similarity < 0.65)
+
+**When matches found (>= 0.65):**
+1. Read the existing entry (highest similarity)
+2. Reason about how to integrate new content into existing
+3. Update existing entry: `upsert_knowledge(id="existing-id", content="merged...")`
 
 **Protocol:** ALWAYS use this tool before creating KB entries
 

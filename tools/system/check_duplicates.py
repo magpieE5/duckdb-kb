@@ -1,8 +1,7 @@
-"""Check for duplicate KB entries using two-pass semantic search
+"""Check for duplicate KB entries using single-pass semantic search
 
 Implements deterministic duplicate detection protocol:
-- Pass 1: Strict check (similarity >= 0.75) - high confidence duplicates
-- Pass 2: Fallback check (similarity >= 0.3) - conceptually related entries
+- Single pass: similarity >= 0.65 (catches duplicates and consolidation candidates)
 
 Always run before creating new KB entries to avoid fragmentation.
 """
@@ -18,14 +17,13 @@ from tools.base import generate_embedding, DEFAULT_SIMILARITY_THRESHOLD
 
 TOOL = Tool(
     name="check_duplicates",
-    description="""Check for duplicate KB entries using two-pass semantic search.
+    description="""Check for duplicate KB entries using single-pass semantic search.
 
 WHEN TO USE: Before creating any KB entry, integrated with upsert workflows
 PROTOCOL:
-- Pass 1: Strict check (similarity >= 0.75) - high confidence duplicates
-- Pass 2: Fallback check (similarity >= 0.3) - conceptually related entries
+- Single pass: similarity >= 0.65 (catches duplicates and consolidation candidates)
 
-Returns strict_match, possible_match, recommendation, and next_steps.""",
+Returns matches, recommendation, and next_steps.""",
     inputSchema={
         "type": "object",
         "properties": {
@@ -36,12 +34,6 @@ Returns strict_match, possible_match, recommendation, and next_steps.""",
             "category": {
                 "type": "string",
                 "description": "Optional: limit search to this category"
-            },
-            "return_mode": {
-                "type": "string",
-                "enum": ["strict", "all"],
-                "default": "all",
-                "description": "strict=0.75+ only, all=both passes (default: all)"
             }
         },
         "required": ["query"]
@@ -53,41 +45,28 @@ Returns strict_match, possible_match, recommendation, and next_steps.""",
 # =============================================================================
 
 async def execute(con, args: dict) -> List[TextContent]:
-    """Execute two-pass duplicate detection"""
+    """Execute single-pass duplicate detection"""
 
     query = args["query"]
     category = args.get("category")
-    return_mode = args.get("return_mode", "all")
 
     # Generate embedding for query
     query_embedding = generate_embedding(query)
 
-    # Pass 1: Strict check (similarity >= 0.75)
-    strict_matches = await _search_pass(
+    # Single pass: similarity >= 0.65
+    matches = await _search_pass(
         con,
         query_embedding,
         category,
-        similarity_threshold=0.75,
-        limit=5
+        similarity_threshold=0.65,
+        limit=10
     )
 
-    # Pass 2: Fallback check (similarity >= 0.3) - only if strict found nothing
-    possible_matches = []
-    if not strict_matches and return_mode == "all":
-        possible_matches = await _search_pass(
-            con,
-            query_embedding,
-            category,
-            similarity_threshold=0.3,
-            limit=10
-        )
-
     # Build recommendation
-    recommendation, next_steps = _build_recommendation(strict_matches, possible_matches)
+    recommendation, next_steps = _build_recommendation(matches)
 
     response = {
-        "strict_match": strict_matches,
-        "possible_match": possible_matches if return_mode == "all" else [],
+        "matches": matches,
         "recommendation": recommendation,
         "next_steps": next_steps,
         "query": query,
@@ -142,29 +121,21 @@ async def _search_pass(con, query_embedding: List[float], category: str, similar
     return matches
 
 
-def _build_recommendation(strict_matches: List, possible_matches: List) -> tuple:
+def _build_recommendation(matches: List) -> tuple:
     """Build recommendation and next steps based on results"""
 
-    if strict_matches:
-        recommendation = "⚠️ HIGH CONFIDENCE DUPLICATES FOUND (similarity >= 0.75)"
+    if matches:
+        recommendation = "⚠️ SIMILAR ENTRIES FOUND (similarity >= 0.65)"
         next_steps = [
-            "MUST show user the duplicates and get explicit approval before proceeding",
-            "Display: entry IDs, titles, similarity scores",
-            "Wait for user decision: update existing vs. create new",
-            "DO NOT create new entry without user approval"
-        ]
-    elif possible_matches:
-        recommendation = "ℹ️ POSSIBLE RELATED ENTRIES FOUND (similarity >= 0.3)"
-        next_steps = [
-            "Show user the related entries",
-            "Suggest consolidation if appropriate",
-            "User can proceed with creation or consolidate existing",
-            "Safe to create if user confirms intent"
+            "Show user the similar entries with IDs, titles, and similarity scores",
+            "User decides: update existing entry OR create new entry",
+            "High similarity (0.85+): Strong duplicate candidate - recommend updating existing",
+            "Medium similarity (0.65-0.84): Related content - user discretion"
         ]
     else:
         recommendation = "✅ NO DUPLICATES FOUND - Safe to create"
         next_steps = [
-            "No similar entries detected",
+            "No similar entries detected (similarity < 0.65)",
             "Proceed with KB entry creation"
         ]
 
