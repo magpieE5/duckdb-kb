@@ -108,7 +108,7 @@ mcp__duckdb-kb__initialize_database(force=True)
 ```
 **Verify:** Tool returns success=true, vss_available=true, and stats showing empty tables
 
-**Note:** This tests the `initialize_database` system tool (one of 3 new tools added for deterministic /kb and /sm workflows)
+**Note:** This tests the `initialize_database` system tool (one of 9 system tools supporting deterministic /kb and /sm workflows)
 
 **Step 3b: Import from canonical markdown seed data**
 ```python
@@ -480,9 +480,9 @@ mcp__duckdb-kb__query_knowledge(
 
 ### Step 6c: System Tools Tests
 
-Test the 3 system tools supporting deterministic /kb and /sm workflows.
+Test key system tools supporting deterministic /kb and /sm workflows (9 total, testing 3 core ones here).
 
-**Note:** `initialize_database` already tested in Step 3a.
+**Note:** `initialize_database` already tested in Step 3a. Additional tools like `validate_context_entries`, `check_duplicates`, `offload_topics`, `log_session`, `track_evolution`, and `track_commitments` tested in operational workflows.
 
 **Test 1: git_commit_and_get_sha**
 ```python
@@ -515,11 +515,9 @@ mcp__duckdb-kb__get_kb_session_status()
 **Verify:**
 - ✅ Returns `"database"` object with `"action"` field
   - Should be "check_empty" (database exists, has entries)
-- ✅ Returns `"kb_md"` object with `"action"` field
-  - Will be "ready" if USER.md exists, "setup_kb_md" if template
 - ✅ Returns `"status"` object with:
-  - `"focus_areas"` (list) - Parsed from USER.md if exists
-  - `"commitments"` (object) - all/approaching/overdue from USER.md
+  - `"focus_areas"` (list) - Parsed from KB context entries if exist
+  - `"commitments"` (object) - all/approaching/overdue parsed from user-current-state
 - ✅ No errors, valid JSON structure
 
 **Test 3: check_token_budgets**
@@ -551,11 +549,11 @@ mcp__duckdb-kb__check_token_budgets(
 
 **Success Criteria:**
 - ✅ `git_commit_and_get_sha` creates commit and returns SHA
-- ✅ `get_kb_session_status` returns database/kb_md/status structure
-- ✅ `check_token_budgets` checks 4 KB context entries
+- ✅ `get_kb_session_status` returns database/status structure (parses KB entries, not USER.md)
+- ✅ `check_token_budgets` checks 4 KB context entries with 15K/5K/15K/5K budgets
 - ✅ Token measurement uses simple approximation (len // 4)
 - ✅ Budget status correctly identifies ok/over_budget (no "warning" state)
-- ✅ All 3 system tools functional and tested
+- ✅ Core system tools functional and tested
 
 ---
 
@@ -674,7 +672,7 @@ mcp__duckdb-kb__upsert_knowledge(
 **Verify:**
 - ✅ Duplicate detection workflow tested (smart_search before create)
 - ✅ Existing entry updated instead of creating duplicate
-- ✅ arlo-current-state now under 10K budget
+- ✅ arlo-current-state now under 15K budget
 - ✅ Demonstrates standard KB workflow integration
 
 **Cleanup: Reset to test commit**
@@ -701,7 +699,22 @@ git reset --hard HEAD~1
 
 **IMPORTANT: Run cleanup BEFORE export/import to prevent test data pollution.**
 
-Remove all test entries created during testing:
+**Recommended:** Use `cleanup_test_entries` MCP tool:
+```python
+# Dry run first to see what will be deleted
+mcp__duckdb-kb__cleanup_test_entries(
+    pattern="test",
+    dry_run=True
+)
+
+# Execute cleanup
+mcp__duckdb-kb__cleanup_test_entries(
+    pattern="test",
+    dry_run=False
+)
+```
+
+**Manual cleanup (fallback):**
 ```python
 # Query for test entries
 mcp__duckdb-kb__query_knowledge(
@@ -866,17 +879,18 @@ Read `~/duckdb-kb/README.md` and extract:
 **Step 11b: Verify Implementation**
 
 For each README claim, verify actual implementation exists:
-1. Check MCP server code (`mcp_server.py`) for tool definitions
-   - Should advertise **15 MCP tools** (11 KB operations + 4 system tools)
-   - System tools: initialize_database, git_commit_and_get_sha, get_kb_session_status, check_token_budgets
+1. Check MCP server code (`mcp_server.py`) and tools directory
+   - Should advertise **25 MCP tools** (2 read + 3 search + 2 write + 4 utility + 9 system + 4 diagnostics)
+   - Tools organized in modular structure: tools/read, tools/search, tools/write, tools/utility, tools/system, tools/diagnostics
+   - Key system tools: initialize_database, git_commit_and_get_sha, get_kb_session_status, check_token_budgets, validate_context_entries, check_duplicates, offload_topics, log_session, track_evolution, track_commitments
 2. Check database schema (`schema.sql`) for required tables/indexes
 3. Check utility modules for supporting functionality
 
 Use Grep/Read tools to verify:
 ```bash
-# Example: Verify all 15 tools are registered
-grep -n "name=" ~/duckdb-kb/mcp_server.py | grep "Tool("
-# Should return 15 matches
+# Example: Verify all tools are registered via auto-discovery
+ls ~/duckdb-kb/tools/*/*.py | wc -l
+# Should return 25 (excluding __init__.py and base.py)
 ```
 
 **Step 11c: Verify Test Coverage**
@@ -898,7 +912,7 @@ Compare `/test-kb` steps against README features:
 
 ## Summary: [ALIGNED ✅ | GAPS FOUND ⚠️]
 
-### MCP Tools: 15 (11 KB operations + 4 system tools)
+### MCP Tools: 25 (2 read + 3 search + 2 write + 4 utility + 9 system + 4 diagnostics)
 ### Features Claimed in README: {N}
 ### Features Implemented: {N}
 ### Features Tested: {N}
