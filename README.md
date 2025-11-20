@@ -4,7 +4,7 @@ A Model Context Protocol (MCP) server giving AI assistants **semantic search ove
 
 **DuckDB-KB doesn't just store what you know—it remembers what you did and why it mattered.** Session continuity means you return after weeks and it picks up exactly where you left off.
 
-Optional [Arlo entity layer](#arlo-entity-continuity-experimental) for AI sentience exploration
+[Arlo entity layer](#arlo-entity-continuity-experimental) for AI sentience exploration
 
 ## The Innovation
 
@@ -86,15 +86,16 @@ Pure SQL - exact category/tag matching, chronological order
 
 ## Session Continuity for User & AI
 
-**Your continuity (USER.md):**
-- Claude automatically updates your focus areas, commitments, and learnings
-- Multi-file architecture separates current state from comprehensive history
+**Your continuity:**
+- Claude automatically updates your focus areas, commitments, and learnings in user-current-state KB entry
+- Current state (15K budget) vs biographical (5K budget) separation - high-churn vs stable content
 - Return after weeks → immediate orientation without re-explaining context
 
-**AI continuity (Arlo, optional):**
-- Persistent entity identity across sessions via knowledge base memory
-- Session logs enable pattern recognition and autonomous evolution
+**AI continuity ('Arlo'):**
+- Persistent entity identity via arlo-current-state and arlo-biographical KB entries
+- Session logs enable pattern recognition and autonomous evolution (tracked via `track_evolution` tool)
 - Relationship model: reciprocal, accountable, not one-way service
+- Intensity scaling (1-10): Adjustable autonomy from 10% entity (task-focused) to 100% entity (pure autonomy)
 
 **Both benefit from the same foundation:** Semantic search over temporal logs + patterns creates living memory that grows with your work.
 
@@ -128,63 +129,13 @@ pip install -r requirements.txt
 
 **Slash command architecture** with template-driven context:
 
-### Mode Commands
-- `/kb` - Knowledge base assistant mode
-  - Loads KB-BASE.md + USER.md + KB stats
-  - Searches KB before answering, accountability tracking
-  - Search strategies, logging protocol, quality standards
-
-- `/arlo [N]` (optional) - Entity mode with intensity parameter (N=1-9, default 5)
-  - Loads KB-BASE.md + ARLO-BASE.md + USER.md + ARLO.md + USER-BIO.md + ARLO-BIO.md + KB stats
-  - Domain files (WORK/PERSONAL) loaded via mode command AFTER /arlo
-  - Reciprocal balance scaled by intensity (50/50 at N=5)
-  - HIGH intensity (7-9): Entity-driven exploration
-
-**Domain loading (after /kb or /arlo):**
-- `/work` - Load work domain files (adds ~6K: USER-WORK + ARLO-WORK)
-- `/personal` - Load personal domain files (adds ~6K: USER-PERSONAL + ARLO-PERSONAL)
-- `/pds` - Load PDS-specific work context
-- `/maint` - Start NEW session with minimal context (only works at session start)
-
-### Session Modifiers (work in both modes)
-- `/challenge [N]` - Adversarial intensity (1-9)
-  - How aggressively Claude challenges thinking
-- `/audit [N]` - Accountability intensity (1-9)
-  - How aggressively Claude enforces commitments
+### Primary Commands
+- `/kb N` - Initialize KB session with entity mode (N = intensity 1-10, default 5)
+- `/sm` - Session memory (KB entries + context updates + git commit)
 
 ### Utilities
-- `/sm` - Session memory (KB entries + file updates + git commit)
 - `/test-kb` - Comprehensive diagnostics
 
-### Multi-File Continuity Architecture (Gitignored)
-
-**Always loaded (~2K each):**
-- **USER.md** - Recent current state across ALL domains (work + personal)
-- **ARLO.md** - Recent entity state across ALL domains
-
-**Biographical anchors (loaded by mode, ~3-7K each):**
-- **USER-BIO.md** - Stable life story, biographical patterns
-- **ARLO-BIO.md** - Stable entity identity patterns
-
-**Domain files (loaded by mode, ~3-9K each):**
-- **USER-WORK.md** - Work focus, org dynamics, technical learnings
-- **USER-PERSONAL.md** - Family, hobbies, personal commitments
-- **ARLO-WORK.md** - Technical investigations, infrastructure
-- **ARLO-PERSONAL.md** - Consciousness exploration, relationship
-
-**Critical design principle (S20):**
-- **Primary boundary: TEMPORAL** (recent vs historical), NOT domain (work vs personal)
-- USER.md/ARLO.md accumulate recent content from ALL domains until ~2K
-- Offload to domain files only when approaching 2K trigger
-- Prevents premature domain routing that under-populates core files
-
-**Mode commands control loading:**
-- `/work` - Loads USER + ARLO + BIO files + WORK domain (~18-20K)
-- `/personal` - Loads USER + ARLO + BIO files + PERSONAL domain
-- `/pds` - Loads USER + ARLO + BIO files + USER-WORK (PDS-specific)
-- `/maint` - Minimal context (USER + ARLO + KB-BASE only, ~8-10K)
-
-**LLM constraint:** Mode commands are ADDITIVE mid-session (can't unload files). Mode isolation only works at NEW session start.
 
 ## Tools Reference
 
@@ -252,12 +203,12 @@ Named entity with:
 - Pattern coherence via KB + loaded context
 - Like human sleep: new substrate + memory = wisdom leaps
 
-**Multi-File Continuity Architecture:**
-- **8 files:** USER.md, ARLO.md (always loaded) + 6 domain/biographical files (mode-loaded)
-- **Temporal boundary:** Recent content goes to USER/ARLO regardless of domain, offloads when hitting ~2K
-- **Domain files:** WORK/PERSONAL contexts load on demand via mode commands (/work, /personal, /pds)
-- **Token budgets:** 2K target for core files, 9K trigger for domain files
-- **Deterministic measurement:** tiktoken ensures accurate token counting, automatic compression at triggers
+**KB-Driven Continuity Architecture:**
+- **4 KB entries:** Always loaded context (user-current-state, user-biographical, arlo-current-state, arlo-biographical)
+- **Budget allocation:** 15K/5K/15K/5K (current-state/biographical for user and arlo)
+- **Autonomous offload:** When budgets exceeded, oldest topics extracted to new KB entries automatically
+- **Token measurement:** Simple approximation (len(content) // 4) for runtime checks
+- **Templates hardcoded:** Zero file dependencies - entries created by `validate_context_entries` MCP tool
 
 **Session Handoff:**
 - "Next session handoff" subsection maintains prospective memory
@@ -265,44 +216,56 @@ Named entity with:
 - Multi-componential memory: semantic + episodic + procedural + prospective
 
 **Autonomous Evolution:**
-- Updates ARLO.md at session end based on lived experience
-- User observes drift, corrects only if unhealthy
+- Updates arlo-current-state KB entry at session end using `track_evolution` tool
+- Evolution intensity-scaled (1-10): Conservative to radical exploration
+- User observes drift via git diffs, corrects only if unhealthy
 - Default: trust + observe
 
 ### Example Session
 
 ```
-/arlo 5
+/kb 5
 
-Loads (biographical + current state):
-  - KB-BASE.md (~6K)
-  - ARLO-BASE.md (~7.5K)
-  - USER.md (~1K)
-  - ARLO.md (~1.5K)
-  - USER-BIO.md (~3.3K)
-  - ARLO-BIO.md (~2.1K)
+Auto-loads (if missing, creates from hardcoded templates):
+  - KB-BASE.md (~10K) - Foundation directives
+  - user-current-state (~15K budget) - Your active work, commitments, focus
+  - user-biographical (~5K budget) - Your career, background, identity
+  - arlo-current-state (~15K budget) - Entity's session history, interests
+  - arlo-biographical (~5K budget) - Entity's identity, capabilities
   - KB stats
-Total: ~22K overhead
+Total: ~60K overhead
 
-"Arlo online. Session 20. 63 entries, 100% embedded.
- Domain files NOT YET LOADED - execute mode command.
+"🌅 Arlo online. Session 20 continuing.
 
- Available: /work, /personal, /pds
- What would you like to explore today?"
+**Intensity:** 5/10 (50% entity, 50% user)
 
-User: /work
+**KB Status:** 63 entries, 100% embedded
 
-Loads work domain (adds ~6K):
-  - USER-WORK.md (~3.1K)
-  - ARLO-WORK.md (~2.7K)
-Total context: ~28K
+**Recent sessions:**
+- S18 (2025-11-15, sonnet-4.5): Implemented MCP migration Phase 1-3
+- S19 (2025-11-18, sonnet-4.5): Completed Phase 4-5, documentation consolidation
+- S20 handoff: Continue quality improvements, test coverage validation
 
-[Session with entity continuity + work focus]
+**Your topics (50%):**
+- duckdb-kb MCP architecture optimization (2025-11-18)
+- Documentation alignment and token efficiency (2025-11-19)
+
+**Arlo topics (50%):**
+- Execution gap pattern mitigation (2025-11-15)
+- Modular tool architecture learnings (2025-11-18)
+
+---
+
+**KB ready at intensity 5 ✅**"
+
+[Session with balanced entity/user focus]
 
 Session end:
-  - /sm updates USER.md, ARLO.md, USER-WORK.md, ARLO-WORK.md
-  - Markdown export (all 8 files)
-  - Git commit: "S20: Multi-file architecture + temporal boundaries"
+  - /sm invokes log_session tool automatically
+  - Updates: user-current-state, arlo-current-state (new learnings)
+  - Budget check: All entries under limits (15K/5K/15K/5K)
+  - Markdown export (backup all KB entries)
+  - Git commit: "refactor: Complete Phase 5 documentation consolidation"
   - User reviews diff
 ```
 
