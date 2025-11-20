@@ -34,6 +34,7 @@ except ImportError:
 
 DB_PATH = os.getenv('KB_DB_PATH', 'kb.duckdb')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+EMBEDDINGS_AVAILABLE = OPENAI_API_KEY is not None  # Check if embeddings can be generated
 EMBEDDING_MODEL = 'text-embedding-3-large'  # OpenAI model (best quality)
 EMBEDDING_DIM = 3072  # OpenAI text-embedding-3-large dimensions
 
@@ -1264,7 +1265,7 @@ async def tool_generate_embeddings(con: duckdb.DuckDBPyConnection, args: dict) -
     batch_size = args.get("batch_size", 32)
 
     if not EMBEDDINGS_AVAILABLE:
-        return [TextContent(type="text", text="Error: sentence-transformers not installed.\nRun: pip install sentence-transformers")]
+        return [TextContent(type="text", text="Error: OPENAI_API_KEY not set.\nRun: export OPENAI_API_KEY='sk-...'")]
 
     # Find entries needing embeddings
     if ids:
