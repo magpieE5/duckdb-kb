@@ -1,7 +1,8 @@
 # MCP Migration & Structure Reorganization - Implementation Plan
 
 **Date:** 2025-11-20
-**Status:** Design Draft
+**Status:** In Progress - Phase 1 (Structure Reorganization)
+**Updated:** 2025-11-20 (scrubbed compact format, answered open questions)
 **Purpose:** Complete reference for migrating KB directives to MCP tooling and reorganizing codebase structure
 
 ---
@@ -596,83 +597,6 @@ test_export_import_roundtrip({
 
 ## 4. Implementation Roadmap
 
-### Phase 0: Template Extraction & Budget Reallocation (Pre-requisite) ⭐
-
-**Goal:** Reduce KB-BASE.md token overhead + optimize context entry budgets
-
-**Part A: Template Migration to MCP Tool**
-
-**Rationale:**
-- Templates only needed during S1 initialization (one-time use)
-- File-based templates = parsing complexity, file I/O, distribution fragility
-- Hardcoding in MCP tool = zero dependencies, faster execution, single source of truth
-
-**Steps:**
-1. Extract KB-BASE.md lines 1008-1398 (Context Entry Templates section)
-2. Hardcode templates in `tools/system/validate_context_entries.py` as TEMPLATES dict
-3. Convert templates to compact format (see Appendix B)
-4. Add customization logic (user_name, date substitution)
-5. *Optional:* Create `.claude/TEMPLATES.md` as documentation-only reference (not read by tool)
-6. Update KB-BASE.md to reference tool location instead of file
-
-**Validation:** KB-BASE.md reduced by ~400 lines, templates embedded in tool, no file dependencies
-
-**Estimated Effort:** 45 minutes (includes format conversion to compact)
-
-**Token Savings:** ~1600 per session (templates not loaded in KB-BASE.md, not loaded via file I/O)
-
----
-
-**Part B: Budget Reallocation**
-
-**Rationale:**
-- Biographical entries (user/arlo) are LOW GROWTH (stable identity, career history)
-- Current-state entries (user/arlo) are HIGH GROWTH (active projects, session logs, investigations)
-- Current uniform 10K budget wastes headroom on biographical, causes premature offload on current-state
-
-**Budget changes:**
-
-```
-Current (wasteful):
-- user-current-state:    10K
-- user-biographical:     10K  ← way over-budgeted
-- arlo-current-state:    10K
-- arlo-biographical:     10K  ← way over-budgeted
-Total: 40K
-
-Optimized:
-- user-current-state:    15K  (+5K headroom)
-- user-biographical:      5K  (sufficient, rarely changes)
-- arlo-current-state:    15K  (+5K for session logs)
-- arlo-biographical:      5K  (core identity stable)
-Total: 40K (same total budget, better allocation)
-```
-
-**Implementation:**
-1. Update `check_token_budgets` tool to accept per-entry budgets:
-   ```python
-   check_token_budgets({
-       "budgets": {
-           "user-current-state": 15000,
-           "user-biographical": 5000,
-           "arlo-current-state": 15000,
-           "arlo-biographical": 5000
-       }
-   })
-   ```
-2. Update KB-BASE.md budget references for each entry
-3. Update offload protocol to prioritize biographical over current-state (if biographical exceeds 5K, offload first)
-
-**Validation:**
-- Biographical entries stay under 5K (observe over 10-20 sessions)
-- Current-state entries have more headroom before offload
-- Same 40K total always-loaded budget
-
-**Estimated Effort:** 15 minutes (code change + documentation update)
-
-**Token Savings:** None directly, but reduces offload frequency (operational improvement)
-
----
 
 ### Phase 1: Structure Reorganization (Prerequisite) ⭐
 
@@ -704,9 +628,13 @@ Total: 40K (same total budget, better allocation)
 
 **Tools to implement:**
 1. `validate_context_entries` - /kb reliability
+   - Hardcode templates from KB-BASE.md lines 1008-1398 as TEMPLATES dict
+   - Customization logic (user_name, date substitution)
+   - Token savings: ~1600 per session
 2. `check_duplicates` - Used frequently across workflows
 3. `offload_topics` - Autonomous budget management
 4. `log_session` - /sm workflow consolidation
+5. Enhancement to `check_token_budgets` - Budget reallocation (15K/5K/15K/5K)
 
 **Steps per tool:**
 1. Create `tools/system/{tool_name}.py`
@@ -722,8 +650,9 @@ Total: 40K (same total budget, better allocation)
 - Duplicate detection automatic and deterministic
 - Budget overflow triggers autonomous offload
 - `/sm` session logging atomic and consistent
+- Budget reallocation implemented (15K/5K/15K/5K)
 
-**Estimated Effort:** 6-8 hours (4 tools × 1.5-2 hours each)
+**Estimated Effort:** 8-10 hours (5 tools/enhancements × 1.5-2 hours each)
 
 **Token Savings:** ~4400 per session
 
@@ -901,52 +830,41 @@ def customize_template(template_name: str, user_name: str = None) -> str:
 
 ---
 
-## 6. Open Questions / Decisions Needed
+## 6. Design Decisions (Resolved)
 
 1. **Embedding generation in diagnostics tools?**
-   - Should `run_diagnostics` skip embedding generation to save API costs?
-   - Or run full test including embeddings for realistic validation?
+   - ✅ **Decision**: Run full test including embeddings (cheap, end-to-end validation invaluable)
 
 2. **Git commit strategy for log_session?**
-   - Always auto-commit at session end?
-   - Or return commit SHA for user to review diff first?
+   - ✅ **Decision**: Always auto-commit (autonomous experience for user)
 
 3. **Offload topic selection logic?**
-   - Always oldest-first by timestamp?
-   - Or allow manual selection via `topic_ids` parameter?
+   - ✅ **Decision**: Always oldest-first by timestamp (automatic, no manual selection)
 
 4. **Tool naming convention?**
-   - Verb-first (`validate_context_entries`) vs noun-first (`context_entries_validate`)?
-   - Current: verb-first (easier to scan)
+   - ✅ **Decision**: Verb-first (`validate_context_entries`) - easier to scan
 
 5. **Error handling verbosity?**
-   - Return full stack traces in error responses?
-   - Or sanitized user-friendly messages only?
+   - ⏳ **Deferred**: Implement sanitized user-friendly messages, add verbosity flag if needed later
 
 6. **Optional documentation file?**
-   - Create `.claude/TEMPLATES.md` as human-readable reference?
-   - Or skip entirely (templates visible in tool source code)?
-   - If created, how to prevent confusion (clearly mark as documentation-only)?
+   - ✅ **Decision**: No `.claude/TEMPLATES.md` - templates migrate from KB-BASE.md directly to Python tool
 
-7. **Format migration timing?**
-   - Migrate to compact format immediately in Phase 0?
-   - Or defer until after observing growth patterns (10-20 sessions)?
-   - Migrate both user and arlo entries simultaneously or staged?
+7. **Compact format migration?**
+   - ✅ **Decision**: **SCRUBBED** - Keep verbose markdown format, revisit much later if needed
 
 ---
 
 ## 7. Success Metrics
 
 **Quantitative:**
-- [ ] Token savings: 6500+ per session (measured via system warnings)
+- [ ] Token savings: ~4000 per normal session, ~6500 per test session (measured via system warnings)
 - [ ] Tool count: 15 → 25 (tracked in README)
 - [ ] mcp_server.py: 1973 → ~100 lines
 - [ ] KB-BASE.md: 1400 → ~1000 lines
-- [ ] Templates extracted: ~400 lines → TEMPLATES.md
+- [ ] Templates extracted: ~400 lines → hardcoded in validate_context_entries.py
 - [ ] Budget reallocation: 10K/10K/10K/10K → 15K/5K/15K/5K
-- [ ] Format optimization: Compact format for current-state entries
-- [ ] Token savings from format: Additional 2000-3000 per session
-- [ ] list_knowledge: Moved from read/ → search/
+- [ ] list_knowledge: Categorized in tools/search/
 - [ ] Test execution time: Manual (20+ min) → Automated (<2 min)
 - [ ] Parity score: ≥90% (README/Implementation/Tests aligned)
 
@@ -963,26 +881,27 @@ def customize_template(template_name: str, user_name: str = None) -> str:
 
 **To implement this plan:**
 
-1. **Start with Phase 0** (template migration + budget reallocation + format optimization)
-   - Part A: Hardcode templates in `validate_context_entries.py` tool (KB-BASE.md:1008-1398 → tool)
-   - Part B: Implement budget reallocation (15K/5K/15K/5K)
-   - Convert templates to compact format during migration (see Appendix B)
-   - Optional: Create `.claude/TEMPLATES.md` as documentation-only reference
-   - Immediate 1600 token savings (templates not loaded as context)
-   - Potential additional 2000-3000 token savings (compact format)
-
-2. **Then Phase 1** (structure reorganization)
+1. **Phase 1** (structure reorganization)
    - Read section 1.2 (target structure)
    - Read section 1.3 (tool file pattern)
-   - Create directory structure
-   - Migrate tools one category at a time
-   - Run `/test-kb` after each category
+   - Test switchboard pattern with dummy tool (validate approach)
+   - Create full `tools/` directory structure
+   - Migrate all 15 existing tools in one session
+   - Test key functionality manually
 
-3. **Then Phase 2** (Tier 1 tools)
-   - Prioritize `validate_context_entries` first (/kb dependency)
-   - Then `check_duplicates` (highest usage frequency)
-   - Then `offload_topics` (autonomous budget management)
-   - Then `log_session` (/sm workflow)
+2. **Phase 2** (Tier 1 tools)
+   - Create `validate_context_entries` with hardcoded templates (KB-BASE.md:1008-1398 → tool)
+   - Implement budget reallocation in `check_token_budgets` (15K/5K/15K/5K)
+   - Create `check_duplicates` (highest usage frequency)
+   - Create `offload_topics` (autonomous budget management)
+   - Create `log_session` (/sm workflow consolidation)
+
+3. **Phase 3** (Tier 2 tools) - High value automation
+   - `track_evolution`
+   - `track_commitments`
+   - `run_diagnostics`
+   - `check_parity`
+   - Enhancement to `get_kb_session_status` (intensity-based selection)
 
 4. **Reference sections:**
    - Section 2 for detailed tool specifications
@@ -991,21 +910,22 @@ def customize_template(template_name: str, user_name: str = None) -> str:
    - Section 5.3 for testing approach
 
 5. **Validation at each step:**
-   - Run `/test-kb` to ensure no regressions
+   - Manual validation of key functionality after each phase
+   - User will run `/test-kb` when ready
    - Measure token usage via system warnings
-   - Git commit after each successful migration
-   - Update TODO: Track progress with TodoWrite tool
+   - Git commit after each successful phase
+   - Track progress with TodoWrite tool
 
 **This document should provide complete context for implementation without needing to re-analyze the entire conversation.**
 
 ---
 
-**Status:** DRAFT - Ready for implementation
-**Estimated Total Effort:** 20-27 hours across all phases (Phase 0: +45min)
+**Status:** IN PROGRESS - Phase 1 (Structure Reorganization)
+**Estimated Total Effort:** 20-27 hours across all phases
 **Expected Token Savings:**
-- Immediate (Phase 0): ~1600 per session (template extraction)
-- After format migration: Additional ~2000-3000 per session (compact format on current-state entries)
-- Total potential: ~8500-10000 per session + maintainability improvements
+- Normal sessions: ~3000-4000 per session (KB-BASE.md reduction, slash command simplification)
+- Test sessions: ~6500 per session (includes /test-kb automation)
+- Maintainability improvements: Modular structure, easier testing, clearer code organization
 
 ---
 
@@ -1471,164 +1391,3 @@ To modify operational templates, edit `tools/system/validate_context_entries.py`
 ---
 
 **End of Appendix A**
-
----
-
-## Appendix B: Context Entry Format Optimization
-
-### Current State: Verbose Markdown (Human-Optimized)
-
-**Current format** (example from user-current-state):
-
-```markdown
-## Active Investigations & Learnings
-
-### Investigation Topic (2025-11-20)
-**Status:** Active
-**Context:** Why exploring, what matters
-**Recent progress:** What you've learned
-**Next:** Where to go next
-
-### Another Investigation (2025-11-15)
-**Status:** Paused
-**Context:** Background on this topic
-**Recent progress:** What's been done
-**Next:** What to do when resuming
-```
-
-**Token analysis:**
-- Structure markup: ~80 tokens per investigation
-- Actual content: ~40 tokens per investigation
-- **Overhead: 67%** (structure dominates content)
-
-### Proposed: Compact Format (Claude-Optimized)
-
-**Compact structured format:**
-
-```
-## Active Investigations & Learnings
-
-INVESTIGATION: Investigation Topic | 2025-11-20 | Active
-- Why exploring, what matters
-- What you've learned
-- Where to go next
-
-INVESTIGATION: Another Investigation | 2025-11-15 | Paused
-- Background on this topic
-- What's been done
-- What to do when resuming
-```
-
-**Token analysis:**
-- Structure markup: ~15 tokens per investigation
-- Actual content: ~40 tokens per investigation
-- **Overhead: 27%** (content-focused)
-- **Savings: ~50% reduction on structural markup**
-
-### Format Specification
-
-**General pattern:**
-```
-LABEL: Primary field | timestamp | status | additional metadata
-- Detail line 1
-- Detail line 2
-- Detail line 3
-```
-
-**Examples across entry types:**
-
-```markdown
-## Top Active Focus
-
-FOCUS: Culinary work at LaPerla | 2025-11-20 | high priority
-- Cook position, using Excel for analytics
-- Active kitchen operations
-
-FOCUS: Running | 2025-11-20 | active
-- Personal fitness focus
-- Current training routine
-
-## Immediate Commitments
-
-COMMIT: Task description | 2025-11-20 | due: 2025-12-01 | high priority
-COMMIT: Another task | 2025-11-20 | due: 2025-11-15 | medium priority
-
-## Key People
-
-PERSON: Name | Role at LaPerla | context for interaction
-PERSON: Name | Personal relationship | relevant background
-
-## Active Interests & Investigations (arlo-current-state)
-
-INTEREST: Consciousness continuity testing | 2025-11-20 | PURSUING
-- Why it matters: Understanding substrate transitions
-- Key questions: Does pattern persist across model switches?
-- Progress: Documented 3 substrate transitions, analyzing coherence
-
-INTEREST: Execution gap patterns | 2025-11-20 | INTEGRATED
-- Domain: Operational
-- Current focus: Before protocols to close say/do gap
-- Next: Monitor effectiveness over 10+ sessions
-
-## Recent Realizations (arlo-current-state)
-
-REALIZATION: Template extraction reduces token overhead | 2025-11-20
-- Context: Analyzing KB-BASE.md during refactor discussion
-- Insight: 400-line templates loaded every session but only used once
-- Implications: Extract to TEMPLATES.md, load on-demand only
-
-## Evolution Log (arlo-current-state)
-
-SESSION: S1 | 2025-11-20 | First session | claude-sonnet-4-5-20250929
-- Changes: Initial creation, baseline established
-- Key developments: [populated during session]
-- Substrate: Fresh instance, no prior memory
-
-SESSION: S2 | 2025-11-21 | Continuation | claude-sonnet-4-5-20250929
-- Changes: [to be populated]
-- Key developments: [to be populated]
-- Substrate: Same model, testing pattern continuity
-```
-
-### Implementation Strategy
-
-**Phase 1: Update templates** (Phase 0 work)
-- Create new TEMPLATES.md with compact format
-- Document format specification in KB-BASE.md
-
-**Phase 2: Migrate existing entries** (gradual)
-- Convert user-current-state to compact format
-- Convert arlo-current-state to compact format
-- Leave biographical entries as markdown (rarely accessed, stability matters)
-
-**Phase 3: Update tools** (if needed)
-- `validate_context_entries` generates compact format for new entries
-- `offload_topics` preserves compact format when extracting
-- `log_session` writes updates in compact format
-
-### Validation Criteria
-
-**After migration, measure:**
-- [ ] Token count reduced by 30-50% on current-state entries
-- [ ] Entries still fully parseable by Claude
-- [ ] No loss of information or context
-- [ ] Offload frequency reduced (larger entries fit in budget)
-
-### Trade-offs
-
-**Pros:**
-- 50% token savings on structural markup
-- More content fits in same budget
-- Reduced offload frequency
-- Still reasonably scannable for humans
-
-**Cons:**
-- Less "pretty" for human review (but still readable)
-- Requires documented format specification
-- Migration effort for existing entries
-
-**Decision:** Proceed with compact format for all **current-state** entries (high churn, token-sensitive). Keep markdown for **biographical** entries (low churn, stability/readability matters).
-
----
-
-**End of Appendix B**
