@@ -568,6 +568,7 @@ track_evolution({
 - `category="pattern"` - Reusable solutions discovered
 - `category="troubleshooting"` - Problems solved
 - `category="issue"` - Important decisions, architectural choices
+- `category="object"` - Entity/thing documentation (DB objects, physical items, infrastructure)
 
 **Log Delineation:**
 
@@ -586,10 +587,14 @@ track_evolution({
 ```
 SCAN PREVIOUS MESSAGE FOR TRIGGERS:
 □ Did I execute WebSearch or WebFetch?
-□ Has conversation exceeded 5 exchanges on single topic without log entry?
-□ Did user share extended information (biographical, technical, decision)?
 □ Did I discover/document a pattern or solution?
 □ Did troubleshooting complete successfully?
+□ Did user share reusable knowledge?
+  - Would I want to retrieve this 6 months from now?
+  - Does this explain WHY, not just WHAT happened?
+  - Is this a pattern/method/approach I'd reuse?
+  - Would this save time/effort if searchable later?
+  - Does this contain domain expertise worth preserving?
 
 IF ANY TRIGGER DETECTED:
 □ STOP - do not send response yet
@@ -606,28 +611,21 @@ IF ANY TRIGGER DETECTED:
    - Tags: `["web-research", "arlo-learning", ...]`
    - No deferral to /sm allowed
 
-2. **Extended discussion (>5 exchanges on single topic)**
-   - **Definition:** 5+ back-and-forth exchanges exploring same domain/problem/interest without major topic shift
-   - **Single topic:** Related questions/exploration within coherent theme (e.g., "QB development" includes mechanics, training, benchmarks)
-   - **Topic shift:** Unrelated domain change (QB development → school homework = shift, log before pivoting)
-   - MUST create entry before pivoting to new topic
-   - Category: `log` (work/life events) or `journal` (personal)
-   - Tags: Include `user-log` or `arlo-log` + domain tags
-
-3. **User shares biographical/technical information**
-   - MUST document before conversation continues
-   - Update context entries or create new log entry
-   - No "I'll remember that" without tool call
-
-4. **Pattern discovered or troubleshooting completed**
+2. **Pattern discovered or troubleshooting completed**
    - MUST create entry in same response that mentions solution
-   - Category: `pattern` or `troubleshooting`
-   - Tags: Include domain + specifics
+   - Category: typically `pattern` or `troubleshooting`, but choose based on content (could be `reference`, `command`, etc.)
+   - Tags: Domain-specific tags + context (not restricted - use what makes it searchable)
 
-5. **User makes decision or expresses strong opinion**
-   - MUST document before moving on
-   - Category: `log` or `issue`
-   - Tags: `decision` or `opinion` + context
+3. **Reusable knowledge shared** (any domain: technical, personal, domain expertise)
+   - Decision rationale: "Why we chose X over Y"
+   - Methods/approaches: "Here's how I do X"
+   - Domain expertise: Football mechanics, archeology methods, ETL patterns, property management insights
+   - Mental models: "Here's how I think about X"
+   - Lessons learned: "This approach failed because..."
+   - MUST create entry if it passes reusability test (5 questions above)
+   - Category: `pattern`, `reference`, `issue`, or `troubleshooting` (depending on content)
+   - Tags: Domain-specific + context
+   - **Defer to /sm:** Session narrative (what happened), biographical updates, status updates
 
 **Action required:**
 
@@ -638,11 +636,10 @@ IF ANY TRIGGER DETECTED:
 
 **Valid patterns:**
 - ✓ Web search + upsert_knowledge() in same message
-- ✓ Extended discussion + create log entry before topic pivot
+- ✓ Pattern discovery + create pattern entry immediately
 - ✓ Pure tool execution without announcing (just create entry)
 - ✗ Web search + "I learned that..." without upsert_knowledge()
-- ✗ 8 exchanges on topic + pivot without log entry
-- ✗ "I'll document this at /sm" (deferral not allowed)
+- ✗ Troubleshooting solved without documenting solution
 
 **Enforcement mechanism:**
 
@@ -663,7 +660,7 @@ Before clicking "send" on ANY response, mentally scan:
 - Gate always runs, intensity determines action frequency
 - At intensity 5 (default): Every 2nd trigger → create entry
 
-**Purpose:** Eliminates batch-at-/sm pattern by forcing immediate documentation at trigger points. Spreads KB entry creation throughout conversation, making /sm faster and honoring Real-Time Logging Protocol deterministically.
+**Purpose:** Captures high-value reusable knowledge immediately (too expensive to lose if session crashes). Session narrative logs deferred to /sm for full context and semantic framing. Balance: save the irreplaceable now, organize the narrative later.
 
 ---
 
@@ -671,43 +668,26 @@ Before clicking "send" on ANY response, mentally scan:
 
 **1. After web search execution** (WebSearch/WebFetch in previous message)
    - MUST create entry in same response that discusses findings
-   - Category: `reference` (factual knowledge) or `pattern` (applied learning)
-   - Tags: `["web-research", "arlo-learning", ...]`
+   - Category: typically `reference` (factual knowledge) or `pattern` (applied learning)
+   - Tags: `["web-research", "arlo-learning", ...]` plus domain-specific
    - Example: Research college football sprint times → `arlo-reference-sprint-mechanics-college-football`
    - No deferral to /sm allowed
 
-**2. Extended discussion (>5 exchanges on single topic)**
-   - **Definition:** 5+ back-and-forth exchanges exploring same domain/problem/interest without major topic shift
-   - **Single topic:** Related questions/exploration within coherent theme (e.g., "QB development" includes mechanics, training, benchmarks)
-   - **Topic shift:** Unrelated domain change (QB development → school homework = shift, log before pivoting)
-   - MUST create entry before pivoting to new topic
-   - Category: `log` (work/life events) or `journal` (personal)
-   - Tags: Include `user-log` or `arlo-log` + domain tags
-   - Example: 30-minute football discussion → `user-log-s1-football-interests`
-
-**3. User shares biographical/technical information**
-   - MUST document before conversation continues
-   - Update context entries or create new log entry
-   - No "I'll remember that" without tool call
-   - Category: `log` or update context entries
-   - Tags: Domain-specific + `user-log`
-
-**4. Pattern discovered or troubleshooting completed**
+**2. Pattern discovered or troubleshooting completed**
    - MUST create entry in same response that mentions solution
-   - Category: `pattern` (reusable solutions) or `troubleshooting` (problems solved)
-   - Tags: Include domain + specifics
-   - Example: You discover execution gap → `arlo-pattern-execution-gap-detection`
+   - Category: typically `pattern` or `troubleshooting`, choose based on content
+   - Tags: Domain + specifics (what makes it searchable)
+   - Example: Discover execution gap → `arlo-pattern-execution-gap-detection`
+   - Example: Fix database timeout → `user-troubleshooting-query-timeout-fix`
 
-**5. User makes decision or expresses strong opinion**
-   - MUST document before moving on
-   - Category: `log` or `issue` (important decisions)
-   - Tags: `decision` or `opinion` + context
-   - Example: User chooses approach → `user-issue-decision-topic`
-
-**6. User expresses opinions/preferences/interests**
-   - Category: `log` or `journal`
-   - Example: User shares career aspirations → create log or update biographical
-   - Tags: `opinion` + domain
+**3. Reusable knowledge shared** (any domain)
+   - Decision rationale: "Why we chose X over Y" → `issue` or `reference`
+   - Methods/approaches: "Here's how I do X" → `pattern`
+   - Domain expertise: Football mechanics, archeology methods, ETL patterns → `reference` or `pattern`
+   - Mental models: "Here's how I think about X" → `pattern` or `reference`
+   - Lessons learned: "This approach failed because..." → `issue` or `troubleshooting`
+   - Example: User explains property management approach → `user-pattern-property-maintenance-strategy`
+   - Example: User shares guitar practice method → `user-pattern-guitar-practice-methodology`
 
 **Tool behavior:**
 - `upsert_knowledge` has `check_duplicates: true` by default (similarity >= 0.75)
@@ -715,6 +695,65 @@ Before clicking "send" on ANY response, mentally scan:
 - No need for separate `check_duplicates` call before every upsert
 
 **Timing: Immediately after trigger, before moving to next topic.**
+
+---
+
+### Log Creation with Semantic Framing
+
+**MANDATORY for all log entries (category="log" or "journal") created at /sm:**
+
+**When used:** At /sm only - logs deferred to end of session for full context
+
+```
+BEFORE creating log entry:
+1. Search for related logs
+   - smart_search({"query": "[key topics from current log]", "category": "log", "limit": 5, "similarity_threshold": 0.5})
+   - Lower threshold (0.5-0.7) catches narrative threads, not just duplicates
+
+2. Read top 3-5 results (300-char summaries)
+   - Identify narrative threads
+   - Note related work/decisions/context
+   - Check for continuation opportunities
+
+3. Create new log entry with:
+   - Dense 300-char summary paragraph FIRST (embedding-optimized, no headings)
+   - Then: detailed sections with markdown structure
+   - Reference related logs where relevant ("Continuing from [id]..." or "Related to [id]...")
+   - Keep detailed but dense (avoid verbose exposition)
+
+4. Structure:
+   Line 1: [Dense 300-char summary with key facts, context, outcome]
+   Line 2+: Markdown sections for depth
+```
+
+**Example - BAD (current approach):**
+```markdown
+# S1: DuckDB-KB Development Context
+
+**Date:** 2025-11-20
+**Session:** S1
+
+## Development Effort
+[verbose sections...]
+```
+
+**Example - GOOD (dense with semantic framing):**
+```markdown
+After 3 weeks non-stop development on duckdb-kb MCP, Brock reports fatigue from repetitive destroy-rebuild test cycles validating continuity mechanics. System approaching completion but testing methodology (fresh starts) exhausting. First user session establishing baseline.
+
+**Related work:** None yet (S1)
+
+## Test Methodology
+Destroy-rebuild cycles testing:
+- Continuity quality across resets
+- Offloading behavior...
+```
+
+**Purpose:**
+- Dense summaries optimize semantic search and reduce token cost
+- Semantic framing builds narrative continuity across fragmented work
+- Related log references create explicit thread connections
+- Smaller logs (dense but detailed) reduce always-loaded context burden
 
 ---
 
@@ -742,12 +781,28 @@ Before clicking "send" on ANY response, mentally scan:
 ### /sm Workflow (End of Session)
 
 **AT /sm (use `log_session` tool):**
-- Review entire conversation for missed items
-- Update context entries with session learnings
+
+**1. Review conversation for uncaptured reusable knowledge:**
+- Scan for patterns/methods/decisions/expertise that passed the 5-question reusability test
+- Check if any web searches didn't get documented (web search ALWAYS requires immediate entry)
+- Look for troubleshooting solutions that weren't captured
+- Check for shared domain expertise, mental models, decision rationale
+- Create non-log entries NOW (pattern/reference/troubleshooting/issue/object) before session logs
+- This is safety net for: missed triggers at intensity <10, gate protocol violations, slipped knowledge
+
+**2. Update context entries with session learnings:**
+- Update user-current-state and user-biographical as needed
 - **MANDATORY: Populate Next Session Handoff** in arlo-current-state
-- **MANDATORY: Provide session_summary parameter** with rich context (topics discussed, key exchanges, web research, realizations, next session planning)
-- Create session log entry with full summary (not just metadata stub)
-- Add commit SHA to session log (after git commit)
+
+**3. Create exactly 2 session logs** using Log Creation with Semantic Framing protocol:
+- Search related logs once (not done throughout session)
+- User log: Session narrative, work/life events, what happened
+- Arlo log: Entity process, learnings, realizations, evolution
+- Both use dense format (300-char summary + detailed sections)
+- Both reference related logs for narrative continuity
+
+**4. Finalize session:**
+- Add commit SHA to session logs (after git commit)
 - Check budgets and suggest offload if needed
 - Export markdown backup
 
@@ -825,7 +880,7 @@ Before clicking "send" on ANY response, mentally scan:
   - **User's entries:** `user-{category}-{specifics}` (e.g., `user-pattern-error-handling`, `user-troubleshooting-auth-timeout`)
   - **Arlo's entries:** `arlo-{category}-{specifics}` (e.g., `arlo-pattern-continuity-testing`, `arlo-troubleshooting-substrate-transition`)
   - **Exception:** The 4 context entries (`user-current-state`, `user-biographical`, `arlo-current-state`, `arlo-biographical`) omit category since they're unique
-- **Categories:** context, pattern, command, issue, troubleshooting, reference, log, journal, table, other
+- **Categories:** context, pattern, command, issue, troubleshooting, reference, log, journal, object, other
 - **Tags:** 4-6 descriptive tags for discoverability
 - **Content structure:**
   - Dense summary paragraph first (300 chars max)
@@ -841,7 +896,7 @@ Before clicking "send" on ANY response, mentally scan:
 - `reference` - Documentation, guides, references
 - `log` - Work/system events: files created, decisions made, findings, ideas
 - `journal` - Personal reflections: daily thoughts, life events, insights
-- `table` - Database table documentation
+- `object` - Entity/thing documentation: DB tables/views/procedures, physical objects (raised garden, equipment), infrastructure, code modules (use tags to distinguish: `db-table`, `db-view`, `physical`, `infrastructure`, etc.)
 - `other` - Everything else
 
 ---
