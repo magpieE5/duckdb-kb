@@ -6,7 +6,7 @@ tags:
 - context
 - always-load
 created: '2025-11-20T19:58:51.237458'
-updated: '2025-11-20T20:07:06.045553'
+updated: '2025-11-20T20:20:57.131978'
 metadata: {}
 ---
 
@@ -30,13 +30,17 @@ metadata: {}
 
 ### Top Active Focus
 
-1. **Catcher in the Rye Report (2025-11-20)** - school project
+1. **Music Theory Basics (2025-11-20)** - learning/exploration
+   - New interest area
+   - Plans to explore fundamentals in S3
+
+2. **Catcher in the Rye Report (2025-11-20)** - school project
    - 7th grade English assignment
    - Current status: In progress
 
-2. **Flag Football (2025-11-20)** - athletics/personal interest
+3. **Flag Football (2025-11-20)** - athletics/personal interest
    - Active player
-   - Wants to discuss experience in next session
+   - Deferred discussion for later
 
 **Note:** All topics include timestamp (YYYY-MM-DD) for age tracking. Update timestamp when topic revisited.
 
@@ -50,6 +54,11 @@ metadata: {}
 
 ## Active Investigations & Learnings
 
+### Music Theory (2025-11-20)
+**Status:** New interest
+**Context:** Wants to learn fundamentals/basics
+**Next session:** Explore music theory basics in S3
+
 ### Catcher in the Rye Analysis (2025-11-20)
 **Status:** Active
 **Context:** 7th grade English literature assignment
@@ -57,9 +66,9 @@ metadata: {}
 **Next:** Research and analysis
 
 ### Football Knowledge (2025-11-20)
-**Recent research:** NCAA/NFL rankings, Heisman candidates, playoff picture
+**Recent research:** NCAA/NFL rankings, Heisman candidates, playoff picture (S1)
 **Context:** General football interest, plays flag football
-**Next session:** Plans to share flag football experience
+**Discussion:** Deferred for later session
 
 ---
 

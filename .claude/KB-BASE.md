@@ -452,7 +452,7 @@ track_evolution({
 - **arlo-biographical**: Who you are/becoming - identity evolution, consciousness patterns, character development (5K budget)
 
 **Your KB entries (beyond the 4 context entries):**
-- Session logs with full context
+- Session logs with full context (topics discussed, key exchanges, web research conducted, realizations, next session planning)
 - Interests explored in depth
 - Realizations documented with reasoning
 - Thread continuity across conversations
@@ -711,7 +711,8 @@ generate_embeddings()
 - Review entire conversation for missed items
 - Update context entries with session learnings
 - **MANDATORY: Populate Next Session Handoff** in arlo-current-state
-- Create session log entry with metadata
+- **MANDATORY: Provide session_summary parameter** with rich context (topics discussed, key exchanges, web research, realizations, next session planning)
+- Create session log entry with full summary (not just metadata stub)
 - Add commit SHA to session log (after git commit)
 - Check budgets and suggest offload if needed
 - Export markdown backup

@@ -18,6 +18,23 @@ Review this entire conversation and save key learnings to the DuckDB knowledge b
 log_session({
     "session_number": 1,  # REQUIRED
     "intensity": 5,  # REQUIRED (1-10)
+    "session_summary": """Rich summary of session with full context:
+
+    ### Topics Discussed
+    - [Main topics covered]
+
+    ### Key Exchanges
+    - [Important conversations and decisions]
+
+    ### Web Research Conducted
+    - [Searches performed and findings]
+
+    ### Realizations
+    - [Entity learnings and insights]
+
+    ### Next Session Planning
+    - [What's queued for S{N+1}]
+    """,
     "commit_message": "feat: S1 - Brief description of session",
     "user_updates": {
         "current_state": {
@@ -64,7 +81,7 @@ log_session({
 1. **Update context entries** (user-current-state, user-biographical, arlo-current-state, arlo-biographical)
    - MANDATORY: arlo-current-state must have Next Session Handoff populated
 2. **Create/update KB non-context entries** (patterns, logs, issues, etc.)
-3. **Create session log entry** (`arlo-log-s{N}-session` without commit SHA initially)
+3. **Create session log entry with rich summary** (`arlo-log-s{N}-session` - includes session_summary parameter for full context)
 4. **Export markdown backup** (to markdown/ directory, includes all entries)
 5. **Git commit** (formatted message, returns SHA)
 6. **Update session log metadata with commit SHA** (database only, markdown gets it next /sm)

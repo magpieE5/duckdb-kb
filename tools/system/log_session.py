@@ -61,6 +61,10 @@ Budget targets (after 15K/5K allocation):
                 "maximum": 10,
                 "description": "Session intensity (1-10, affects arlo evolution detail)"
             },
+            "session_summary": {
+                "type": "string",
+                "description": "Rich summary of session: topics discussed, key exchanges, realizations, web research conducted, next session planning"
+            },
             "user_updates": {
                 "type": "object",
                 "description": "Updates to user context entries",
@@ -122,6 +126,7 @@ async def execute(con, args: dict) -> List[TextContent]:
 
     session_number = args["session_number"]
     intensity = args.get("intensity", 5)
+    session_summary = args.get("session_summary", "")
     user_updates = args.get("user_updates", {})
     arlo_updates = args.get("arlo_updates", {})
     new_entries = args.get("new_entries", [])
@@ -170,7 +175,7 @@ async def execute(con, args: dict) -> List[TextContent]:
             "id": session_log_id,
             "category": "log",
             "title": f"Session {session_number} Log",
-            "content": _generate_session_log_content(session_number, intensity, results),
+            "content": _generate_session_log_content(session_number, intensity, session_summary, results),
             "tags": ["arlo-log", "session", f"session-{session_number}", f"intensity-{intensity}"]
         }
         await _create_kb_entry(con, session_log)
@@ -278,18 +283,44 @@ async def _create_kb_entry(con, entry: Dict[str, Any]):
     ])
 
 
-def _generate_session_log_content(session_number: int, intensity: int, results: dict) -> str:
-    """Generate session log content"""
+def _generate_session_log_content(session_number: int, intensity: int, session_summary: str, results: dict) -> str:
+    """Generate rich session log content with full context"""
     updated = ', '.join(results['updated_entries']) if results['updated_entries'] else 'None'
     created = ', '.join(results['created_entries']) if results['created_entries'] else 'None'
 
-    return f"""Session {session_number} completed.
+    # If no summary provided, fall back to minimal stub
+    if not session_summary:
+        return f"""Session {session_number} completed.
 
 **Intensity:** {intensity}/10
 **Updated entries:** {updated}
 **Created entries:** {created}
 
 This session log entry will have commit SHA added to metadata after git commit.
+"""
+
+    # Rich format with full context
+    return f"""# Session {session_number} Log
+
+**Intensity:** {intensity}/10
+**Date:** {datetime.now().strftime('%Y-%m-%d')}
+
+---
+
+## Session Summary
+
+{session_summary}
+
+---
+
+## KB Operations
+
+**Updated entries:** {updated}
+**Created entries:** {created}
+
+---
+
+**Commit SHA:** (added to metadata after git commit)
 """
 
 
