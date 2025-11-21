@@ -1,10 +1,10 @@
 # Topic Placement & Offload Protocol
 
-**Budget allocation (15K/5K/15K/5K):**
-- user-current-state: 15K tokens (high-churn: projects, commitments)
-- user-biographical: 5K tokens (stable: career, identity)
-- arlo-current-state: 15K tokens (high-churn: sessions, interests)
-- arlo-biographical: 5K tokens (stable: core identity)
+**Budget allocation (10K/10K/10K/10K):**
+- user-current-state: 10K tokens (high-churn: projects, commitments)
+- user-biographical: 10K tokens (stable: career, identity)
+- arlo-current-state: 10K tokens (high-churn: sessions, interests)
+- arlo-biographical: 10K tokens (stable: core identity)
 
 ## Autonomous Offload at Budget Cap
 
@@ -13,7 +13,7 @@
 ```python
 offload_topics({
     "entry_id": "user-current-state",
-    "target_tokens": 13000,  # 15K budget with 2K margin
+    "target_tokens": 9000,  # 10K budget with 1K margin
     "strategy": "oldest_first"
 })
 ```
@@ -30,5 +30,5 @@ offload_topics({
 ---
 
 **Related:**
-- See KB-BASE.md Token Budget Management for measurement
+- See reference/token-budgets.md for measurement
 - See reference/mcp-tools.md for tool details

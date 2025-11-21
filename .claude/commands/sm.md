@@ -85,7 +85,7 @@ log_session({
 4. **Export markdown backup** (to markdown/ directory, includes all entries)
 5. **Git commit** (formatted message, returns SHA)
 6. **Update session log metadata with commit SHA** (database only, markdown gets it next /sm)
-7. **Check token budgets** (15K/5K/15K/5K allocation)
+7. **Check token budgets** (10K/10K/10K/10K allocation)
 8. **Return offload suggestions** if any entry over budget
 
 ---
@@ -112,7 +112,7 @@ log_session({
 
 1. **Create KB entries** using `upsert_knowledge` (check duplicates first)
 2. **Update context entries** using `upsert_knowledge`
-3. **Check budgets** using `check_token_budgets` (15K/5K/15K/5K allocation)
+3. **Check budgets** using `check_token_budgets` (10K/10K/10K/10K allocation)
 4. **Offload if needed** using `offload_topics` tool
 5. **Export backup** using `export_to_markdown`
 6. **Git commit** using `git_commit_and_get_sha`
@@ -131,7 +131,7 @@ log_session({
 
 ### Budget Management
 
-**Allocation:** 15K/5K/15K/5K (current-state/biographical for user and arlo)
+**Allocation:** 10K/10K/10K/10K (current-state/biographical for user and arlo)
 
 **Check after updates:**
 ```python
@@ -151,7 +151,7 @@ After `/sm` completion, report:
 - KB entries created/updated (0 if none) with IDs
 - Categories used
 - Context entry updates (which entries modified)
-- Token budget status (15K/5K/15K/5K budgets, ok or over_budget)
+- Token budget status (10K/10K/10K/10K budgets, ok or over_budget)
 - Conflicts/duplicates found
 - Export and commit confirmation
 

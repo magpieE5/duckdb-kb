@@ -40,14 +40,14 @@ Workflow:
 5. Export markdown backup (to markdown/ directory)
 6. Git commit with formatted message
 7. Update session log metadata with commit SHA (database only)
-8. Check token budgets (15K/5K/15K/5K)
+8. Check token budgets (10K/10K/10K/10K)
 9. Return offload suggestions if any entry over budget
 
-Budget targets (after 15K/5K allocation):
-- user-current-state: 15K
-- user-biographical: 5K
-- arlo-current-state: 15K
-- arlo-biographical: 5K""",
+Budget targets (10K/10K/10K/10K allocation):
+- user-current-state: 10K
+- user-biographical: 10K
+- arlo-current-state: 10K
+- arlo-biographical: 10K""",
     inputSchema={
         "type": "object",
         "properties": {

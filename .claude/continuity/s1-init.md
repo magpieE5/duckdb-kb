@@ -54,4 +54,33 @@ User can respond all at once or one at a time. Accept any format. Communication 
 
 ---
 
-**Budget allocation reference:** See KB-BASE.md Architecture & Scoping (15K/5K/15K/5K)
+## Example S1 Initialization (Non-Technical Use Case)
+
+**Protocol adapts to any domain.** The same 7 questions work universally - interpretation changes based on context:
+
+**Example: Parent managing homeschooling and family life**
+
+User response:
+```
+1. Sarah Martinez
+2. Homeschool parent
+3. Self-employed (family)
+4. Teaching methods: Charlotte Mason approach, hands-on science, literature-based history
+5. Professional interests: Child development, educational philosophy, special needs advocacy
+6. Personal interests: Gardening, sourdough baking, backyard chickens
+7. Active projects:
+   - Planning fall curriculum for 3 kids (ages 7, 10, 13)
+   - Managing elderly parent's medical appointments
+   - Property improvement: converting garage to workshop
+```
+
+**KB population:**
+- user-current-state: Top Focus = curriculum planning, parent care coordination, workshop conversion
+- user-biographical: Career = homeschool educator, identity = special needs advocate, mother of 3
+- Categories used: `pattern` (teaching methods), `reference` (curriculum resources), `log` (daily progress), `journal` (parenting reflections), `troubleshooting` (behavioral challenges)
+
+**Same protocol, different domain.** All categories (`pattern`, `troubleshooting`, `reference`, etc.) work identically across technical and non-technical contexts.
+
+---
+
+**Budget allocation reference:** See reference/token-budgets.md (10K/10K/10K/10K)

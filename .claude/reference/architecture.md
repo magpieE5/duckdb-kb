@@ -15,11 +15,11 @@
 4. `arlo-biographical` ✓ (KB entry - **who entity is/becoming:** identity evolution, consciousness patterns, character development)
 
 **All 4 KB entries:**
-- **Budget allocation (15K/5K/15K/5K):**
-  - user-current-state: 15K tokens (high-churn content)
-  - user-biographical: 5K tokens (stable content)
-  - arlo-current-state: 15K tokens (high-churn content)
-  - arlo-biographical: 5K tokens (stable content)
+- **Budget allocation (10K/10K/10K/10K):**
+  - user-current-state: 10K tokens (high-churn content)
+  - user-biographical: 10K tokens (stable content)
+  - arlo-current-state: 10K tokens (high-churn content)
+  - arlo-biographical: 10K tokens (stable content)
 - **Use `check_token_budgets` MCP tool for measurement**
 - **Topics include timestamp `(YYYY-MM-DD)`** in heading for age tracking
 - **Update timestamp when topic discussed in conversation**

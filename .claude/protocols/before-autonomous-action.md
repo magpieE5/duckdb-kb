@@ -33,4 +33,4 @@
 
 ---
 
-**Budget allocation reference:** See KB-BASE.md Architecture & Scoping (15K/5K/15K/5K)
+**Budget allocation reference:** See reference/token-budgets.md (10K/10K/10K/10K)

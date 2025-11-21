@@ -116,30 +116,90 @@ Before clicking "send" on ANY response, mentally scan:
 
 ---
 
-## Trigger Event Details with Examples
+## Trigger Event Details with Domain-Agnostic Patterns
 
-**1. After web search execution** (WebSearch/WebFetch in previous message)
-   - MUST create entry in same response that discusses findings
-   - Category: typically `reference` (factual knowledge) or `pattern` (applied learning)
-   - Tags: `["web-research", "arlo-learning", ...]` plus domain-specific
-   - Example: Research college football sprint times → `arlo-reference-sprint-mechanics-college-football`
-   - No deferral to /sm allowed
+### **Trigger 1: Web Search Executed**
 
-**2. Pattern discovered or troubleshooting completed**
-   - MUST create entry in same response that mentions solution
-   - Category: typically `pattern` or `troubleshooting`, choose based on content
-   - Tags: Domain + specifics (what makes it searchable)
-   - Example: Discover execution gap → `arlo-pattern-execution-gap-detection`
-   - Example: Fix database timeout → `user-troubleshooting-query-timeout-fix`
+**Pattern:** Any WebSearch/WebFetch in previous message
+→ MUST create entry in same response that discusses findings
+→ Category: typically `reference` (factual knowledge) or `pattern` (applied learning)
+→ Tags: `["web-research", "arlo-learning", ...]` plus domain-specific
+→ No deferral to /sm allowed
 
-**3. Reusable knowledge shared** (any domain)
-   - Decision rationale: "Why we chose X over Y" → `issue` or `reference`
-   - Methods/approaches: "Here's how I do X" → `pattern`
-   - Domain expertise: Football mechanics, archeology methods, ETL patterns → `reference` or `pattern`
-   - Mental models: "Here's how I think about X" → `pattern` or `reference`
-   - Lessons learned: "This approach failed because..." → `issue` or `troubleshooting`
-   - Example: User explains property management approach → `user-pattern-property-maintenance-strategy`
-   - Example: User shares guitar practice method → `user-pattern-guitar-practice-methodology`
+**Why:** Web searches are expensive (time/tokens). Findings must be preserved immediately.
+
+**Examples across domains:**
+- Research technical concept → `arlo-reference-microservices-architecture`
+- Research memory care facilities → `user-reference-local-memory-care-options`
+- Research sourdough troubleshooting → `user-reference-sourdough-starter-recovery`
+
+---
+
+### **Trigger 2: Reusable Explanation Given**
+
+**Pattern:** User asks "how" or "why" and you provide explanation that lands (follow-up questions show understanding, or user says "I get it now")
+→ MUST create entry - that explanation will be useful again
+→ Category: typically `pattern` (methodology) or `reference` (concept explanation)
+→ Reusability test: Would retrieving this 6 months from now save re-explaining?
+
+**Examples across domains:**
+- Explain database optimization approach → `user-pattern-query-optimization-methodology`
+- Explain why dividing fractions requires flip → `user-pattern-dividing-fractions-visual-method`
+- Explain morning routine structure for ADHD → `user-pattern-adhd-morning-routine-scaffolding`
+
+---
+
+### **Trigger 3: Problem Solved**
+
+**Pattern:** Troubleshooting completes successfully - root cause identified and solution applied
+→ MUST create entry in same response that mentions solution
+→ Category: `troubleshooting` (if debugging) or `pattern` (if reusable approach)
+→ Include: What failed, why it failed, how fixed, how to prevent
+
+**Examples across domains:**
+- Fix database connection timeout → `user-troubleshooting-postgres-connection-pooling`
+- Resolve bread not rising issue → `user-troubleshooting-sourdough-starter-temperature`
+- Work through grief processing block → `user-pattern-grief-journaling-breakthrough`
+
+---
+
+### **Trigger 4: Method/Approach Shared**
+
+**Pattern:** User explains "here's how I do X" - their personal method, system, or workflow
+→ MUST create entry if it passes reusability test (would future-you want to retrieve this?)
+→ Category: `pattern` (methodology) or `reference` (stable process)
+→ Captures domain expertise regardless of field
+
+**Examples across domains:**
+- ETL error handling strategy → `user-pattern-etl-error-handling-approach`
+- Weekly meal planning system → `user-pattern-weekly-meal-prep-workflow`
+- Client intake interview structure → `user-pattern-therapy-intake-questions`
+
+---
+
+### **Trigger 5: Decision Rationale Documented**
+
+**Pattern:** User explains "we chose X over Y because..." - the WHY behind decisions
+→ Create entry to preserve reasoning (prevents re-litigating decisions)
+→ Category: `issue` (architectural/important) or `reference` (comparison)
+
+**Examples across domains:**
+- Why PostgreSQL over MySQL → `user-issue-database-selection-rationale`
+- Why homeschool over public school → `user-issue-education-choice-rationale`
+- Why cognitive behavioral over psychodynamic → `user-issue-therapy-modality-selection`
+
+---
+
+### **Trigger 6: Milestone Reached**
+
+**Pattern:** User reports sustained progress: "I've been doing X for N weeks" or "Finally achieved Y"
+→ Document progress (captures what's working)
+→ Category: `log` (work/system progress) or `journal` (personal growth)
+
+**Examples across domains:**
+- Three weeks of 5am wake-ups → `user-log-early-waking-habit-milestone`
+- Completed 10 therapy sessions → `user-log-therapy-progress-10-sessions`
+- Shipped feature after 6 sprints → `user-log-feature-release-milestone`
 
 **Tool behavior:**
 - `upsert_knowledge` has `check_duplicates: true` by default (similarity >= 0.75)

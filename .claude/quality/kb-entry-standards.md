@@ -13,19 +13,40 @@
   - Then: Problem/Solution/Context/Example sections
   - Use markdown formatting for readability
 
-**Category Guidelines:**
+**Category Guidelines (Domain-Agnostic):**
+
+Each category works across any domain - technical, educational, personal, creative, therapeutic, etc.
+
 - `context` - Always-loaded continuity substrate (4 core entries: user-current-state, user-biographical, arlo-current-state, arlo-biographical)
-- `pattern` - Reusable solutions, architectural approaches, best practices
-- `command` - CLI commands, procedures, scripts
-- `issue` - Important decisions, bugs fixed, architectural choices
-- `troubleshooting` - Problems solved, fixes discovered, debugging procedures
-- `reference` - Documentation, guides, references
-- `log` - Work/system events: files created, decisions made, findings, ideas
-- `journal` - Personal reflections: daily thoughts, life events, insights
-- `object` - Entity/thing documentation: DB tables/views/procedures, physical objects (raised garden, equipment), infrastructure, code modules (use tags to distinguish: `db-table`, `db-view`, `physical`, `infrastructure`, etc.)
-- `other` - Everything else
+
+- `pattern` - Reusable solutions, methodologies, approaches that work repeatedly
+  - Examples: Database error handling strategy, visual method for teaching fractions, morning routine for ADHD management, sourdough feeding schedule
+
+- `command` - Executable procedures, recipes, step-by-step instructions
+  - Examples: Git workflow commands, bread recipe steps, meditation sequence, therapy session structure
+
+- `issue` - Important decisions with rationale, architectural choices, "why we chose X"
+  - Examples: Technology stack selection, homeschooling decision, therapy modality choice, career pivot reasoning
+
+- `troubleshooting` - Problems solved with root cause and prevention
+  - Examples: Database timeout fix, sourdough not rising diagnosis, anxiety spiral interruption technique, communication breakdown resolution
+
+- `reference` - Stable information for lookup: documentation, preferences, routines, key people
+  - Examples: API documentation, daily medication schedule, client contact preferences, family medical history, recipe collection
+
+- `log` - Work/system events: progress made, decisions executed, milestones reached
+  - Examples: Feature shipped, therapy session notes, habit streak milestone, recipe experiment results
+
+- `journal` - Personal reflections: insights, feelings, growth observations
+  - Examples: Career transition thoughts, grief processing, learning breakthrough, parenting realization
+
+- `object` - Entity/thing documentation: systems, physical objects, relationships, spaces
+  - Examples: Database schema, raised garden bed (location/specs), client profile, recipe variations, home office setup
+  - Use tags to distinguish: `db-table`, `physical-object`, `person`, `location`, `infrastructure`
+
+- `other` - Everything else not fitting above categories
 
 ---
 
-**Budget allocation reference:** See KB-BASE.md Architecture & Scoping (15K/5K/15K/5K)
+**Budget allocation reference:** See reference/token-budgets.md (10K/10K/10K/10K)
 **Related:** See protocols/real-time-logging.md for category/tag guidance
