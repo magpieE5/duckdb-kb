@@ -64,6 +64,7 @@ def search_logs_python(con, query_embedding: List[float], threshold: float) -> L
                array_cosine_similarity(embedding, CAST(? AS FLOAT[3072])) AS similarity
         FROM knowledge
         WHERE category = 'log'
+          AND category != 'context'
           AND embedding IS NOT NULL
           AND array_cosine_similarity(embedding, CAST(? AS FLOAT[3072])) > ?
         ORDER BY created DESC
@@ -91,7 +92,8 @@ def search_exact_python(con, query_text: str,
                1.0 AS similarity,
                'exact' AS match_type
         FROM knowledge
-        WHERE (LOWER(id) LIKE LOWER(?)
+        WHERE category != 'context'
+          AND (LOWER(id) LIKE LOWER(?)
            OR LOWER(content) LIKE LOWER(?)
            OR LOWER(title) LIKE LOWER(?)
            OR ARRAY_TO_STRING(tags, ',') LIKE LOWER(?))
@@ -127,6 +129,7 @@ def search_semantic_python(con, query_embedding: List[float],
                'semantic' AS match_type
         FROM knowledge
         WHERE embedding IS NOT NULL
+          AND category != 'context'
           AND array_cosine_similarity(embedding, CAST(? AS FLOAT[3072])) > ?
     """
     params = [query_embedding, query_embedding, threshold]

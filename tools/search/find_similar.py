@@ -79,6 +79,7 @@ async def execute(con, args: dict) -> List[TextContent]:
             WHERE
                 embedding IS NOT NULL
                 AND category = ?
+                AND category != 'context'
                 AND array_cosine_similarity(embedding, CAST(? AS FLOAT[3072])) > ?
             ORDER BY similarity DESC
             LIMIT ?
@@ -98,6 +99,7 @@ async def execute(con, args: dict) -> List[TextContent]:
             FROM knowledge
             WHERE
                 embedding IS NOT NULL
+                AND category != 'context'
                 AND array_cosine_similarity(embedding, CAST(? AS FLOAT[3072])) > ?
             ORDER BY similarity DESC
             LIMIT ?
