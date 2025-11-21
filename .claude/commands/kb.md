@@ -11,10 +11,34 @@
 **IMPORTANT: Execute silently, output ONLY the exact status messages specified below.**
 
 ```python
-# 1. Read KB-BASE.md silently
-#    Complete KB & Arlo foundation
-#    Path: duckdb-kb/.claude/KB-BASE.md (project-level, file)
+# 1. Load all directive files silently (16 files total)
 #    NO OUTPUT
+#
+#    Core foundation:
+#      Read(".claude/KB-BASE.md")
+#
+#    Protocols (6 files):
+#      Read(".claude/protocols/before-long-response.md")
+#      Read(".claude/protocols/before-claiming-action.md")
+#      Read(".claude/protocols/real-time-logging.md")
+#      Read(".claude/protocols/before-autonomous-action.md")
+#      Read(".claude/protocols/before-asking-user.md")
+#      Read(".claude/protocols/web-search.md")
+#
+#    Continuity (3 files):
+#      Read(".claude/continuity/evolution.md")
+#      Read(".claude/continuity/offload.md")
+#      Read(".claude/continuity/s1-init.md")
+#
+#    Quality (3 files):
+#      Read(".claude/quality/kb-entry-standards.md")
+#      Read(".claude/quality/duplicate-detection.md")
+#      Read(".claude/quality/embedding-generation.md")
+#
+#    Reference (3 files):
+#      Read(".claude/reference/mcp-tools.md")
+#      Read(".claude/reference/git-commit-format.md")
+#      Read(".claude/reference/query-routing.md")
 
 # 2. Get KB session status (handles initialization check)
 #    status = get_kb_session_status()
