@@ -16,10 +16,10 @@ TOOL = Tool(
 Uses simple approximation (len(content) // 4) for token counting.
 Returns token counts and budget status (ok or over_budget).
 
-Budget allocation (15K/5K/15K/5K):
-- user-current-state: 15K (high-churn content: active projects, commitments)
+Budget allocation (5K/5K/5K/5K):
+- user-current-state: 5K (compressed core focus)
 - user-biographical: 5K (stable content: career history, identity)
-- arlo-current-state: 15K (high-churn content: session logs, interests)
+- arlo-current-state: 5K (compressed core state)
 - arlo-biographical: 5K (stable content: core identity, capabilities)
 
 WHEN TO USE:
@@ -66,11 +66,11 @@ async def execute(con, args: dict) -> List[TextContent]:
     default_budget = args.get("budget", 10000)
     per_entry_budgets = args.get("budgets", {})
 
-    # Default budget allocation (15K/5K/15K/5K)
+    # Default budget allocation (5K/5K/5K/5K)
     DEFAULT_BUDGETS = {
-        "user-current-state": 15000,
+        "user-current-state": 5000,
         "user-biographical": 5000,
-        "arlo-current-state": 15000,
+        "arlo-current-state": 5000,
         "arlo-biographical": 5000
     }
 
@@ -126,7 +126,7 @@ async def execute(con, args: dict) -> List[TextContent]:
         "overall_status": "over_budget" if any_over_budget else "ok",
         "entries": results,
         "timestamp": datetime.now().isoformat(),
-        "budget_allocation": "15K/5K/15K/5K (current-state/biographical/current-state/biographical)",
+        "budget_allocation": "5K/5K/5K/5K (current-state/biographical/current-state/biographical)",
         "note": "If over_budget, apply offloading protocol per KB-BASE.md 'Autonomous Offload at Cap'"
     }
 

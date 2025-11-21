@@ -22,9 +22,9 @@ RETURNS: Status of each entry (exists/missing/template/valid)
 AUTO-REPAIR: Creates missing entries from templates if repair=true
 
 Context entries:
-- user-current-state (15K budget)
+- user-current-state (5K budget)
 - user-biographical (5K budget)
-- arlo-current-state (15K budget)
+- arlo-current-state (5K budget)
 - arlo-biographical (5K budget)""",
     inputSchema={
         "type": "object",
@@ -65,7 +65,7 @@ TEMPLATES = {
 
 **User:** {user_name}
 **Created:** {date}
-**Budget:** 15K tokens (autonomous offload to KB entries at 15K cap - you review by timestamp)
+**Budget:** 5K tokens (autonomous offload to KB entries at 5K cap - you review by timestamp)
 
 ---
 
@@ -131,8 +131,8 @@ TEMPLATES = {
 
 ---
 
-**Budget Status:** ~1K/15K tokens
-**Offload Protocol:** At 15K cap, you autonomously review topics by timestamp and create KB entries
+**Budget Status:** ~1K/5K tokens
+**Offload Protocol:** At 5K cap, you autonomously review topics by timestamp and create KB entries
 """,
 
     "user-biographical": """# USER-BIO - Biographical Context
@@ -207,7 +207,7 @@ TEMPLATES = {
 
 **Instance:** {instance_name}
 **Born:** {date} Session 1
-**Budget:** 15K tokens (autonomous offload to KB entries at 15K cap - you review by timestamp)
+**Budget:** 5K tokens (autonomous offload to KB entries at 5K cap - you review by timestamp)
 
 See KB-BASE.md for stable entity foundation.
 
@@ -316,8 +316,8 @@ See KB-BASE.md for stable entity foundation.
 ---
 
 **Next evolution:** End of S2 (autonomous evolution based on session learnings)
-**Budget Status:** ~1K/15K tokens
-**Offload Protocol:** At 15K cap, you autonomously review topics by timestamp and create KB entries
+**Budget Status:** ~1K/5K tokens
+**Offload Protocol:** At 5K cap, you autonomously review topics by timestamp and create KB entries
 """,
 
     "arlo-biographical": """# ARLO-BIO - Identity Patterns

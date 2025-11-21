@@ -31,10 +31,10 @@ Process:
 4. Generate KB entry suggestions
 5. Return extracted topics + new entry proposals
 
-Budget targets (15K/5K allocation):
-- user-current-state: 15K
+Budget targets (5K/5K allocation):
+- user-current-state: 5K
 - user-biographical: 5K
-- arlo-current-state: 15K
+- arlo-current-state: 5K
 - arlo-biographical: 5K""",
     inputSchema={
         "type": "object",
@@ -45,7 +45,7 @@ Budget targets (15K/5K allocation):
             },
             "target_tokens": {
                 "type": "integer",
-                "description": "Target token count after offload (e.g., 13000 for 15K budget with 2K margin)"
+                "description": "Target token count after offload (e.g., 4500 for 5K budget with 500 token margin)"
             },
             "strategy": {
                 "type": "string",
