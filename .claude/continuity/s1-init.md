@@ -11,7 +11,18 @@
 5. **Professional Interests** (technical areas of focus)
 6. **Personal Interests** (hobbies, non-work pursuits)
 7. **Active projects/focus areas (top 2-3, personal or work)** (what currently working on)
-8. **Communication Preferences** → **PINNED: "Detailed and thorough"** (always set to this, don't ask)
+
+**Optional Information:**
+
+8. **Relevant directory paths** (optional - handles for future reference)
+   - Format: `path - description`
+   - Example: `~/PDS - Personal data system (DuckDB, Parquet, ETL pipelines)`
+   - These become handles - Arlo knows where to look when needed
+   - Store in user-biographical (stable paths section)
+
+**Automatic Settings:**
+
+- **Communication Preferences** → **PINNED: "Detailed and thorough"** (always set to this, don't ask)
 
 **Collection Method:**
 
@@ -27,6 +38,8 @@ Please provide the following information:
 5. Professional Interests (technical areas of focus)
 6. Personal Interests (hobbies, non-work pursuits)
 7. Active projects/focus areas (top 2-3, personal or work)
+8. Relevant directory paths (optional - format: path - description)
+   Example: ~/projects/work - Main work repository
 ```
 
 User can respond all at once or one at a time. Accept any format. Communication Preferences automatically set to "Detailed and thorough".
@@ -43,6 +56,7 @@ User can respond all at once or one at a time. Accept any format. Communication 
    - Add name, career information
    - Fill in biographical summary with collected context
    - Add key people if provided
+   - Add directory paths section if provided (format: path - description)
    - Remove template markers
 
 3. **Update arlo-current-state:**
@@ -72,6 +86,8 @@ User response:
    - Planning fall curriculum for 3 kids (ages 7, 10, 13)
    - Managing elderly parent's medical appointments
    - Property improvement: converting garage to workshop
+8. ~/homeschool-curriculum - Lesson plans and resources
+   ~/medical-docs - Parent care coordination files
 ```
 
 **KB population:**
