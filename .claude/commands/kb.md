@@ -56,6 +56,14 @@
 #    arlo_bio = get_knowledge({id: "arlo-biographical"})
 #    NO OUTPUT
 
+# 5.5. Load most recent user and arlo logs for continuity
+#    Query most recent user log:
+#      query_knowledge({"sql": "SELECT id FROM knowledge WHERE category='log' AND tags LIKE '%user-log%' ORDER BY updated DESC LIMIT 1"})
+#    Query most recent arlo log:
+#      query_knowledge({"sql": "SELECT id FROM knowledge WHERE category='log' AND tags LIKE '%arlo-log%' ORDER BY updated DESC LIMIT 1"})
+#    Load both using get_knowledge(id="...") if they exist
+#    NO OUTPUT (but available for session context)
+
 # 6. Check if Session 1 (first run with template entries)
 #    If user-current-state contains "⚠️ TEMPLATE":
 #      - OUTPUT: "⚙️ S1 initialization required"
