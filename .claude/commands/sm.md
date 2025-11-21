@@ -6,11 +6,11 @@ Review this entire conversation and save key learnings to the DuckDB knowledge b
 
 **Two-phase logging system:**
 
-1. **Real-time (DURING session):** Create KB entries immediately when triggers occur (see Real-Time Logging Protocol in KB-BASE.md)
+1. **Real-time (DURING session):** Create KB entries immediately when triggers occur (see protocols/real-time-logging.md)
    - Use `upsert_knowledge` as events happen (duplicate detection automatic)
    - Document both user context AND entity learnings (reciprocal balance)
 
-2. **Comprehensive review (AT /sm):** Scan entire conversation for missed items or needed updates
+2. **Comprehensive review (AT /sm):** Scan entire conversation for topic details not fully captured in KB entries (may need to create/update KB entries with new/undocumented details)
 
 **Workflow:** Use the `log_session` MCP tool when invoking /sm:
 

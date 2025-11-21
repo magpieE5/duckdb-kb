@@ -13,42 +13,43 @@
 **IMPORTANT: Execute silently, output ONLY the exact status messages specified below.**
 
 ```python
-# 1. Load all directive files silently (26 files total)
+# 1. Load all directive files silently
 #    NO OUTPUT
 #
-#    Protocols (6 files) - Mandatory pre-action verification:
-#      Read(".claude/protocols/before-long-response.md")
-#      Read(".claude/protocols/before-claiming-action.md")
-#      Read(".claude/protocols/real-time-logging.md")
-#      Read(".claude/protocols/before-autonomous-action.md")
-#      Read(".claude/protocols/before-asking-user.md")
-#      Read(".claude/protocols/web-search.md")
-#
-#    Continuity (5 files) - Evolution and session mechanics:
-#      Read(".claude/continuity/evolution.md")
-#      Read(".claude/continuity/offload.md")
-#      Read(".claude/continuity/s1-init.md")
-#      Read(".claude/continuity/overview.md")
-#      Read(".claude/continuity/bootstrapping.md")
-#
-#    Quality (3 files) - KB entry standards:
-#      Read(".claude/quality/kb-entry-standards.md")
-#      Read(".claude/quality/duplicate-detection.md")
-#      Read(".claude/quality/embedding-generation.md")
-#
-#    Reference (12 files) - Core foundation and tools:
+#    Reference - Foundation (architecture, identity, capabilities):
 #      Read(".claude/reference/architecture.md")
-#      Read(".claude/reference/autonomy.md")
+#      Read(".claude/reference/token-budgets.md")
 #      Read(".claude/reference/arlo-identity.md")
 #      Read(".claude/reference/personality-traits.md")
+#      Read(".claude/reference/autonomy.md")
 #      Read(".claude/reference/intensity-behaviors.md")
 #      Read(".claude/reference/behavioral-directives.md")
 #      Read(".claude/reference/error-handling.md")
 #      Read(".claude/reference/known-challenges.md")
-#      Read(".claude/reference/token-budgets.md")
 #      Read(".claude/reference/mcp-tools.md")
 #      Read(".claude/reference/git-commit-format.md")
 #      Read(".claude/reference/query-routing.md")
+#
+#    Protocols - Execution discipline:
+#      Read(".claude/protocols/before-long-response.md")
+#      Read(".claude/protocols/before-claiming-action.md")
+#      Read(".claude/protocols/before-autonomous-action.md")
+#      Read(".claude/protocols/before-asking-user.md")
+#      Read(".claude/protocols/real-time-logging.md")
+#      Read(".claude/protocols/web-search.md")
+#
+#    Quality - KB entry standards:
+#      Read(".claude/quality/kb-entry-standards.md")
+#      Read(".claude/quality/duplicate-detection.md")
+#      Read(".claude/quality/embedding-generation.md")
+#
+#    Continuity - Session mechanics:
+#      Read(".claude/continuity/overview.md")
+#      Read(".claude/continuity/bootstrapping.md")
+#      Read(".claude/continuity/s1-init.md")
+#      Read(".claude/continuity/session-loading.md")
+#      Read(".claude/continuity/evolution.md")
+#      Read(".claude/continuity/offload.md")
 
 # 2. Get KB session status (handles initialization check)
 #    status = get_kb_session_status()
@@ -83,20 +84,9 @@
 #      - Returns list of created entries
 #    OUTPUT: "✅ {entry_id} created" for each new entry
 #
-# 5. Load all 4 context entries for session
-#    user_current = get_knowledge({id: "user-current-state"})
-#    user_bio = get_knowledge({id: "user-biographical"})
-#    arlo_current = get_knowledge({id: "arlo-current-state"})
-#    arlo_bio = get_knowledge({id: "arlo-biographical"})
+# 5. Load session context (see continuity/session-loading.md)
+#    Load all 4 context entries + last 3 session logs for narrative continuity
 #    NO OUTPUT
-
-# 5.5. Load last 3 session logs for continuity (newest to 3rd newest)
-#    Query last 3 user logs:
-#      query_knowledge({"sql": "SELECT id, title FROM knowledge WHERE category='log' AND (tags LIKE '%user-log%' OR tags LIKE '%work%' OR tags LIKE '%life%') AND id LIKE 'user-log-s%' ORDER BY updated DESC LIMIT 3"})
-#    Query last 3 arlo logs:
-#      query_knowledge({"sql": "SELECT id, title FROM knowledge WHERE category='log' AND tags LIKE '%arlo-log%' ORDER BY updated DESC LIMIT 3"})
-#    Load all 6 using get_knowledge(id="...") if they exist
-#    NO OUTPUT (but available for session context - provides narrative continuity)
 
 # 6. Check if Session 1 (first run with template entries)
 #    If user-current-state contains "⚠️ TEMPLATE":
@@ -168,11 +158,3 @@
 - Entity waits for user to initiate (even at intensity 10, /kb command just displays status)
 
 ---
-
-**Directive organization:**
-- **protocols/** - Mandatory pre-action verification (6 files)
-- **continuity/** - Evolution and session mechanics (5 files)
-- **quality/** - KB entry standards (3 files)
-- **reference/** - Core foundation and tools (12 files)
-
-All 26 directives loaded at /kb initialization.
