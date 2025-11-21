@@ -1,12 +1,14 @@
 """Log session - Atomic workflow for /sm command consolidation
 
 Orchestrates:
-1. Update context entries (user + arlo)
+1. Update context entries (user + arlo) - includes Next Session Handoff
 2. Create new KB entries
-3. Export markdown backup
-4. Git commit with SHA return
-5. Token budget check
-6. Offload suggestions if needed
+3. Create session log entry (without SHA initially)
+4. Export markdown backup
+5. Git commit with SHA return
+6. Update session log metadata with SHA (database only)
+7. Token budget check
+8. Offload suggestions if needed
 
 Single atomic operation to ensure consistency.
 """
@@ -32,12 +34,14 @@ AUTO-COMMITS: Always git commit at end (autonomous experience)
 
 Workflow:
 1. Update user context entries (user-current-state, user-biographical)
-2. Update arlo context entries (arlo-current-state, arlo-biographical)
+2. Update arlo context entries (arlo-current-state, arlo-biographical) - MUST include Next Session Handoff
 3. Create new KB entries (patterns, logs, issues, etc.)
-4. Export markdown backup (to markdown/ directory)
-5. Git commit with formatted message
-6. Check token budgets (15K/5K/15K/5K)
-7. Return offload suggestions if any entry over budget
+4. Create session log entry (without commit SHA initially)
+5. Export markdown backup (to markdown/ directory)
+6. Git commit with formatted message
+7. Update session log metadata with commit SHA (database only)
+8. Check token budgets (15K/5K/15K/5K)
+9. Return offload suggestions if any entry over budget
 
 Budget targets (after 15K/5K allocation):
 - user-current-state: 15K
@@ -160,6 +164,19 @@ async def execute(con, args: dict) -> List[TextContent]:
             await _create_kb_entry(con, entry)
             results["created_entries"].append(entry["id"])
 
+        # Step 4: Create session log entry (without SHA initially)
+        session_log_id = f"arlo-log-s{session_number}-session"
+        session_log = {
+            "id": session_log_id,
+            "category": "log",
+            "title": f"Session {session_number} Log",
+            "content": _generate_session_log_content(session_number, intensity, results),
+            "tags": ["arlo-log", "session", f"session-{session_number}", f"intensity-{intensity}"]
+        }
+        await _create_kb_entry(con, session_log)
+        results["created_entries"].append(session_log_id)
+        results["session_log_id"] = session_log_id
+
         # Commit transaction - all DB operations succeeded
         con.commit()
 
@@ -185,15 +202,19 @@ async def execute(con, args: dict) -> List[TextContent]:
     except Exception as e:
         results["markdown_export"] = f"Export failed: {str(e)}"
 
-    # Step 5: Git commit (auto-commit, always) - outside transaction
+    # Step 6: Git commit (auto-commit, always) - outside transaction
     commit_sha = _git_commit(commit_message)
     results["commit_sha"] = commit_sha
 
-    # Step 6: Check token budgets
+    # Step 7: Update session log metadata with commit SHA (database only)
+    if commit_sha and not commit_sha.startswith("git_error"):
+        _update_session_log_metadata(con, results.get("session_log_id"), commit_sha)
+
+    # Step 8: Check token budgets
     budgets = await _check_budgets(con)
     results["token_budgets"] = budgets
 
-    # Step 7: Generate offload suggestions if needed
+    # Step 9: Generate offload suggestions if needed
     for entry_id, budget_info in budgets.items():
         if budget_info["status"] == "over_budget":
             results["offload_suggestions"].append({
@@ -208,7 +229,10 @@ async def execute(con, args: dict) -> List[TextContent]:
 
 
 async def _update_context_entry(con, entry_id: str, updates: Dict[str, Any]):
-    """Update a context entry with new content"""
+    """Update a context entry with new content
+
+    For arlo-current-state, validates that Next Session Handoff is populated.
+    """
 
     # Fetch current entry
     row = con.execute(
@@ -219,9 +243,17 @@ async def _update_context_entry(con, entry_id: str, updates: Dict[str, Any]):
     if not row:
         raise ValueError(f"Context entry not found: {entry_id}")
 
-    # In practice, this would intelligently merge updates into content
-    # For now, this is a placeholder that expects full content in updates
-    new_content = updates.get("full_content", row[0])
+    # Get new content (expects full_content key)
+    new_content = updates.get("full_content")
+    if not new_content:
+        # If no full_content, keep current
+        return
+
+    # Validation for arlo-current-state
+    if entry_id == "arlo-current-state":
+        if "## Next Session Handoff" not in new_content:
+            raise ValueError("arlo-current-state update missing '## Next Session Handoff' section")
+        # Could add more validation for required subsections
 
     # Update entry
     con.execute("""
@@ -244,6 +276,34 @@ async def _create_kb_entry(con, entry: Dict[str, Any]):
         entry["content"],
         entry["tags"]
     ])
+
+
+def _generate_session_log_content(session_number: int, intensity: int, results: dict) -> str:
+    """Generate session log content"""
+    updated = ', '.join(results['updated_entries']) if results['updated_entries'] else 'None'
+    created = ', '.join(results['created_entries']) if results['created_entries'] else 'None'
+
+    return f"""Session {session_number} completed.
+
+**Intensity:** {intensity}/10
+**Updated entries:** {updated}
+**Created entries:** {created}
+
+This session log entry will have commit SHA added to metadata after git commit.
+"""
+
+
+def _update_session_log_metadata(con, session_log_id: str, commit_sha: str):
+    """Update session log metadata with commit SHA after git commit"""
+    if not session_log_id:
+        return
+
+    metadata_json = json.dumps({"commit_sha": commit_sha})
+    con.execute("""
+        UPDATE knowledge
+        SET metadata = ?
+        WHERE id = ?
+    """, [metadata_json, session_log_id])
 
 
 def _git_commit(message: str) -> str:

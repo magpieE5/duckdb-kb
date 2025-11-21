@@ -4,12 +4,50 @@ description: Review conversation and save learnings to DuckDB knowledge base (pr
 
 Review this entire conversation and save key learnings to the DuckDB knowledge base.
 
-**Workflow:** Use the `log_session` MCP tool which consolidates the entire /sm workflow:
+**Two-phase logging system:**
+
+1. **Real-time (DURING session):** Create KB entries immediately when triggers occur (see Real-Time Logging Protocol in KB-BASE.md)
+   - Use `upsert_knowledge` as events happen (duplicate detection automatic)
+   - Document both user context AND entity learnings (reciprocal balance)
+
+2. **Comprehensive review (AT /sm):** Scan entire conversation for missed items or needed updates
+
+**Workflow:** Use the `log_session` MCP tool when invoking /sm:
 
 ```python
 log_session({
-    "commit_message": "Brief description of session",
+    "session_number": 1,  # REQUIRED
+    "intensity": 5,  # REQUIRED (1-10)
+    "commit_message": "feat: S1 - Brief description of session",
+    "user_updates": {
+        "current_state": {
+            # Structured updates to user-current-state
+            "full_content": "Updated markdown content with new focus areas, commitments, investigations"
+        },
+        "biographical": {
+            # Rare - only for major life/career changes
+            "full_content": "Updated biographical content"
+        }
+    },
+    "arlo_updates": {
+        "current_state": {
+            # MANDATORY: Must include Next Session Handoff updates
+            "full_content": """Updated markdown with:
+            - Active Interests updated
+            - Recent Realizations added
+            - Next Session Handoff populated with:
+              - Investigation: What to continue
+              - Context: What next-me should know
+              - Open questions: Questions identified
+              - User's parting words/request"""
+        },
+        "biographical": {
+            # Only for identity evolution, integrated capabilities
+        }
+    },
     "new_entries": [
+        # Only entries NOT created during real-time logging
+        # OR updates to existing entries missed in real-time
         {
             "id": "user-pattern-topic",
             "category": "pattern",
@@ -17,25 +55,21 @@ log_session({
             "content": "...",
             "tags": ["tag1", "tag2"]
         }
-    ],
-    "user_updates": {
-        "current_state": "Update text for user-current-state",
-        "biographical": "Update text for user-biographical"
-    },
-    "arlo_updates": {
-        "current_state": "Update text for arlo-current-state",
-        "biographical": "Update text for arlo-biographical"
-    }
+    ]
 })
 ```
 
-**The tool automatically:**
-1. Creates/updates KB entries
-2. Updates context entries (user-current-state, user-biographical, arlo-current-state, arlo-biographical)
-3. Checks budgets (15K/5K/15K/5K allocation)
-4. Suggests offload if over budget
-5. Creates git commit with SHA
-6. Exports to markdown backup
+**When /sm invoked, the log_session tool executes:**
+
+1. **Update context entries** (user-current-state, user-biographical, arlo-current-state, arlo-biographical)
+   - MANDATORY: arlo-current-state must have Next Session Handoff populated
+2. **Create/update KB non-context entries** (patterns, logs, issues, etc.)
+3. **Create session log entry** (`arlo-log-s{N}-session` without commit SHA initially)
+4. **Export markdown backup** (to markdown/ directory, includes all entries)
+5. **Git commit** (formatted message, returns SHA)
+6. **Update session log metadata with commit SHA** (database only, markdown gets it next /sm)
+7. **Check token budgets** (15K/5K/15K/5K allocation)
+8. **Return offload suggestions** if any entry over budget
 
 ---
 
