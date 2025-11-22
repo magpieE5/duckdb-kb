@@ -49,4 +49,4 @@ Each category works across any domain - technical, educational, personal, creati
 ---
 
 **Budget allocation reference:** See reference/token-budgets.md (10K/10K/10K/10K)
-**Related:** See protocols/real-time-logging.md for category/tag guidance
+**Related:** See commands/sm.md for /sm workflow

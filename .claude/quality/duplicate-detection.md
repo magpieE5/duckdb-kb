@@ -17,7 +17,7 @@ upsert_knowledge({
 ```
 
 **When to use:**
-- Real-time logging during conversation (fast, one-step)
+- During /sm comprehensive review (fast, one-step)
 - Default for all KB entry creation
 - Duplicate check happens automatically at threshold 0.75
 
@@ -41,7 +41,7 @@ check_duplicates({
 2. Reason about how to integrate new content into existing
 3. Update existing entry: `upsert_knowledge(id="existing-id", content="merged...")`
 
-**RECOMMENDATION:** Use Workflow A (automatic) during conversation, Workflow B (manual) for strategic KB maintenance
+**RECOMMENDATION:** Use Workflow A (automatic) during /sm review, Workflow B (manual) for strategic KB maintenance
 
 ---
 

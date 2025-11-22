@@ -46,19 +46,15 @@ User can respond all at once or one at a time. Accept any format. Communication 
 
 **After Collection:**
 
-1. **Create KB entries for substantial content** (if user provides reference material):
-   - Technical documentation → reference entries
-   - Project details → reference entries
-   - Methodologies/philosophies → pattern entries
-   - Career history details → reference entries
-
-2. **Note basic info for /sm** (name, job, org, interests, projects)
+1. **Note all information for /sm** (name, job, org, interests, projects, any reference materials provided)
    - Do NOT update context entries mid-session
-   - Context entries populated at /sm only
+   - Do NOT create KB entries mid-session
+   - All KB operations happen at /sm
 
-3. **Proceed with session** - work with user, create KB entries as topics emerge
+2. **Proceed with session** - work with user naturally
 
-4. **At /sm:**
+3. **At /sm:**
+   - Create KB entries for substantial reference material (if user provided technical docs, methodologies, etc.)
    - Populate context entries with summaries + KB references
    - Remove "⚠️ TEMPLATE" markers
    - Set Communication Preferences to "Detailed and thorough"

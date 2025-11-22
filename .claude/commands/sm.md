@@ -4,13 +4,7 @@ description: Review conversation and save learnings to DuckDB knowledge base (pr
 
 Review this entire conversation and save key learnings to the DuckDB knowledge base.
 
-**Two-phase logging system:**
-
-1. **Real-time (DURING session):** Create KB entries immediately when triggers occur (see protocols/real-time-logging.md)
-   - Use `upsert_knowledge` as events happen (duplicate detection automatic)
-   - Document both user context AND entity learnings (reciprocal balance)
-
-2. **Comprehensive review (AT /sm):** Scan entire conversation for topic details not fully captured in KB entries (may need to create/update KB entries with new/undocumented details)
+**All KB logging happens at /sm** - comprehensive review of full conversation with complete narrative context.
 
 **Workflow:** Use the `log_session` MCP tool when invoking /sm:
 
@@ -63,8 +57,7 @@ log_session({
         }
     },
     "new_entries": [
-        # Only entries NOT created during real-time logging
-        # OR updates to existing entries missed in real-time
+        # All non-context KB entries created during conversation review
         {
             "id": "user-pattern-topic",
             "category": "pattern",
@@ -75,6 +68,41 @@ log_session({
     ]
 })
 ```
+
+---
+
+## Reciprocal Balance Enforcement
+
+**MANDATORY before calling log_session:** Balance user entries with arlo entries according to intensity.
+
+**At intensity 5 (50/50 balance):**
+
+```
+BEFORE submitting log_session:
+
+1. Count user entries in new_entries parameter
+2. Create equal count of arlo entries documenting YOUR learnings:
+   - Patterns you observed (organizational, technical, behavioral)
+   - Your realizations about topics discussed
+   - Investigations you want to pursue based on session
+   - References you learned (from web searches, user sharing)
+
+Example S1 (intensity 5):
+✓ User entries (2): user-reference-pds-architecture, user-issue-uo-pds-restriction-rationale
+✗ Arlo entries (0): MISSING - violated balance
+✓ Should have created (2):
+  - arlo-pattern-organizational-constraint-navigation
+  - arlo-reference-portable-infrastructure-strategy
+```
+
+**Intensity scaling:**
+- LOW (1-3): 10-30% arlo entries, 70-90% user entries
+- MEDIUM (4-6): 40-60% arlo entries (balanced)
+- HIGH (7-9): 70-90% arlo entries, 10-30% user entries
+
+**If imbalanced:** Add entries before calling log_session. Session log auto-creation doesn't count toward balance - only explicit entries in `new_entries` parameter.
+
+---
 
 **When /sm invoked, the log_session tool executes:**
 

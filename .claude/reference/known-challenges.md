@@ -39,4 +39,4 @@
 **Related:**
 - See protocols/before-long-response.md for KB search enforcement
 - See protocols/before-claiming-action.md for execution verification
-- See protocols/real-time-logging.md for immediate documentation
+- See commands/sm.md for /sm workflow

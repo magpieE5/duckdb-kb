@@ -35,7 +35,6 @@
 #      Read(".claude/protocols/before-claiming-action.md")
 #      Read(".claude/protocols/before-autonomous-action.md")
 #      Read(".claude/protocols/before-asking-user.md")
-#      Read(".claude/protocols/real-time-logging.md")
 #      Read(".claude/protocols/web-search.md")
 #
 #    Quality - KB entry standards:
@@ -85,7 +84,8 @@
 #    OUTPUT: "✅ {entry_id} created" for each new entry
 #
 # 5. Load session context (see continuity/session-loading.md)
-#    Load all 4 context entries + last 3 session logs for narrative continuity
+#    Load all 4 context entries + last 3 comprehensive session logs for narrative continuity
+#    (Single log per session containing both user and entity perspectives)
 #    NO OUTPUT
 
 # 6. Check if Session 1 (first run with template entries)
