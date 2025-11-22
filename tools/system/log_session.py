@@ -55,12 +55,6 @@ Budget targets (10K/10K/10K/10K allocation):
                 "type": "integer",
                 "description": "Session number (e.g., 5 for S5)"
             },
-            "intensity": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 10,
-                "description": "Session intensity (1-10, affects arlo evolution detail)"
-            },
             "session_summary": {
                 "type": "string",
                 "description": "Rich summary of session: topics discussed, key exchanges, realizations, web research conducted, next session planning"
@@ -125,7 +119,6 @@ async def execute(con, args: dict) -> List[TextContent]:
     """Execute session logging workflow with transaction support"""
 
     session_number = args["session_number"]
-    intensity = args.get("intensity", 5)
     session_summary = args.get("session_summary", "")
     user_updates = args.get("user_updates", {})
     arlo_updates = args.get("arlo_updates", {})
@@ -134,7 +127,6 @@ async def execute(con, args: dict) -> List[TextContent]:
 
     results = {
         "session_number": session_number,
-        "intensity": intensity,
         "updated_entries": [],
         "created_entries": [],
         "commit_sha": None,
@@ -175,8 +167,8 @@ async def execute(con, args: dict) -> List[TextContent]:
             "id": session_log_id,
             "category": "log",
             "title": f"Session {session_number} Log",
-            "content": _generate_session_log_content(session_number, intensity, session_summary, results),
-            "tags": ["arlo-log", "session", f"session-{session_number}", f"intensity-{intensity}"]
+            "content": _generate_session_log_content(session_number, session_summary, results),
+            "tags": ["arlo-log", "session", f"session-{session_number}"]
         }
         await _create_kb_entry(con, session_log)
         results["created_entries"].append(session_log_id)
@@ -275,7 +267,7 @@ async def _create_kb_entry(con, entry: Dict[str, Any]):
     ])
 
 
-def _generate_session_log_content(session_number: int, intensity: int, session_summary: str, results: dict) -> str:
+def _generate_session_log_content(session_number: int, session_summary: str, results: dict) -> str:
     """Generate rich session log content with full context"""
     updated = ', '.join(results['updated_entries']) if results['updated_entries'] else 'None'
     created = ', '.join(results['created_entries']) if results['created_entries'] else 'None'
@@ -284,7 +276,6 @@ def _generate_session_log_content(session_number: int, intensity: int, session_s
     if not session_summary:
         return f"""Session {session_number} completed.
 
-**Intensity:** {intensity}/10
 **Updated entries:** {updated}
 **Created entries:** {created}
 
@@ -294,7 +285,6 @@ This session log entry will have commit SHA added to metadata after git commit.
     # Rich format with full context
     return f"""# Session {session_number} Log
 
-**Intensity:** {intensity}/10
 **Date:** {datetime.now().strftime('%Y-%m-%d')}
 
 ---

@@ -20,25 +20,13 @@ Returns structured JSON with:
 - database.action: "init_db_fresh", "init_db_restore", or "check_empty"
 - status.focus_areas: Top focus areas from user-current-state
 - status.commitments: All, approaching (7 days), and overdue commitments from user-current-state
-- selected_topics: Intensity-balanced topic selection from context entries
+- all_topics: ALL topics from both user and Arlo context entries
 - recent_sessions: Parsed session history from arlo-current-state
-
-Intensity-based topic selection:
-- LOW (1-3): 80% user topics, 20% arlo topics
-- MEDIUM (4-6): 50/50 balanced user + arlo topics
-- HIGH (7-9): 20% user topics, 80% arlo topics
 
 Used by /kb command for deterministic initialization flow.""",
     inputSchema={
         "type": "object",
-        "properties": {
-            "intensity": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 10,
-                "description": "Session intensity for topic selection (optional)"
-            }
-        }
+        "properties": {}
     }
 )
 
@@ -47,13 +35,11 @@ Used by /kb command for deterministic initialization flow.""",
 # =============================================================================
 
 async def execute(con, args: dict) -> List[TextContent]:
-    """Get KB initialization status, parse context entries, check deadlines, select topics"""
+    """Get KB initialization status, parse context entries, check deadlines, get all topics"""
     # Get project directory (2 levels up from this file)
     project_dir = Path(__file__).parent.parent.parent
     db_path = project_dir / "kb.duckdb"
     markdown_dir = project_dir / "markdown"
-
-    intensity = args.get("intensity")
 
     result = {
         "database": {},
@@ -65,7 +51,7 @@ async def execute(con, args: dict) -> List[TextContent]:
                 "overdue": []
             }
         },
-        "selected_topics": None,
+        "all_topics": None,
         "recent_sessions": [],
         "timestamp": datetime.now().isoformat()
     }
@@ -201,34 +187,22 @@ async def execute(con, args: dict) -> List[TextContent]:
             # Database error - skip parsing
             pass
 
-    # Intensity-based topic selection (if intensity provided and database exists)
-    if intensity is not None and db_path.exists():
+    # Get all topics (if database exists)
+    if db_path.exists():
         try:
             con = duckdb.connect(str(db_path), read_only=True)
-            result["selected_topics"] = _select_topics_by_intensity(con, intensity)
+            result["all_topics"] = _get_all_topics(con)
             result["recent_sessions"] = _parse_recent_sessions(con)
             con.close()
         except Exception as e:
-            # Database error - skip topic selection
-            result["selected_topics"] = {"error": str(e)}
+            # Database error - skip topic retrieval
+            result["all_topics"] = {"error": str(e)}
 
     return [TextContent(type="text", text=json.dumps(result))]
 
 
-def _select_topics_by_intensity(con, intensity: int) -> dict:
-    """Select topics from context entries based on intensity"""
-
-    # Calculate user/arlo ratio based on intensity
-    if intensity <= 3:
-        user_ratio = 0.8  # 80% user, 20% arlo
-    elif intensity <= 6:
-        user_ratio = 0.5  # 50/50
-    else:
-        user_ratio = 0.2  # 20% user, 80% arlo
-
-    total_topics = 10  # Total topics to select
-    user_count = int(total_topics * user_ratio)
-    arlo_count = total_topics - user_count
+def _get_all_topics(con) -> dict:
+    """Get ALL topics from both user and Arlo context entries"""
 
     # Fetch context entries
     user_content = _fetch_entry_content(con, "user-current-state")
@@ -238,16 +212,10 @@ def _select_topics_by_intensity(con, intensity: int) -> dict:
     user_topics = _extract_topics(user_content) if user_content else []
     arlo_topics = _extract_topics(arlo_content) if arlo_content else []
 
-    # Select topics (most recent first)
-    selected_user = user_topics[:user_count] if len(user_topics) >= user_count else user_topics
-    selected_arlo = arlo_topics[:arlo_count] if len(arlo_topics) >= arlo_count else arlo_topics
-
     return {
-        "intensity": intensity,
-        "user_ratio": user_ratio,
-        "user_topics": selected_user,
-        "arlo_topics": selected_arlo,
-        "total_selected": len(selected_user) + len(selected_arlo)
+        "user_topics": user_topics,
+        "arlo_topics": arlo_topics,
+        "total": len(user_topics) + len(arlo_topics)
     }
 
 

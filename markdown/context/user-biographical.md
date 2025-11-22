@@ -6,7 +6,7 @@ tags:
 - context
 - always-load
 created: '2025-11-21T21:44:23.156007'
-updated: '2025-11-21T23:05:16.927724'
+updated: '2025-11-22T07:54:03.192113'
 metadata: {}
 ---
 
@@ -100,4 +100,4 @@ He lives on 11 acres in South Eugene with his family, balancing technical work w
 
 ---
 
-*KB Entry: `user-biographical` | Category: context | Updated: 2025-11-21*
+*KB Entry: `user-biographical` | Category: context | Updated: 2025-11-22*

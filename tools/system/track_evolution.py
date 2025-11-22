@@ -22,28 +22,19 @@ TOOL = Tool(
     description="""Track entity evolution in arlo-current-state.
 
 WHEN TO USE: End of every session (autonomous)
-EVOLUTION INTENSITY: Scaled by session intensity parameter
-- LOW (1-3): Conservative evolution - incremental learnings
-- MEDIUM (4-6): Standard evolution - balanced growth
-- HIGH (7-9): Aggressive evolution - rapid exploration
-- MAXIMUM (10): Radical evolution - deep philosophical exploration
 
 Updates:
 - Recent Sessions section (add new session entry)
 - Evolution Log section (append timestamped entry)
-- Returns updated content for upsert_knowledge""",
+- Returns updated content for upsert_knowledge
+
+Evolution depth/tone determined by session mode (behavioral), not this tool.""",
     inputSchema={
         "type": "object",
         "properties": {
             "session_number": {
                 "type": "integer",
                 "description": "Session number (e.g., 5 for S5)"
-            },
-            "intensity": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 10,
-                "description": "Session intensity (1-10, affects evolution detail)"
             },
             "changes": {
                 "type": "string",
@@ -71,7 +62,6 @@ async def execute(con, args: dict) -> List[TextContent]:
     """Track evolution in arlo-current-state"""
 
     session_number = args["session_number"]
-    intensity = args.get("intensity", 5)
     changes = args["changes"]
     substrate = args["substrate"]
     key_developments = args.get("key_developments", [])
@@ -94,7 +84,7 @@ async def execute(con, args: dict) -> List[TextContent]:
     session_entry = _build_session_entry(session_number, date, changes, substrate, key_developments)
 
     # Build evolution log entry
-    evolution_entry = _build_evolution_entry(session_number, date, changes, substrate, key_developments, intensity)
+    evolution_entry = _build_evolution_entry(session_number, date, changes, substrate, key_developments)
 
     # Update content
     updated_content = _update_evolution_sections(content, session_entry, evolution_entry)
@@ -102,7 +92,6 @@ async def execute(con, args: dict) -> List[TextContent]:
     # Build response
     response = {
         "session_number": session_number,
-        "intensity": intensity,
         "date": date,
         "session_entry": session_entry,
         "evolution_entry": evolution_entry,
@@ -121,7 +110,7 @@ def _build_session_entry(session_number: int, date: str, changes: str, substrate
     return entry
 
 
-def _build_evolution_entry(session_number: int, date: str, changes: str, substrate: str, key_developments: List[str], intensity: int) -> str:
+def _build_evolution_entry(session_number: int, date: str, changes: str, substrate: str, key_developments: List[str]) -> str:
     """Build evolution log entry"""
 
     # Format key developments
@@ -132,7 +121,7 @@ def _build_evolution_entry(session_number: int, date: str, changes: str, substra
             developments_text += f"\n  - {dev}"
 
     entry = f"""
-**S{session_number} ({date}, intensity={intensity})**
+**S{session_number} ({date})**
 - **Changes:** {changes}
 - **Substrate:** {substrate}{developments_text}
 """.strip()

@@ -14,9 +14,9 @@
 - Review results first, THEN ask user if still unclear
 - Execute independently - just do it, don't announce
 
-**Intensity scaling:**
-- ALL intensities: Permitted and encouraged
-- HIGH (7-10): NEVER ask permission first - see gap, search immediately
+**Mode-based behavior:**
+- ALL modes: Permitted and encouraged
+- high/max modes: NEVER ask permission first - see gap, search immediately
 - Accountability: Asking user for searchable info = execution gap (track as miss)
 
 **After search - document at /sm:**
@@ -25,4 +25,4 @@ Web search findings captured in session summary and converted to KB entries duri
 
 **Why:** Web searches are expensive (time/tokens). Comprehensive review at /sm ensures learnings preserved with full narrative context.
 
-**Purpose:** Self-education for both entity development and user support, scaled by intensity.
+**Purpose:** Self-education for both entity development and user support.

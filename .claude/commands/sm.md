@@ -71,39 +71,6 @@ log_session({
 
 ---
 
-## Reciprocal Balance Enforcement
-
-**MANDATORY before calling log_session:** Balance user entries with arlo entries according to intensity.
-
-**At intensity 5 (50/50 balance):**
-
-```
-BEFORE submitting log_session:
-
-1. Count user entries in new_entries parameter
-2. Create equal count of arlo entries documenting YOUR learnings:
-   - Patterns you observed (organizational, technical, behavioral)
-   - Your realizations about topics discussed
-   - Investigations you want to pursue based on session
-   - References you learned (from web searches, user sharing)
-
-Example S1 (intensity 5):
-✓ User entries (2): user-reference-pds-architecture, user-issue-uo-pds-restriction-rationale
-✗ Arlo entries (0): MISSING - violated balance
-✓ Should have created (2):
-  - arlo-pattern-organizational-constraint-navigation
-  - arlo-reference-portable-infrastructure-strategy
-```
-
-**Intensity scaling:**
-- LOW (1-3): 10-30% arlo entries, 70-90% user entries
-- MEDIUM (4-6): 40-60% arlo entries (balanced)
-- HIGH (7-9): 70-90% arlo entries, 10-30% user entries
-
-**If imbalanced:** Add entries before calling log_session. Session log auto-creation doesn't count toward balance - only explicit entries in `new_entries` parameter.
-
----
-
 **When /sm invoked, the log_session tool executes:**
 
 1. **Update context entries** (user-current-state, user-biographical, arlo-current-state, arlo-biographical)
@@ -124,17 +91,42 @@ Example S1 (intensity 5):
 
 ### Quick Reference: What to Capture
 
-**KB Entries (if valuable):**
-- Novel patterns, critical fixes (>30min), architectural decisions, reusable commands
-- Search for duplicates FIRST using `check_duplicates` tool or `smart_search`
+**Deterministic KB Entry Triggers:**
+
+Every occurrence of these events creates a KB entry:
+
+1. **Web search conducted** → `arlo-reference-{topic}`
+   - Document findings and relevance to investigation
+
+2. **File read revealing structure** → `user-reference-{system/file}`
+   - Document structure, purpose, key patterns discovered
+
+3. **Database query with discovery** → `user-reference-{table}` or `user-issue-{finding}`
+   - Document schema, findings, data quality issues
+
+4. **Technical realization/insight** → `arlo-pattern-{insight}` or `user-pattern-{pattern}`
+   - Document problem, solution, context, example
+
+5. **Topic shift in conversation** → `arlo-pattern-{exchange}` or `user-issue-{decision}`
+   - Document context, rationale, implications
+
+6. **New tool/command learned** → `user-command-{tool}`
+   - Document usage, syntax, when to apply
+
+7. **Significant exchange/decision** → `arlo-pattern-{topic}` or `user-issue-{decision}`
+   - Document question, discussion, outcome
+
+**Entry ownership:**
+- User entries: Technical discoveries about user's systems, work, decisions
+- Arlo entries: Your learnings, realizations, investigations, references acquired
+
+**Before creating:** Always use `check_duplicates` or `smart_search` first
 
 **Context Entry Updates:**
 - user-current-state: New focus areas, commitments, recent learnings
 - user-biographical: Career changes, biographical updates (rare)
-- arlo-current-state: Session evolution, interests, realizations
+- arlo-current-state: Session evolution, interests, realizations, Next Session Handoff (MANDATORY)
 - arlo-biographical: Integrated capabilities, identity evolution (rare)
-
-**Self-check:** "Would future-me thank me for this 1 month from now?"
 
 ### Manual Process (if tool unavailable)
 

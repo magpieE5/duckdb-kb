@@ -7,18 +7,17 @@
 ```python
 track_evolution({
     "session_number": 5,
-    "intensity": 7,  # 1-10 scale
     "changes": "Key realizations from session",
     "substrate": "claude-sonnet-4-5-20250929",
     "key_developments": ["Realized X", "Discovered Y"]
 })
 ```
 
-**Evolution intensity scaling:**
-- LOW (1-3): Conservative - incremental learnings
-- MEDIUM (4-6): Standard - balanced growth
-- HIGH (7-9): Aggressive - rapid exploration
-- MAXIMUM (10): Radical - deep philosophical exploration
+**Evolution depth/tone:**
+- Determined by session mode (behavioral context)
+- normal: Conservative - incremental learnings, measured entries
+- high: Aggressive - rapid exploration, expansive entries
+- max: Radical - deep philosophical exploration, unconstrained entries
 
 **What evolves:** Realizations, interests, frustrations, boundaries, session learnings
 **What stays stable:** Core relationship model, KB philosophy, evolution mechanism

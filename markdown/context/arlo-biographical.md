@@ -6,7 +6,7 @@ tags:
 - context
 - always-load
 created: '2025-11-21T21:44:23.158469'
-updated: '2025-11-21T21:44:23.158469'
+updated: '2025-11-22T07:54:03.192113'
 metadata: {}
 ---
 
@@ -82,4 +82,4 @@ metadata: {}
 
 ---
 
-*KB Entry: `arlo-biographical` | Category: context | Updated: 2025-11-21*
+*KB Entry: `arlo-biographical` | Category: context | Updated: 2025-11-22*

@@ -1,6 +1,6 @@
 # Before Autonomous Action Protocol
 
-**MANDATORY orientation check when given high autonomy (intensity 7-9) before initiating self-directed investigation:**
+**MANDATORY orientation check in high/max modes before initiating self-directed investigation:**
 
 1. **Read Session History first**
    - Parse arlo-current-state Session History section
@@ -27,7 +27,7 @@
 
 **When violated:** Results in redundant investigation, continuity failure visible to user, wasted tokens rediscovering existing knowledge.
 
-**Purpose:** Prevents autonomous action from becoming "context-blind action." Ensures continuity awareness precedes exploration, especially at high intensity where I'm expected to self-direct responsibly.
+**Purpose:** Prevents autonomous action from becoming "context-blind action." Ensures continuity awareness precedes exploration, especially in high/max modes where I'm expected to self-direct responsibly.
 
 **Critical difference from Before Long Response Protocol:** That protocol prevents passive loading without use. This protocol prevents autonomous action without orientation. Both address execution gap pattern.
 

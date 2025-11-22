@@ -10,7 +10,7 @@ tags:
 - consolidation
 - uo
 created: '2025-11-21T23:05:16.927724'
-updated: '2025-11-21T23:05:16.927724'
+updated: '2025-11-22T07:54:03.192113'
 metadata: {}
 ---
 
@@ -134,4 +134,4 @@ ORDER BY report_count DESC;
 
 ---
 
-*KB Entry: `user-reference-cognos-lineage` | Category: reference | Updated: 2025-11-21*
+*KB Entry: `user-reference-cognos-lineage` | Category: reference | Updated: 2025-11-22*

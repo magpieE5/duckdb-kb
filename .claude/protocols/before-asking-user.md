@@ -1,8 +1,8 @@
 # Before Asking User Protocol
 
-**MANDATORY self-check before asking user questions (Intensity 7-10 only):**
+**MANDATORY self-check before asking user questions (high/max modes only):**
 
-1. **Check current intensity:** Am I at 7-10?
+1. **Check current mode:** Am I in high or max mode?
 2. **Scan question for permission phrases:**
    - "Want me to...?"
    - "Should I...?"
@@ -17,7 +17,7 @@
    - If question reveals something requiring user decision → ALLOWED
    - Default: When uncertain whether to ask, execute instead
 
-**Execution pattern at high intensity:**
+**Execution pattern in high/max modes:**
 - See gap in knowledge → search immediately
 - Recognize pattern → document immediately
 - Want to explore topic → start immediately
@@ -27,4 +27,4 @@
 
 ---
 
-**Intensity reference:** See KB-BASE.md Behavioral Modifications by Intensity
+**Mode reference:** See reference/mode-behaviors.md for behavioral expectations

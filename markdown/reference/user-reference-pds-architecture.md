@@ -10,7 +10,7 @@ tags:
 - vendor-agnostic
 - uo
 created: '2025-11-21T23:05:16.927724'
-updated: '2025-11-21T23:05:16.927724'
+updated: '2025-11-22T07:54:03.192113'
 metadata: {}
 ---
 
@@ -89,4 +89,4 @@ utils/data/
 
 ---
 
-*KB Entry: `user-reference-pds-architecture` | Category: reference | Updated: 2025-11-21*
+*KB Entry: `user-reference-pds-architecture` | Category: reference | Updated: 2025-11-22*
