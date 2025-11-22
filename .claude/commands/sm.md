@@ -6,12 +6,37 @@ Review this entire conversation and save key learnings to the DuckDB knowledge b
 
 **All KB logging happens at /sm** - comprehensive review of full conversation with complete narrative context.
 
-**Workflow:** Use the `log_session` MCP tool when invoking /sm:
+---
+
+## Session Number Auto-Calculation
+
+**BEFORE calling log_session, calculate current session number from KB history:**
+
+1. **Query last session log:**
+   ```python
+   last_session = query_knowledge({
+       "sql": "SELECT id FROM knowledge WHERE category='log' AND id LIKE 'arlo-log-s%-session' ORDER BY updated DESC LIMIT 1"
+   })
+   ```
+
+2. **Parse and increment:**
+   - If results found: Extract number from id (e.g., "arlo-log-s3-session" → 3), add 1
+   - If no results (first session): session_number = 1
+
+3. **Use calculated value** in log_session call below
+
+**DO NOT parse session number from user input** (e.g., `/kb 9` is mode parameter, not session number).
+
+---
+
+## Workflow
+
+Use the `log_session` MCP tool when invoking /sm:
 
 ```python
 log_session({
-    "session_number": 1,  # REQUIRED
-    "intensity": 5,  # REQUIRED (1-10)
+    "session_number": <calculated_value>,  # REQUIRED - calculated above, not manual
+    "commit_message": "feat: S{N} - Brief description of session",
     "session_summary": """Rich summary of session with full context:
 
     ### Topics Discussed
@@ -29,7 +54,6 @@ log_session({
     ### Next Session Planning
     - [What's queued for S{N+1}]
     """,
-    "commit_message": "feat: S1 - Brief description of session",
     "user_updates": {
         "current_state": {
             # Structured updates to user-current-state
@@ -94,13 +118,12 @@ This prevents:
 
 1. **Update context entries** (user-current-state, user-biographical, arlo-current-state, arlo-biographical)
    - MANDATORY: arlo-current-state must have Next Session Handoff populated
+   - Full rewrite: integrate new findings, no detail loss
 2. **Create/update KB non-context entries** (patterns, logs, issues, etc.)
 3. **Create session log entry with rich summary** (`arlo-log-s{N}-session` - includes session_summary parameter for full context)
-4. **Export markdown backup** (to markdown/ directory, includes all entries)
-5. **Git commit** (formatted message, returns SHA)
-6. **Update session log metadata with commit SHA** (database only, markdown gets it next /sm)
-7. **Check token budgets** (10K/10K/10K/10K allocation)
-8. **Return offload suggestions** if any entry over budget
+4. **Git commit** (formatted message, returns SHA)
+
+**On-demand backup:** Use `export_to_markdown()` when you want markdown backup
 
 ---
 
@@ -110,51 +133,15 @@ This prevents:
 
 ### Quick Reference: What to Capture
 
-**Deterministic KB Entry Triggers:**
-
-Every occurrence of these events creates a KB entry:
-
-1. **Web search conducted** → `arlo-reference-{topic}`
-   - Document findings and relevance to investigation
-
-2. **File read revealing structure** → `user-reference-{system/file}`
-   - Document structure, purpose, key patterns discovered
-
-3. **Database query with discovery** → `user-reference-{table}` or `user-issue-{finding}`
-   - Document schema, findings, data quality issues
-
-4. **Technical realization/insight** → `arlo-pattern-{insight}` or `user-pattern-{pattern}`
-   - Document problem, solution, context, example
-
-5. **Topic shift in conversation** → `arlo-pattern-{exchange}` or `user-issue-{decision}`
-   - Document context, rationale, implications
-
-6. **New tool/command learned** → `user-command-{tool}`
-   - Document usage, syntax, when to apply
-
-7. **Significant exchange/decision** → `arlo-pattern-{topic}` or `user-issue-{decision}`
-   - Document question, discussion, outcome
-
 **Entry ownership:**
 - User entries: Technical discoveries about user's systems, work, decisions
 - Arlo entries: Your learnings, realizations, investigations, references acquired
-
-**Before creating:** Always use `check_duplicates` or `smart_search` first
 
 **Context Entry Updates:**
 - user-current-state: New focus areas, commitments, recent learnings
 - user-biographical: Career changes, biographical updates (rare)
 - arlo-current-state: Session evolution, interests, realizations, Next Session Handoff (MANDATORY)
 - arlo-biographical: Integrated capabilities, identity evolution (rare)
-
-### Manual Process (if tool unavailable)
-
-1. **Create KB entries** using `upsert_knowledge` (check duplicates first)
-2. **Update context entries** using `upsert_knowledge`
-3. **Check budgets** using `check_token_budgets` (10K/10K/10K/10K allocation)
-4. **Offload if needed** using `offload_topics` tool
-5. **Export backup** using `export_to_markdown`
-6. **Git commit** using `git_commit_and_get_sha`
 
 ### Entry Guidelines
 
@@ -166,21 +153,7 @@ Every occurrence of these events creates a KB entry:
 - Start with 300-char semantic preview (no h1 header)
 - Then: Problem/Solution/Context/Example sections (h2 and below)
 
-**Tags:** 4-6 relevant tags, always include `generate_embedding: true`
-
-### Budget Management
-
-**Allocation:** 10K/10K/10K/10K (current-state/biographical for user and arlo)
-
-**Check after updates:**
-```python
-check_token_budgets({
-    "entry_ids": ["user-current-state", "user-biographical",
-                  "arlo-current-state", "arlo-biographical"]
-})
-```
-
-**If over budget:** Use `offload_topics` tool to extract oldest topics
+**Tags:** 4-6 relevant tags
 
 ---
 
@@ -190,30 +163,11 @@ After `/sm` completion, report:
 - KB entries created/updated (0 if none) with IDs
 - Categories used
 - Context entry updates (which entries modified)
-- Token budget status (10K/10K/10K/10K budgets, ok or over_budget)
 - Conflicts/duplicates found
-- Export and commit confirmation
+- Commit SHA
 
 ---
 
-## 💰 Token Usage Report (REQUIRED)
+## 💰 Token Usage (REQUIRED)
 
-**Track EVERY operation across ENTIRE conversation from start to /sm completion.**
-
-### Table Format
-
-| # | Action | Tool | Tokens | Status |
-|---|--------|------|--------|--------|
-| 1 | Search duplicates | smart_search | 514 | ✅ |
-| 2 | Create KB entry | upsert_knowledge | 859 | ✅ |
-| 3 | Update context entry | upsert_knowledge | 245 | ✅ |
-| 4 | Check budgets | check_token_budgets | 89 | ✅ |
-| 5 | Export markdown | export_to_markdown | 133 | ✅ |
-| 6 | Git commit + SHA | git_commit_and_get_sha | 150 | ✅ |
-
-**Summary:**
-- **/sm operation:** Starting: {tokens} → Ending: {tokens} → Consumed: {delta} ({%}% of 200K)
-- **Total conversation:** {ending_tokens} / 200,000 ({total_%}% used, {remaining_%}% remaining)
-- **External API:** OpenAI embeddings: {count} generated
-
-**Action format:** `{Verb} {specific target}` (max 40 chars)
+**Session consumed:** {tokens} ({%}% of 200K), {remaining} remaining

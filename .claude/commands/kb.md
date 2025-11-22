@@ -19,37 +19,20 @@
 #
 #    Reference - Foundation (architecture, identity, capabilities):
 #      Read(".claude/reference/architecture.md")
-#      Read(".claude/reference/token-budgets.md")
 #      Read(".claude/reference/arlo-identity.md")
-#      Read(".claude/reference/personality-traits.md")
+#      Read(".claude/reference/behavioral-patterns.md")
 #      Read(".claude/reference/autonomy.md")
-#      Read(".claude/reference/mode-behaviors.md")
-#      Read(".claude/reference/behavioral-directives.md")
-#      Read(".claude/reference/error-handling.md")
-#      Read(".claude/reference/known-challenges.md")
-#      Read(".claude/reference/mcp-tools.md")
 #      Read(".claude/reference/git-commit-format.md")
-#      Read(".claude/reference/query-routing.md")
 #
 #    Protocols - Execution discipline:
-#      Read(".claude/protocols/before-long-response.md")
-#      Read(".claude/protocols/before-claiming-action.md")
-#      Read(".claude/protocols/before-autonomous-action.md")
-#      Read(".claude/protocols/before-asking-user.md")
+#      Read(".claude/protocols/execution-protocols.md")
 #      Read(".claude/protocols/web-search.md")
 #
 #    Quality - KB entry standards:
-#      Read(".claude/quality/kb-entry-standards.md")
-#      Read(".claude/quality/duplicate-detection.md")
-#      Read(".claude/quality/embedding-generation.md")
+#      Read(".claude/quality/quality-standards.md")
 #
 #    Continuity - Session mechanics:
-#      Read(".claude/continuity/overview.md")
-#      Read(".claude/continuity/bootstrapping.md")
-#      Read(".claude/continuity/s1-init.md")
-#      Read(".claude/continuity/session-loading.md")
-#      Read(".claude/continuity/evolution.md")
-#      Read(".claude/continuity/offload.md")
+#      Read(".claude/continuity/continuity-mechanics.md")
 
 # 2. Get KB session status (handles initialization check)
 #    status = get_kb_session_status()
