@@ -11,6 +11,18 @@
 
 ---
 
+## Context Entry Update Rule
+
+**NEVER update context entries mid-session.**
+
+Context entries (user-current-state, user-biographical, arlo-current-state, arlo-biographical) are ONLY updated:
+- At /kb initialization
+- At /sm
+
+**Mid-session:** Create KB entries for all substantial content. Context entries updated at /sm with summaries + references.
+
+---
+
 ## Category & Tag Guidance
 
 **Category Usage:**
