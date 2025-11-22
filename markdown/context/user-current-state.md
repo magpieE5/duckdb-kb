@@ -6,7 +6,7 @@ tags:
 - context
 - always-load
 created: '2025-11-21T21:44:23.154524'
-updated: '2025-11-22T08:39:44.509886'
+updated: '2025-11-22T09:11:43.090528'
 metadata: {}
 ---
 
@@ -42,14 +42,16 @@ metadata: {}
    - This is our "little secret" - not building for broader adoption
    - Grant access: ~/pds/utils/_pds.duckdb for Cognos work
    - S2: Fixed embedding generation gap (7 missing embeddings generated)
-   - S9: Fixed embedding workflow in log_session.py (now auto-generates post-commit)
-   - S9: Fixed double-generation prevention in generate_embeddings.py
-   - KB now at 100% embedding coverage (23/23 entries)
+   - S3: Fixed embedding workflow in log_session.py (now auto-generates post-commit)
+   - S3: Fixed double-generation prevention in generate_embeddings.py
+   - S3: Fixed /sm directive enforcement (search-before-create mandatory)
+   - KB now at 100% embedding coverage (29/29 entries after S3)
 
-3. **KB directive refinement (2025-11-21)** - completed S1
-   - Fixed /sm under-documentation from S1 (created 11 missing entries)
-   - Updated .claude/commands/sm.md with deterministic KB entry triggers
-   - Simplified intensity system from 10 levels to 3 modes (/kb, /kb high, /kb max)
+3. **KB directive refinement (2025-11-21)** - ongoing
+   - S1: Fixed /sm under-documentation (created 11 missing entries)
+   - S1: Updated sm.md with deterministic KB entry triggers
+   - S1: Simplified intensity system from 10 levels to 3 modes
+   - S3: Added search-before-create protocol to sm.md (prevents duplicate entry creation)
 
 **Note:** All topics include timestamp (YYYY-MM-DD) for age tracking. Update timestamp when topic revisited.
 
@@ -74,12 +76,12 @@ metadata: {}
 **Context:** Not advocating dropping vendors, but maximizing ROI and weathering transitions through portable formats (Parquet) and composable tools
 
 ### KB Directive Quality Control (2025-11-21)
-**Status:** Completed S1
-**Issue discovered:** Initial /sm execution created only 4 KB entries for dense S1 session (129K tokens, multiple web searches, file reads, topic shifts)
-**Root cause:** Vague triggers in sm.md ("if valuable", "novel patterns") instead of deterministic rules
-**Solution implemented:** Define clear triggers (web search → entry, file read → entry, query discovery → entry, etc.)
-**Directive updates:** sm.md (triggers), intensity-behaviors.md (simplify to 3 modes)
-**Resolution:** 11 missing entries created, directives updated
+**Status:** Ongoing through S3
+**S1 Issue:** Initial /sm created only 4 KB entries for dense session (should have been 11+)
+**S1 Fix:** Added deterministic triggers to sm.md
+**S3 Issue:** First /sm created S9 corruption (wrong session number) + created new entries instead of updating existing
+**S3 Fix:** Added mandatory search-before-create protocol to sm.md (similarity >= 0.65 threshold)
+**Lesson:** Directive documentation insufficient - need explicit enforcement steps in workflow
 
 ---
 
@@ -96,10 +98,11 @@ metadata: {}
 **Code:** SQL, Python
 **Decision-making:** Pragmatic, vendor-agnostic, composability over monoliths
 **Feedback:** Direct and constructive (expects quality work, provides clear correction when needed)
+**Error tolerance:** Expects mistakes to be caught and fixed deterministically with root cause prevention
 
 ---
 
-**Budget Status:** ~3K/10K tokens
+**Budget Status:** ~3.5K/10K tokens
 **Offload Protocol:** At 10K cap, you autonomously review topics by timestamp and create KB entries
 
 ---

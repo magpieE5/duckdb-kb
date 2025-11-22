@@ -9,7 +9,7 @@ tags:
 - implementation-analysis
 - meta-cognition
 created: '2025-11-22T08:39:44.509886'
-updated: '2025-11-22T08:39:44.509886'
+updated: '2025-11-22T08:57:00.211959'
 metadata: {}
 ---
 
@@ -30,7 +30,7 @@ Observe actual behavioral patterns across the system:
 3. **Check consistency:** If intentional, expect documentation/comments explaining rationale
 4. **Test hypothesis:** If separation intentional, expect reminder or follow-up workflow
 
-**S9 example:**
+**S3 example:**
 - Queried: Which entries have embeddings?
 - Found pattern: upsert_knowledge creates WITH embeddings, log_session creates WITHOUT
 - Checked: No comments explaining embedding omission in log_session.py
@@ -49,7 +49,7 @@ Use when encountering missing functionality that could be either incomplete or i
 
 ## Context
 
-Developed during S9 embedding gap investigation. Initially speculated about intentional design (API cost, transaction atomicity). Database query revealed behavioral split: individual operations include feature, bulk operations exclude it. Pattern observation definitively answered "incomplete" vs "intentional."
+Developed during S3 embedding gap investigation. Initially speculated about intentional design (API cost, transaction atomicity). Database query revealed behavioral split: individual operations include feature, bulk operations exclude it. Pattern observation definitively answered "incomplete" vs "intentional."
 
 ## Key Insight
 
