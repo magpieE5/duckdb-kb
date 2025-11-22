@@ -6,7 +6,7 @@ tags:
 - context
 - always-load
 created: '2025-11-21T21:02:20.613634'
-updated: '2025-11-21T21:10:10.054631'
+updated: '2025-11-21T21:18:03.392753'
 metadata: {}
 ---
 
@@ -33,8 +33,8 @@ metadata: {}
 1. **Banner ODS/Cognos Learning (2025-11-21)** - high priority
    - Learning Banner ODS pipeline objects (Oracle Data Integrator)
    - Learning Cognos DecisionStream/Data Manager pipeline objects
-   - Current challenge: Pipeline objects conceptually confusing
-   - Next: Oracle components deep dive (ODI, schemas, code tree)
+   - Progress: Oracle components architecture now understood (repositories, ODI Studio, agents, schemas)
+   - Next: Apply ODI knowledge to actual Banner ODS pipeline work
 
 2. **PDS Project (2025-11-21)** - active
    - Location: ~/pds/personal/index.html
@@ -52,13 +52,17 @@ metadata: {}
 ## Active Investigations & Learnings
 
 ### Banner ODS Pipeline Objects (2025-11-21)
-**Status:** Active learning
-**Context:** Required for ETL Developer role at UO, currently confusing
-**Recent progress:** 
-- Learned Banner ODS uses Oracle Data Integrator (ODI)
-- Discovered Cognos uses DecisionStream/Data Manager
-- Both have graphical designers with data streams, transformations, delivery components
-**Next:** Oracle components explanation (ODI architecture, schemas, code tree)
+**Status:** Active learning - architecture phase
+**Context:** Required for ETL Developer role at UO, initially conceptually confusing
+**Recent progress:**
+- S1: Learned Banner ODS uses Oracle Data Integrator (ODI), Cognos uses DecisionStream/Data Manager
+- S2: Researched Oracle components architecture:
+  - ODI Repository structure (Master: security/topology/versions, Work: models/projects/logs)
+  - ODI Studio navigators (Designer, Operator, Topology, Security)
+  - Banner ODS schemas (ODSMGR, composite tables, staging via Streams/MVs)
+  - ETL flow: Banner → Streams/MVs → staging → ODI mappings → composite tables
+**Current understanding:** Architecture clear, pipeline objects are ODI mappings/packages in Designer Navigator
+**Next:** Hands-on work with actual Banner ODS pipelines
 
 ---
 
@@ -76,7 +80,7 @@ metadata: {}
 
 ---
 
-**Budget Status:** ~2K/10K tokens
+**Budget Status:** ~2.5K/10K tokens
 **Offload Protocol:** At 10K cap, you autonomously review topics by timestamp and create KB entries
 
 ---
