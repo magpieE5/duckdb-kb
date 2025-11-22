@@ -122,8 +122,7 @@ This prevents:
 2. **Create/update KB non-context entries** (patterns, logs, issues, etc.)
 3. **Create session log entry with rich summary** (`arlo-log-s{N}-session` - includes session_summary parameter for full context)
 4. **Git commit** (formatted message, returns SHA)
-
-**On-demand backup:** Use `export_to_markdown()` when you want markdown backup
+5.**Export to Markdown** Use `export_to_markdown()` 
 
 ---
 
