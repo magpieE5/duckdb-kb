@@ -71,6 +71,25 @@ log_session({
 
 ---
 
+**BEFORE composing new_entries array:**
+
+For each topic/investigation from session:
+
+1. **Search for existing entries:** `smart_search(query="{topic}", limit=3)`
+2. **Check similarity:**
+   - If similarity >= 0.65: **UPDATE** existing entry with new findings
+   - If similarity < 0.65: **CREATE** new entry
+3. **Document:** "Searched {N} topics → Updated {X} entries, Created {Y} new"
+
+**NO new entries without search-first check.**
+
+This prevents:
+- Creating duplicates when entries already exist
+- Missing resolution opportunities (issue entries waiting for fixes)
+- Fragmentation (multiple entries for same topic)
+
+---
+
 **When /sm invoked, the log_session tool executes:**
 
 1. **Update context entries** (user-current-state, user-biographical, arlo-current-state, arlo-biographical)

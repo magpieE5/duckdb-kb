@@ -54,7 +54,10 @@ async def execute(con, args: dict) -> List[TextContent]:
 
     # Find entries needing embeddings
     if ids:
-        where = f"id IN ({','.join(['?'] * len(ids))})"
+        if regenerate:
+            where = f"id IN ({','.join(['?'] * len(ids))})"
+        else:
+            where = f"id IN ({','.join(['?'] * len(ids))}) AND embedding IS NULL"
         params = ids
     elif regenerate:
         where = "1=1"

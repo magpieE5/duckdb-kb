@@ -6,7 +6,7 @@ tags:
 - context
 - always-load
 created: '2025-11-21T21:44:23.154524'
-updated: '2025-11-22T07:59:23.340240'
+updated: '2025-11-22T08:39:44.509886'
 metadata: {}
 ---
 
@@ -42,7 +42,9 @@ metadata: {}
    - This is our "little secret" - not building for broader adoption
    - Grant access: ~/pds/utils/_pds.duckdb for Cognos work
    - S2: Fixed embedding generation gap (7 missing embeddings generated)
-   - KB now at 100% embedding coverage (20/20 entries)
+   - S9: Fixed embedding workflow in log_session.py (now auto-generates post-commit)
+   - S9: Fixed double-generation prevention in generate_embeddings.py
+   - KB now at 100% embedding coverage (23/23 entries)
 
 3. **KB directive refinement (2025-11-21)** - completed S1
    - Fixed /sm under-documentation from S1 (created 11 missing entries)

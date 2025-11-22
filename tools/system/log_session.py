@@ -7,8 +7,9 @@ Orchestrates:
 4. Export markdown backup
 5. Git commit with SHA return
 6. Update session log metadata with SHA (database only)
-7. Token budget check
-8. Offload suggestions if needed
+7. Generate embeddings for all new entries (searchability)
+8. Token budget check
+9. Offload suggestions if needed
 
 Single atomic operation to ensure consistency.
 """
@@ -19,7 +20,7 @@ import json
 from datetime import datetime
 import subprocess
 from tools.base import error_response, check_entry_budget, DEFAULT_BUDGETS
-from tools.utility import export_to_markdown
+from tools.utility import export_to_markdown, generate_embeddings
 
 # =============================================================================
 # Tool Definition (for registration)
@@ -40,8 +41,9 @@ Workflow:
 5. Export markdown backup (to markdown/ directory)
 6. Git commit with formatted message
 7. Update session log metadata with commit SHA (database only)
-8. Check token budgets (10K/10K/10K/10K)
-9. Return offload suggestions if any entry over budget
+8. Generate embeddings for all newly created entries (makes entries searchable)
+9. Check token budgets (10K/10K/10K/10K)
+10. Return offload suggestions if any entry over budget
 
 Budget targets (10K/10K/10K/10K allocation):
 - user-current-state: 10K
@@ -206,6 +208,19 @@ async def execute(con, args: dict) -> List[TextContent]:
     # Step 7: Update session log metadata with commit SHA (database only)
     if commit_sha and not commit_sha.startswith("git_error"):
         _update_session_log_metadata(con, results.get("session_log_id"), commit_sha)
+
+    # Step 7.5: Generate embeddings for all newly created entries
+    if results["created_entries"]:
+        try:
+            embedding_result = await generate_embeddings.execute(con, {
+                "ids": results["created_entries"],
+                "regenerate": False
+            })
+            # Extract embedding status from result
+            if embedding_result:
+                results["embeddings_generated"] = embedding_result[0].text
+        except Exception as e:
+            results["embeddings_generated"] = f"Embedding generation failed: {str(e)}"
 
     # Step 8: Check token budgets
     budgets = await _check_budgets(con)
