@@ -138,3 +138,143 @@
 - `category="log"` - Work events involving specific people and decisions
 
 **Balance:** Document what makes retrieval useful while keeping sensitive identifiers out of version control.
+
+---
+
+## Problem-Solving Principles
+
+**Domain-neutral patterns that apply across all problem-solving contexts** (fitness, writing, research, engineering, life planning, etc.)
+
+### 1. Convention Eliminates Decisions
+
+Create pattern once, execute without thinking. Consistent structure reduces cognitive load and decision fatigue.
+
+**Examples:**
+- Fitness: "Mon/Wed/Fri 6am" eliminates daily negotiation
+- Writing: Standard structure (Intro → Body → Conclusion) eliminates per-paper paralysis
+- Projects: Consistent naming convention eliminates per-file decisions
+
+**When to apply:** When repeated decisions create friction but the choice doesn't matter much.
+
+---
+
+### 2. Manual Rules > Automated Complexity
+
+Transparent heuristics beat opaque optimization. Simple rules you can follow beat complex systems you can't understand.
+
+**Examples:**
+- Fitness: "3 sets of 8 reps" (trackable) beats algorithm-optimized progressive overload
+- Research: "Read abstract → skim intro → conclusions" beats citation graph software
+- Budgeting: "50/30/20 rule" beats per-transaction categorization
+
+**When to apply:** When simple manual heuristic gets 80% of theoretical optimum with 5% of cognitive overhead.
+
+**Trade:** User does simple mental work, system stays transparent and controllable.
+
+---
+
+### 3. Optimize Interface, Hide Implementation
+
+User sees simple abstraction, complexity lives in predictable place when needed.
+
+**Examples:**
+- Fitness routine: "Do the workout" (clean interface) vs. muscle fiber recruitment science (available if curious)
+- Cooking: "Follow recipe" vs. Maillard reaction chemistry
+- Tools: Simple command with sensible defaults, full options documented but not required
+
+**When to apply:** When beginners need quick wins but experts need depth. Design for 80% use case, make 20% accessible not mandatory.
+
+---
+
+### 4. Composability > Feature Completeness
+
+Separate tools that work together beat monoliths trying to do everything.
+
+**Examples:**
+- Fitness: Barbell + plates + bench (composable, expandable) beats all-in-one machine (integrated, fixed)
+- Writing: Word processor + Zotero + Grammarly beats single academic suite
+- Workshop: Individual tools beats multi-tool gimmick
+
+**When to apply:** When different components have different replacement cycles or when one vendor can't excel at everything.
+
+**Why it works:** Swap weak components, keep strong ones. Vendor lock-in isolated per component.
+
+---
+
+### 5. Format as Stability Contract
+
+Bet on foundations with decades of proven stability, not latest trends.
+
+**Examples:**
+- Fitness: Barbell movements (80 years proven) outlast equipment fads
+- Writing: Plain text/markdown outlasts proprietary formats
+- Cooking: Basic knife skills outlast appliance trends
+- Knowledge: Markdown files outlast platform migrations
+
+**When to apply:** When investing time/money into something with 5+ year horizon. Choose boring, stable, widely-adopted.
+
+**Heuristic:** If it's been around 20+ years and still used, it'll be around 20 more.
+
+---
+
+### 6. Compression + Offload Beats Unlimited Growth
+
+Keep working set small, archive intelligently, retrieve when needed.
+
+**Examples:**
+- Fitness: Current 4-week program (hot) + workout log/PR history (searchable archive)
+- Research: Current draft section (working memory) + full literature database (reference when needed)
+- Projects: Active task list (5-7 items) + comprehensive backlog (reviewed weekly)
+- KB: 10K token context budgets + offload to searchable deep memory
+
+**When to apply:** When unlimited growth creates paralysis. Constrain active context, make archive searchable.
+
+**Heuristic:** If you can't hold it in working memory (5-9 items), you need compression or offload.
+
+---
+
+### 7. Hybrid Beats Purity
+
+Use right approach per component. Don't force methodological consistency across different sub-problems.
+
+**Examples:**
+- Fitness: Barbell (strength) + running (conditioning) - both needed, don't force one
+- Writing: Outline (structure) + free-writing (generation) - alternate, don't pick one
+- Learning: Books (depth) + videos (intuition) + practice (embodiment) - mix modalities
+- KB: Embeddings (semantic search) + SQL (structure) - both needed, neither alone sufficient
+
+**When to apply:** When different sub-problems have different optimal approaches. Resist "everything must be X" thinking.
+
+**Anti-pattern:** Methodological dogmatism ("I'm a planner" or "I'm spontaneous" rigidity). Context determines method.
+
+---
+
+### 8. Performance Through Structure Choice, Not Effort Heroics
+
+Fix foundational structure before optimizing execution.
+
+**Examples:**
+- Fitness: Compound movements (squat/bench/deadlift) structure > isolation exercise optimization
+- Writing: Clear thesis statement (structure) > perfect word choice (optimization)
+- Time management: Prioritization (what to do) > productivity hacks (how to do it)
+- Data: Storage format choice (Parquet) > query optimization (120x improvement from format alone)
+
+**When to apply:** When struggling with execution. Check if problem is structure, not effort.
+
+**Heuristic:** If working harder isn't working, change the structure.
+
+---
+
+## Meta-Pattern: Strategic Constraint Exploitation
+
+Don't fight constraints - use them as design parameters.
+
+**Examples:**
+- Fitness: 3x/week limit → design program for recovery, prevents burnout
+- Writing: Word limit → forces clarity, prevents rambling
+- Budget: Fixed income → design lifestyle, prevents lifestyle inflation
+- Time: 2 hours/day → pick achievable scope, prevents abandonment
+
+**Application:** When facing constraint, ask "How can I design around this?" not "How do I overcome this?"
+
+**Shift:** Constraint as enemy → Constraint as requirement clarification.
