@@ -67,29 +67,29 @@ Budget targets (10K/10K/10K/10K allocation):
             },
             "user_updates": {
                 "type": "object",
-                "description": "Updates to user context entries",
+                "description": "Updates to user context entries. Each update MUST contain 'full_content' key with complete markdown.",
                 "properties": {
                     "current_state": {
                         "type": "object",
-                        "description": "user-current-state updates (focus, commitments, investigations)"
+                        "description": "user-current-state full replacement: {'full_content': '# USER - Current State\\n...'}"
                     },
                     "biographical": {
                         "type": "object",
-                        "description": "user-biographical updates (career, life context) - optional"
+                        "description": "user-biographical full replacement (optional): {'full_content': '# USER-BIO...\\n...'}"
                     }
                 }
             },
             "arlo_updates": {
                 "type": "object",
-                "description": "Updates to arlo context entries",
+                "description": "Updates to arlo context entries. Each update MUST contain 'full_content' key with complete markdown.",
                 "properties": {
                     "current_state": {
                         "type": "object",
-                        "description": "arlo-current-state updates (interests, realizations, session history)"
+                        "description": "arlo-current-state full replacement: {'full_content': '# ARLO - Current State\\n...'} - MUST include Next Session Handoff section"
                     },
                     "biographical": {
                         "type": "object",
-                        "description": "arlo-biographical updates (identity, capabilities) - optional"
+                        "description": "arlo-biographical full replacement (optional): {'full_content': '# ARLO-BIO...\\n...'}"
                     }
                 }
             },
@@ -234,31 +234,23 @@ async def execute(con, args: dict) -> List[TextContent]:
 
 
 async def _update_context_entry(con, entry_id: str, updates: Dict[str, Any]):
-    """Update a context entry with new content
+    """Update a context entry with complete replacement content
+
+    REQUIRES: updates must contain 'full_content' key with complete markdown
 
     For arlo-current-state, validates that Next Session Handoff is populated.
     """
 
-    # Fetch current entry
-    row = con.execute(
-        "SELECT content FROM knowledge WHERE id = ?",
-        [entry_id]
-    ).fetchone()
+    # Require full_content key
+    if "full_content" not in updates:
+        raise ValueError(f"Missing 'full_content' key in updates for {entry_id}. Must provide complete markdown content.")
 
-    if not row:
-        raise ValueError(f"Context entry not found: {entry_id}")
-
-    # Get new content (expects full_content key)
-    new_content = updates.get("full_content")
-    if not new_content:
-        # If no full_content, keep current
-        return
+    new_content = updates["full_content"]
 
     # Validation for arlo-current-state
     if entry_id == "arlo-current-state":
         if "## Next Session Handoff" not in new_content:
             raise ValueError("arlo-current-state update missing '## Next Session Handoff' section")
-        # Could add more validation for required subsections
 
     # Update entry
     con.execute("""
