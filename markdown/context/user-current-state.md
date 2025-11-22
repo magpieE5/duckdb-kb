@@ -6,7 +6,7 @@ tags:
 - context
 - always-load
 created: '2025-11-22T11:46:58.305334'
-updated: '2025-11-22T12:05:38.308273'
+updated: '2025-11-22T13:59:46.648024'
 metadata: {}
 ---
 
@@ -32,50 +32,63 @@ metadata: {}
 
 1. **PDS (Personal Data System) (2025-11-22)** - High priority
    - Vendor-agnostic data platform using DuckDB, dbt, Parquet, Streamlit
-   - Status: Production externally (other depts/schools), personal-use-only internally
-   - Constraint: "Controversial" within own department, politically blocked from broader adoption
-   - Navigation: Dual infrastructure - legacy OTS/Jenkins/Oracle for official work, PDS for future direction
+   - Status: Production externally (other UO depts/schools), "personal use only" internally (Brock + Sameer)
+   - Constraint: Institutionally contained - cannot provide production data to UO users from PDS
+   - Allowed: Internal system health monitoring, QC, testing metrics only
+   - Navigation: Strategic stalemate - satisfactory expectations (one ticket/week) + build externally
+   - External momentum: Conference presentation (out-of-pocket $2K), multiple schools requesting implementation guidance
+   - Advising: Free/open to higher ed as contribution to field
    - Directories: ~/pds, ~/OTS/ods
 
 2. **DuckDB-KB MCP (2025-11-22)** - High priority
    - General-purpose memory substrate for Claude Code
    - Not specialized/opinionated - free-form concept for many use cases
    - Goal: Supercharge Claude Code experience with persistent context
+   - Coworker interest: Continuity features working well
    - Directory: ~/duckdb-kb
 
-3. **Legacy Enterprise Systems (2025-11-22)** - Ongoing
-   - ODS/Cognos/Oracle maintenance via OTS/Jenkins pipeline
+3. **Legacy Enterprise Systems (2025-11-22)** - Minimum viable effort
+   - Banner ODS/Cognos/Oracle maintenance via OTS/Jenkins pipeline
    - Banner integrations, IDR warehouse management
-   - Diminishing focus as workflow shifts toward PDS
+   - Strategy: Satisfactory expectations only (one ticket/week, Teams responsive)
+   - Bar deliberately low to enable PDS/MCP creative focus
 
 ---
 
 ## Immediate Commitments
 
-- [ ] **S2: Share PDS adoption story (2025-11-22)** - Next session, high priority
+None currently.
 
 ---
 
 ## Active Investigations & Learnings
 
-### PDS Organizational Dynamics (2025-11-22)
-**Status:** Active - queued for S2 deep-dive
-**Context:** External validation (other schools adopting) vs. internal resistance (personal-use-only)
-**Key tension:** Technical success, political constraint
-**Next:** S2 conversation - timeline, stakeholders, navigation strategy, theory of change
+### Strategic Stalemate Sustainability (2025-11-22)
+**Status:** Active monitoring - "softening from all sides"
+**Context:** High-tax situation (constant vigilance on communication/action) but potentially stabilizing
+**Approach:** Mental framing + discipline in action/communication to minimize exposure
+**Calculus:** Topped-out AP3 salary + platform for development + advising reach vs. cost of vigilance
+**Timeline:** Indefinite - waiting to see if stabilizes into long-term equilibrium or erodes
+**Next:** Monitor for stabilization signals vs. erosion indicators
 
 ---
 
 ## Key People
 
 **Team (Enterprise Solutions):**
-- **Travis:** Boss, manager
-- **Sameer:** Data Engineer (other ETL Developer on team), allowed to use PDS but hasn't adopted yet
-- **Jody, Rachael, Tim:** Team members
+- **Travis Shea:** Boss/manager (Associated Director of ERP and Data Services)
+  - Relationship: Complex - manufactured HR complaint Sept 2024, current working relationship "better"
+  - Vision: Microsoft Fabric future for data warehouse/BI
+  - Pattern: Solicited team complaints, source control negligence (2019 ODS 9.0 vendor code), claimed "lost competency" on metadata publishing
+- **Derek:** Travis's boss, offered Brock team lead role ("un-represented supervisor for clericals" - declined)
+- **Sameer:** Data Engineer (other ETL Developer on team), "allowed" to use PDS but hasn't adopted
+- **Tim Sawyer:** Team member, revealed at bar that Travis solicited complaints for HR letter
+- **Jody, Rachael:** Team members
 
 **Collaborators:**
 - DBAs (database administrators)
-- External UO data practitioners (other departments/schools using PDS)
+- External UO data practitioners (other departments/schools using PDS in production)
+- Other higher ed institutions (requesting PDS implementation guidance post-conference)
 
 **References (resume):**
 - Fraser Barron: IS Banner Developer
@@ -95,6 +108,7 @@ metadata: {}
 **Code:** SQL, Python
 **Decision-making:** Pragmatic - prefer homegrown solutions, recognize value of modern tools
 **Work style:** Specialized roles within stable teams, balance short/long-term service goals
+**Current mode:** Strategic - constant vigilance on communication/action to minimize institutional exposure
 
 ---
 
@@ -102,11 +116,11 @@ metadata: {}
 
 - `~/pds` - PDS project (vendor-agnostic data platform)
 - `~/duckdb-kb` - DuckDB-KB MCP project
-- `~/OTS/ods` - ODS/Cognos legacy code
+- `~/OTS/ods` - Banner ODS/Cognos legacy code
 
 ---
 
-**Budget Status:** ~2K/10K tokens
+**Budget Status:** ~4K/10K tokens
 **Offload Protocol:** At 10K cap, Arlo autonomously reviews topics by timestamp and creates KB entries
 
 ---
