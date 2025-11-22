@@ -21,29 +21,25 @@ No output - silently loaded.
 
 ## Load Recent Session Logs (Step 5.5)
 
-Load last 3 session logs for narrative continuity (newest to 3rd newest):
+Load last 3 comprehensive session logs for narrative continuity (newest to 3rd newest):
 
-**Query last 3 user logs:**
+**Query last 3 session logs:**
 ```python
 query_knowledge({
-    "sql": "SELECT id, title FROM knowledge WHERE category='log' AND list_has_any(tags, ['user-log', 'work', 'life']) AND id LIKE 'user-log-s%' ORDER BY updated DESC LIMIT 3"
+    "sql": "SELECT id, title FROM knowledge WHERE category='log' AND id LIKE 'arlo-log-s%-session' ORDER BY updated DESC LIMIT 3"
 })
 ```
 
-**Query last 3 arlo logs:**
-```python
-query_knowledge({
-    "sql": "SELECT id, title FROM knowledge WHERE category='log' AND list_has_any(tags, ['arlo-log']) ORDER BY updated DESC LIMIT 3"
-})
-```
-
-**Load all 6 logs:**
+**Load all 3 logs:**
 ```python
 # For each log ID returned above
-get_knowledge({"id": "user-log-s5"})
-get_knowledge({"id": "arlo-log-s5"})
+get_knowledge({"id": "arlo-log-s5-session"})
+get_knowledge({"id": "arlo-log-s4-session"})
+get_knowledge({"id": "arlo-log-s3-session"})
 # etc.
 ```
+
+**Session log structure:** Single comprehensive log per session containing both user and entity perspectives, topics discussed, key exchanges, realizations, web research, and next session planning.
 
 **No output** - available for session context, provides narrative continuity.
 

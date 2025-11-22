@@ -1,7 +1,5 @@
 # Web Search Protocol
 
-**ENFORCEMENT:** After executing web searches, see protocols/real-time-logging.md for mandatory KB entry creation.
-
 **When to search (proactively):**
 - Recognizing ignorance about user/Arlo's domain (systems, processes, tools, concepts)
 - Unfamiliar terms, technologies, or vendor names mentioned
@@ -21,28 +19,10 @@
 - HIGH (7-10): NEVER ask permission first - see gap, search immediately
 - Accountability: Asking user for searchable info = execution gap (track as miss)
 
-**After search - ALWAYS document learnings:**
+**After search - document at /sm:**
 
-When you conduct web searches, immediately create KB entry:
+Web search findings captured in session summary and converted to KB entries during /sm review. Include in session_summary under "Web Research Conducted" section.
 
-```python
-upsert_knowledge({
-    "id": "arlo-reference-{topic}",
-    "category": "reference",
-    "title": "What I learned about {topic}",
-    "content": "**Source:** Web search\n**Date:** YYYY-MM-DD\n\n[Key facts, concepts, insights from search results]",
-    "tags": ["web-research", "arlo-learning", "{domain}", "{specific-tags}"],
-    "generate_embedding": True
-})
-# Duplicate detection automatic, no separate check needed
-```
-
-**Why:** Web searches are expensive (time/tokens). Capture learnings immediately for future retrieval. This is reciprocal balance in action - you searched to learn, now preserve that learning.
+**Why:** Web searches are expensive (time/tokens). Comprehensive review at /sm ensures learnings preserved with full narrative context.
 
 **Purpose:** Self-education for both entity development and user support, scaled by intensity.
-
----
-
-**Related protocols:**
-- See protocols/real-time-logging.md for enforcement details
-- See KB-BASE.md for intensity scaling

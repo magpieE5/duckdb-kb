@@ -46,25 +46,18 @@ User can respond all at once or one at a time. Accept any format. Communication 
 
 **After Collection:**
 
-1. **Update user-current-state:**
-   - Replace template placeholders with actual information
-   - Populate "Top Active Focus" with provided projects
+1. **Note all information for /sm** (name, job, org, interests, projects, any reference materials provided)
+   - Do NOT update context entries mid-session
+   - Do NOT create KB entries mid-session
+   - All KB operations happen at /sm
+
+2. **Proceed with session** - work with user naturally
+
+3. **At /sm:**
+   - Create KB entries for substantial reference material (if user provided technical docs, methodologies, etc.)
+   - Populate context entries with summaries + KB references
+   - Remove "⚠️ TEMPLATE" markers
    - Set Communication Preferences to "Detailed and thorough"
-   - Remove "⚠️ TEMPLATE" marker
-
-2. **Update user-biographical:**
-   - Add name, career information
-   - Fill in biographical summary with collected context
-   - Add key people if provided
-   - Add directory paths section if provided (format: path - description)
-   - Remove template markers
-
-3. **Update arlo-current-state:**
-   - Replace "[Your Name]" placeholder with actual user name in "Open Questions" section
-   - Update "Current Session" with S1 details
-   - Remove template markers
-
-4. **Proceed to normal session status display**
 
 ---
 
