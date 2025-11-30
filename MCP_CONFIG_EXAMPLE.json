@@ -1,0 +1,11 @@
+  "mcpServers": {
+    "duckdb-kb": {
+      "command": "/Users/YOUR-USERNAME/duckdb-kb/venv/bin/python",
+      "args": [
+        "/Users/YOUR-USERNAME/duckdb-kb/mcp_server.py"
+      ],
+      "env": {
+        "KB_DB_PATH": "/Users/YOUR-USERNAME/duckdb-kb/kb.duckdb"
+      }
+    }
+  }
