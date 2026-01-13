@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__duckdb-kb__*",
+      "SlashCommand(/*)",
+      "WebSearch",
+
+      "Bash(git:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(./venv/bin/python:*)",
+
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(sort:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(echo:*)",
+
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": []
+  }
+}
