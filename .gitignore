@@ -1,0 +1,43 @@
+# Old DuckDB file (migrated to parquet)
+*.duckdb
+*.duckdb.wal
+
+# Parquet IS versioned (single source of truth)
+# kb.parquet - NOT ignored
+
+# Config
+MCP_CONFIG.json
+.claude/settings.local.json
+
+# Logs
+*.log
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.Python
+.env
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+tmp/
+temp/
+*.bak
+
+# Shared DuckDB-KB MCP repos
+markdown/dds/
+# ^ Shared DuckDB-KB MCP repos
