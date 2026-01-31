@@ -1,0 +1,4 @@
+mode,load_order,transcript_depth,log_depth
+auto,1,3,10
+IDR-3799 Eric Bever: COVERAGE_OPTION_DESC,2,0,0
+IDR-3802 REBRMRR,2,0,0

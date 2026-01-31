@@ -1,0 +1,7 @@
+mode,is_auto,id
+auto,TRUE,seed-auto-mode
+seed,TRUE,seed-arlo-foundations
+seed,TRUE,seed-duckdb-kb-mcp-architecture
+seed,TRUE,seed-pds-core-utils
+seed,TRUE,seed-pds-custom-utils
+seed,TRUE,seed-pds-personal-data
